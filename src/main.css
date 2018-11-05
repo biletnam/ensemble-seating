@@ -1,0 +1,211 @@
+html {
+    font-size: 16px;
+    color: #333;
+    font-family: sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#loading-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+#loading-cover[hidden] {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s ease, visibility 0s linear .2s;
+}
+
+#loading-message {
+    margin-top: 2em;
+}
+
+.offline-mode > #loading-cover {
+    display: none;
+}
+
+@media screen and (min-width: 800px) {
+    body {
+        overflow: hidden;
+    }
+    
+    #root {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        grid-template-rows: auto 1fr;
+        grid-template-areas: 'toolbar toolbar'
+                             'rendering-area sections-area';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+#sections-list {
+    grid-area: sections-area;
+    overflow: auto;
+    padding-bottom: 5em;
+    border-top: 1px solid #aaa
+}
+
+@media screen and (min-width: 800px) {
+    #sections-list {
+        border-top: none;
+        border-left: 1px solid #aaa;
+    }
+}
+
+.sections-list--empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1em;
+}
+
+.sections-list__section-container {
+    background-color: #fff;
+    margin: 1em 1em 0 1em;
+}
+
+.mdc-drawer__content {
+    padding-bottom: 5em;
+}
+
+.mdc-list-item {
+    cursor: pointer;
+    user-select: none;
+}
+
+#rendering-area {
+    grid-area: rendering-area;
+    padding: 2em;
+    min-height: 320px;
+    box-sizing: border-box;
+    text-align: center;
+    overflow: auto;
+    display: flex;
+}
+
+.ensemble-row {
+    white-space: nowrap;
+    position: relative;
+}
+
+.seat {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 2em;
+    height: 2em;
+    border: 1px solid #aaa;
+    vertical-align: top;
+    cursor: default;
+    user-select: none;
+    white-space: normal;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+.seat--implicit {
+    border-style: dashed;
+}
+
+.seat--implicit:not(.seat--occupied) {
+    opacity: .5;
+}
+
+.seat__click-surface {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.rendering-area__stage {
+    margin: auto;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.rendering-area__stage--curved-layout {
+    position: relative;
+    align-items: flex-end;
+    flex-direction: row;
+}
+
+.rendering-area__stage--curved-layout.rendering-area__stage--downstage-top {
+    align-items: flex-start;
+}
+
+.rendering-area__stage--curved-layout .seat {
+    position: absolute;
+    /* Move seat over by 1/2 its size to correct for CSS positioning (coords were computed as points on a circle) */
+    margin-left: -1em;
+}
+
+#rendering-toolbar {
+    grid-area: toolbar;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+
+.sections-list__section-control-container {
+    padding: 0 .5em;
+}
+
+.sections-list__new-section-button {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 1em 2em;
+}
+
+.color-square {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+}
+
+.text-input-wrapper:not(:first-child) {
+    margin-top: 1em;
+}
+
+button > .material-icons {
+    pointer-events: none;
+}
+
+@media print {
+    #rendering-toolbar, #sections-list, .mdc-drawer, .mdc-drawer-scrim {
+        display: none !important;
+    }
+
+    #rendering-area {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;
+    }
+}

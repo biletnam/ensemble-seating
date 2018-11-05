@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#4db6ac">
+        <link rel="shortcut icon" href="/static/img/favicon.ico?v=1">
+        
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+        <link rel="manifest" href="/static/manifest.json">
+        <link rel="mask-icon" href="/static/img/safari-pinned-tab.svg" color="#5bbad5">
+        <link rel="shortcut icon" href="/static/img/favicon.ico">
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png">
+        <meta name="msapplication-config" content="/static/browserconfig.xml">
+        <meta name="theme-color" content="#ffffff">
+        <meta property="og:title" content="Ensemble Seating">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://seatingch.art">
+        <meta property="og:description" content="Generate seating charts for musical ensembles">
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128171429-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            
+            gtag('config', 'UA-128171429-1');
+        </script>
+
+    </head>
+    <body>
+        <script>
+            'use strict';
+            try {
+                var params = new URLSearchParams(location.search);
+                if (params.get('offline')) {
+                    document.body.classList.add('offline-mode');
+                    params.delete('offline');
+                    var paramsString = params.toString();
+                    window.history.replaceState(null, '', paramsString.length > 0 ? '/?' + paramsString : '/');
+                }
+            }
+            catch (exception) {
+                // Couldn't use URLSearchParams. PWA probably isn't supported either, so load normally.
+            }
+        </script>
+        <main id="root"></main>
+        <div id="loading-cover">
+            <svg width="256" height="256" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                <title>Ensemble Seating logo</title>
+                <g>
+                    <g>
+                        <path d="M295.21,470.4c-0.12-7.46,1.45-14.86,4.61-21.62c3.14-6.63,7.6-12.54,13.12-17.37c5.56-5.11,12.06-9.09,19.14-11.7
+                            c7.22-2.88,14.92-4.32,22.69-4.25c5.74-0.08,11.47,0.63,17.02,2.13V304.86H216.51v141.79c0.15,8.43-1.17,16.83-3.9,24.81
+                            c-2.58,7.56-6.41,14.63-11.34,20.91c-4.86,5.76-10.75,10.57-17.37,14.18c-6.89,3.59-14.56,5.41-22.33,5.32
+                            c-11.59,0.88-23.02-3.1-31.55-10.99c-7.66-7.81-11.66-18.5-10.99-29.42c-0.14-14.98,6.35-29.25,17.72-38.99
+                            c5.48-5.03,11.85-9,18.79-11.7c7.35-2.84,15.16-4.29,23.04-4.25c5.62-0.06,11.23,0.66,16.66,2.13V207.73h197.8v237.86
+                            c-0.03,8.42-1.34,16.79-3.9,24.81c-2.7,7.5-6.53,14.56-11.34,20.91c-4.92,5.85-10.94,10.66-17.72,14.18
+                            c-6.89,3.59-14.56,5.41-22.33,5.32c-11.58,0.84-22.99-3.14-31.55-10.99C298.53,492.02,294.54,481.32,295.21,470.4z M216.51,273.31
+                            h155.27v-35.45H216.51V273.31z"/>
+                    </g>
+                    <rect x="371.78" width="21.27" height="207.73"/>
+                </g>
+            </svg>
+            <p id="loading-message">Ensemble Seating is loading&hellip;</p>
+            <noscript>
+                <p>Please enable JavaScript in order to use Ensemble Seating.</p>
+            </noscript>
+        </div>
+    </body>
+</html>
