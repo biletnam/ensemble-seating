@@ -191,7 +191,7 @@ body {
     margin-top: 1em;
 }
 
-button > .material-icons {
+button > svg {
     pointer-events: none;
 }
 
