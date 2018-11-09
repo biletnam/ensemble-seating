@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#4db6ac">
+        <title><%= htmlWebpackPlugin.options.title %></title>
         <link rel="shortcut icon" href="/static/img/favicon.ico?v=1">
         
         <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
@@ -16,10 +17,10 @@
         <meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png">
         <meta name="msapplication-config" content="/static/browserconfig.xml">
         <meta name="theme-color" content="#ffffff">
-        <meta property="og:title" content="Ensemble Seating">
+        <meta property="og:title" content="<%= htmlWebpackPlugin.options.title %>">
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://seatingch.art">
-        <meta property="og:description" content="Generate seating charts for musical ensembles">
+        <meta property="og:url" content="<%= htmlWebpackPlugin.options.homepage %>">
+        <meta property="og:description" content="<%= htmlWebpackPlugin.options.description %>">
 
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128171429-1"></script>
@@ -52,7 +53,7 @@
         <div id="loading-cover">
             <svg width="256" height="256" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-                <title>Ensemble Seating logo</title>
+                <title><%= htmlWebpackPlugin.options.title %> logo</title>
                 <g>
                     <g>
                         <path d="M295.21,470.4c-0.12-7.46,1.45-14.86,4.61-21.62c3.14-6.63,7.6-12.54,13.12-17.37c5.56-5.11,12.06-9.09,19.14-11.7
@@ -67,9 +68,9 @@
                     <rect x="371.78" width="21.27" height="207.73"/>
                 </g>
             </svg>
-            <p id="loading-message">Ensemble Seating is loading&hellip;</p>
+            <p id="loading-message"><%= htmlWebpackPlugin.options.title %> is loading&hellip;</p>
             <noscript>
-                <p>Please enable JavaScript in order to use Ensemble Seating.</p>
+                <p>Please enable JavaScript in order to use <%= htmlWebpackPlugin.options.title %>.</p>
             </noscript>
         </div>
     </body>

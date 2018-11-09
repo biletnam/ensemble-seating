@@ -9,9 +9,11 @@ const {GenerateSW} = require('workbox-webpack-plugin');
 
 const packageJsonInfo = require(__dirname + '/package.json');
 const APP_INFO = {
-    VERSION: JSON.stringify(packageJsonInfo.version),
-    NAME: JSON.stringify(packageJsonInfo.appName),
-    CODENAME: JSON.stringify(packageJsonInfo.appCodename)
+    VERSION: packageJsonInfo.version,
+    NAME: packageJsonInfo.appName,
+    CODENAME: packageJsonInfo.appCodename,
+    DESCRIPTION: packageJsonInfo.description,
+    HOMEPAGE: packageJsonInfo.homepage
 }
 
 module.exports = {
@@ -44,6 +46,8 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: __dirname + '/src/index.html',
             title: APP_INFO.NAME,
+            description: APP_INFO.DESCRIPTION,
+            homepage: APP_INFO.HOMEPAGE,
             inject: 'head',
             meta: {
                 viewport: 'width=device-width'
