@@ -12,7 +12,7 @@ const BODY_CONTENT = <div>
     </Typography>
     
     <Typography tag='p' use='body1'>Ensemble Seating helps you create a seating chart for your musical ensembles, section by section.</Typography>
-    <Typography tag='p' use='body1'>This project is open source. <a target='_blank' href='https://github.com/acmertz/ensemble-seating'>View the source on GitHub</a></Typography>
+    <Typography tag='p' use='body1'>This project is open source. <a target='_blank' href='https://github.com/acmertz/ensemble-seating' rel='noopener'>View the source on GitHub</a></Typography>
 </div>;
 
 const AboutDialog = props => (
