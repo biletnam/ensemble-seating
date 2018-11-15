@@ -16,7 +16,8 @@ module.exports = merge(common, {
     devtool: 'source-map',
     externals: {
         "react": "React",
-        "react-dom": "ReactDOM"
+        "react-dom": "ReactDOM",
+        "react-beautiful-dnd": 'ReactBeautifulDnd'
     },
     plugins: [
         new HtmlWebpackIncludeAssetsPlugin({
@@ -27,6 +28,10 @@ module.exports = merge(common, {
                 },
                 {
                     path: 'https://unpkg.com/react-dom@16.6.3/umd/react-dom.production.min.js',
+                    attributes: externalAttributes
+                },
+                {
+                    path: 'https://unpkg.com/react-beautiful-dnd@10.0.1/dist/react-beautiful-dnd.min.js',
                     attributes: externalAttributes
                 }
             ],
