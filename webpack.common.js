@@ -65,7 +65,10 @@ module.exports = {
                 from: './static/**/*'
             }
         ]),
-        new GenerateSW()
+        new GenerateSW({
+            navigateFallback: '/',
+            offlineGoogleAnalytics: true
+        })
     ],
     module: {
         rules: [
