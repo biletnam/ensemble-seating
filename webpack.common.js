@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
 const {GenerateSW} = require('workbox-webpack-plugin');
 
 const packageJsonInfo = require(__dirname + '/package.json');
@@ -50,19 +51,41 @@ module.exports = {
             homepage: JSON.parse(APP_INFO.HOMEPAGE),
             inject: 'head',
             meta: {
-                viewport: 'width=device-width'
+                viewport: 'width=device-width, initial-scale=1'
             }
         }),
         new ScriptExtHtmlWebpackPlugin({
             defaultAttribute: 'defer'
+        }),
+        new WebpackPwaManifest({
+            name: JSON.parse(APP_INFO.NAME),
+            short_name: 'Seating',
+            description: JSON.parse(APP_INFO.DESCRIPTION),
+            background_color: '#4db6ac',
+            theme_color: '#4db6ac',
+            start_url: '/?source=pwa',
+            display: 'standalone',
+            orientation: 'any',
+            ios: true,
+            icons: [
+                {
+                    src: path.resolve('src/static/logo_512.png'),
+                    sizes: [192, 512]
+                },
+                {
+                    src: path.resolve('src/static/apple-touch-icon.png'),
+                    size: 180,
+                    ios: true
+                }
+            ]
         }),
         new webpack.DefinePlugin({
             APP_INFO: APP_INFO
         }),
         new CopyWebpackPlugin([
             {
-                context: './src/',
-                from: './static/**/*'
+                context: './src/static/',
+                from: './favicon*.{ico,png}'
             }
         ]),
         new GenerateSW({
