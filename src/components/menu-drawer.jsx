@@ -128,50 +128,51 @@ class MenuDrawer extends Component {
     }
 
     render() {
-        return <Drawer modal open={this.props.drawerOpen} onClose={() => this.props.onClose()}>
-        <DrawerHeader>
-            <DrawerTitle>{APP_INFO.NAME}</DrawerTitle>
-            <DrawerSubtitle>{this.props.projectName}</DrawerSubtitle>
-        </DrawerHeader>
-        <DrawerContent>
-            <List>
-                <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
-                <ListItem data-name='rename-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<EditIcon />} />Rename this project&hellip;</ListItem>
-                <ListItem data-name='delete-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<DeleteForeverIcon />} />Delete this project&hellip;</ListItem>
+        return <React.Fragment>
+            <Drawer modal open={this.props.drawerOpen} onClose={() => this.props.onClose()}>
+            <DrawerHeader>
+                <DrawerTitle>{APP_INFO.NAME}</DrawerTitle>
+                <DrawerSubtitle>{this.props.projectName}</DrawerSubtitle>
+            </DrawerHeader>
+            <DrawerContent>
+                <List>
+                    <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
+                    <ListItem data-name='rename-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<EditIcon />} />Rename this project&hellip;</ListItem>
+                    <ListItem data-name='delete-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<DeleteForeverIcon />} />Delete this project&hellip;</ListItem>
 
-                <ListDivider />
+                    <ListDivider />
 
-                <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart</ListItem>
-                <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open recent</ListItem>
-                <ListItem data-name='import' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Import</ListItem>
-                <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export</ListItem>
+                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart</ListItem>
+                    <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open recent</ListItem>
+                    <ListItem data-name='import' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Import</ListItem>
+                    <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export</ListItem>
 
-                <ListDivider />
+                    <ListDivider />
 
-                <ListItem data-name='about' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<InfoIcon />} />About</ListItem>
-                
-                <RenameDialog open={this.state.renameDialogVisible} onCancel={() => this.setState({renameDialogVisible: false})}
-                    onAccept={this.handleAcceptRename}
-                    title='Rename project'
-                    label='Project name'
-                    value={this.props.projectName} />
+                    <ListItem data-name='about' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<InfoIcon />} />About</ListItem>
+                </List>
+            </DrawerContent>
+            <DrawerHeader>
+                <DrawerSubtitle>v{APP_INFO.VERSION}</DrawerSubtitle>
+                <DrawerSubtitle>"{APP_INFO.CODENAME}"</DrawerSubtitle>
+            </DrawerHeader>
+        </Drawer>
+        <RenameDialog open={this.state.renameDialogVisible} onCancel={() => this.setState({renameDialogVisible: false})}
+            onAccept={this.handleAcceptRename}
+            title='Rename project'
+            label='Project name'
+            value={this.props.projectName} />
 
-                <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={() => this.setState({deleteProjectDialogVisible: false})}
-                    onAccept={this.handleAcceptDeleteProject}
-                    title={`Delete "${this.props.projectName}?"`} />
+        <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={() => this.setState({deleteProjectDialogVisible: false})}
+            onAccept={this.handleAcceptDeleteProject}
+            title={`Delete "${this.props.projectName}?"`} />
 
-                <RecentProjectsDialog open={this.state.recentProjectsDialogVisible} 
-                    onClose={() => this.setState({recentProjectsDialogVisible: false})}
-                    onRequestOpenProject={this.handleRequestOpenProject} />
+        <RecentProjectsDialog open={this.state.recentProjectsDialogVisible} 
+            onClose={() => this.setState({recentProjectsDialogVisible: false})}
+            onRequestOpenProject={this.handleRequestOpenProject} />
 
-                <AboutDialog open={this.state.aboutDialogVisible} onClose={() => this.setState({aboutDialogVisible: false})} />
-            </List>
-        </DrawerContent>
-        <DrawerHeader>
-            <DrawerSubtitle>v{APP_INFO.VERSION}</DrawerSubtitle>
-            <DrawerSubtitle>"{APP_INFO.CODENAME}"</DrawerSubtitle>
-        </DrawerHeader>
-    </Drawer>
+        <AboutDialog open={this.state.aboutDialogVisible} onClose={() => this.setState({aboutDialogVisible: false})} />
+    </React.Fragment>
     }
 }
 
