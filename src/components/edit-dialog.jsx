@@ -1,29 +1,14 @@
 import React, {Component} from 'react';
 
 import {SimpleDialog} from '@rmwc/dialog';
-import {Typography} from '@rmwc/typography';
-
 import '@material/dialog/dist/mdc.dialog.css';
-import '@material/typography/dist/mdc.typography.css';
-
-import SectionEditor from './edit-section.jsx';
-import MemberEditor from './edit-member.jsx';
-import {cloneSection, clonePerson} from '../helpers/project-helpers.js';
 
 class EditDialog extends Component {
     constructor(props) {
         super(props);
 
-        this.CurrentEditor = props.editorType === 'section' ? SectionEditor : MemberEditor;
-        this.state = null;
-        if (props.data) {
-            if (props.editorType === 'section') {
-                this.state = cloneSection(props.data);
-            }
-            else {
-                this.state = clonePerson(props.data);
-            }
-        }
+        this.CurrentEditor = props.editor;
+        this.state = props.data ? props.cloneFn(props.data) : null;
 
         this.handleClose = this.handleClose.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
@@ -41,11 +26,7 @@ class EditDialog extends Component {
             needsUpdate = true;
 
         if (needsUpdate) {
-            let newData = null;
-            if (this.props.data) {
-                newData = this.props.editorType === 'section' ? cloneSection(this.props.data) : clonePerson(this.props.data);
-            }
-            this.setState(newData);
+            this.setState(this.props.data ? this.props.cloneFn(this.props.data) : null);
         }
     }
 
@@ -67,12 +48,11 @@ class EditDialog extends Component {
     }
 
     render() {
-        let currentEditor
         return <SimpleDialog open={this.props.open}
             title={this.props.title}
             onClose={this.handleClose}
-            body={this.state ? <this.CurrentEditor data={this.state} onRequestEdit={this.handleEdit} /> : null}
-            />
+            body={<this.CurrentEditor data={this.state} onRequestEdit={this.handleEdit} />}
+        />
     }
 }
 

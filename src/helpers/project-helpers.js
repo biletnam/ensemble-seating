@@ -109,14 +109,13 @@ export function listProjects() {
 /* Create types */
 export function createEmptyProject () {
     return {
+        regions: [createRegion()],
         sections: new Array(),
         members: new Array(),
         settings: {
             seatNameLabels: 'initials',
             downstageTop: false,
-            implicitSeatsVisible: false,
-            zoom: 1.0,
-            curvedLayout: true
+            implicitSeatsVisible: false
         },
         appVersion: APP_INFO.VERSION
     };
@@ -130,11 +129,20 @@ export function createSectionRow () {
     }
 }
 
-export function createSection (name = 'Untitled') {
+export function createRegion (name = 'Untitled region') {
+    return {
+        name,
+        id: uuid(),
+        curvedLayout: true
+    }
+}
+
+export function createSection (name = 'Untitled', regionId = null) {
     return {
         name,
         color: randomColor({luminosity: 'light'}),
         id: uuid(),
+        region: regionId,
         rowSettings: [
             {
                 min: 2,
@@ -162,6 +170,10 @@ export function createPerson (name = 'New person', sectionId = null) {
 
 /* Clone types */
 
+export function cloneRegion (region) {
+    return Object.assign({}, region);
+}
+
 export function cloneSection (section) {
     const newSection = Object.assign({}, section);
     newSection.rowSettings = section.rowSettings.map(current => {
@@ -177,6 +189,8 @@ export function clonePerson (person) {
 export function validateProject(project) {
     let valid = true;
 
+    if (!Array.isArray(project.regions))
+        valid = false;
     if (!Array.isArray(project.sections))
         valid = false;
     if (!Array.isArray(project.members))

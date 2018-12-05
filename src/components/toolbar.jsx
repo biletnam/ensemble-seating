@@ -9,6 +9,7 @@ import '@material/notched-outline/dist/mdc.notched-outline.css';
 import '@material/line-ripple/dist/mdc.line-ripple.css';
 
 import MenuIcon from '../icons/baseline-menu-24px.jsx';
+import HorizontalSplitIcon from '../icons/baseline-horizontal_split-24px.jsx';
 import RotateIcon from '../icons/baseline-rotate_90_degrees_ccw-24px.jsx';
 import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
 
@@ -25,6 +26,12 @@ const MainToolbar = props => (
             </ToolbarSection>
 
             <ToolbarSection alignEnd>
+                <ToolbarIcon tag='button'
+                    name='region'
+                    title='Create new region'
+                    icon={<HorizontalSplitIcon />}
+                    onClick={props.onToolbarButtonClick} />
+
                 <ToolbarIcon tag='button'
                     name='sort'
                     title={props.downstageTop ? 'Downstage top' : 'Downstage bottom'}

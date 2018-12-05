@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Region from './region.jsx';
 import Seat from './seat.jsx';
 
 import {Typography} from '@rmwc/typography';
@@ -27,93 +28,32 @@ class SeatingRenderer extends Component {
     }
 
     render() {
-        if (this.props.project.sections.length === 0) {
-            return <div id={this.props.id}>
-                <div className='rendering-area__stage'>
-                    <Typography tag='p' use='headline6'>No seats to display</Typography>
-                    <div>
-                        <Button raised onClick={this.props.onRequestNewSection}>Create a section</Button>
-                    </div>
-                </div>
-            
-            </div>
-        }
-        else {
-                // Generate a seating grid
-                const rows = generateRows(this.props.project.sections);
+        const regionsToRender = [];
 
-                // Build a dictionary of section colors
-                const membersBySection = {};
-                const colorsBySection = {};
-                for (let i=0; i<this.props.project.sections.length; i++) {
-                    const currentSection = this.props.project.sections[i];
-                    membersBySection[currentSection.id] = this.props.project.members.filter(currentMember => currentMember.section == currentSection.id);
-                    colorsBySection[currentSection.id] = currentSection.color;
-                }
-    
-                // Seat members and collapse empty, implicit seats
-                const seatedRows = seatMembers(membersBySection, rows);
-    
-                // Curve rows if necessary, and set container dimensions for scrolling
-                let layoutWidth, layoutHeight;
-                if (this.props.project.settings.curvedLayout) {
-                    curveRows(seatedRows);
-                    [layoutWidth, layoutHeight] = getLayoutDimensions(seatedRows);
-                    console.log(`Dimenxions: ${layoutWidth} x ${layoutHeight}`);
-                }
-                    
-    
-                // Transform the rows so they render in the correct order for the current orientation on screen
-                if (this.props.project.settings.downstageTop) {
-                    for (const currentRow of seatedRows) {
-                        currentRow.reverse();
-    
-                        for (const currentSeat of currentRow) {
-                            currentSeat.y *= -1;
-                        }
-                    }
-                }
-                else {
-                    // Reverse row order
-                    seatedRows.reverse();
-                    for (const currentRow of seatedRows) {
-                        for (const currentSeat of currentRow) {
-                            currentSeat.x *= -1;
-                        }
-                    }
-                }
-    
-                let stageClass = 'rendering-area__stage';
-                if (this.props.project.settings.curvedLayout)
-                    stageClass += ' rendering-area__stage--curved-layout';
-                if (this.props.project.settings.downstageTop)
-                    stageClass += ' rendering-area__stage--downstage-top';
-    
-                return <div id={this.props.id}>
-                    <div className={stageClass} style={{width: `${layoutWidth}px`, height: `${layoutHeight}px`}}>
-                        { 
-                            seatedRows.map((currentRow, rowIndex) => <div key={rowIndex} className='ensemble-row'>
-                                {currentRow.map((currentSeat, seatIndex) => {
-                                    const member = membersBySection[currentSeat.section][currentSeat.seat];
-                                    return <Seat key={currentSeat.id}
-                                        member={member}
-                                        implicit={currentSeat.implicit}
-                                        implicitSeatsVisible={this.props.project.settings.implicitSeatsVisible}
-                                        seatNameLabels={this.props.project.settings.seatNameLabels}
-                                        seatNumber={currentSeat.seat + 1}
-                                        color={colorsBySection[currentSeat.section]}
-                                        selected={member && this.props.editorId === member.id}
-                                        x={currentSeat.x}
-                                        y={currentSeat.y}
-                                        onRequestSelectMember={this.handleMemberSelected} />
-                                })}
-                            </div>)
-                        }
-                    </div>
-                    
-                </div>
-            }
+        for (let i=0; i< this.props.project.regions.length; i++) {
+            const currentRegion =  this.props.project.regions[i];
+            const currentSections = this.props.project.sections.filter(section => section.region === currentRegion.id);
+            const currentMembers = this.props.project.members.filter(member => currentSections.some(section => member.section === section.id));
+
+            regionsToRender.push(
+                <Region key={currentRegion.id}
+                    sections={currentSections} 
+                    members={currentMembers}
+                    curvedLayout={currentRegion.curvedLayout}
+                    downstageTop={this.props.project.settings.downstageTop}
+                    editorId={this.props.editorId}
+                    implicitSeatsVisible={this.props.implicitSeatsVisible}
+                    seatNameLabels={this.props.seatNameLabels}
+                    onRequestSelectMember={this.props.onRequestSelectMember}
+                    onRequestNewSection={this.props.onRequestNewSection} />
+            );
         }
+
+        if (this.props.project.settings.downstageTop)
+            regionsToRender.reverse();
+
+        return <div id={this.props.id}>{regionsToRender}</div>;
+    }
 }
 
 export default SeatingRenderer;

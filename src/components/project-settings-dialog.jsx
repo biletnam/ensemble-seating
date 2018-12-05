@@ -23,7 +23,7 @@ class ProjectSettingsDialog extends Component {
     onChange(event) {
         if (typeof this.props.onChange === 'function') {
             const newSetting = {};
-            if (event.target.name === 'curvedLayout' || event.target.name === 'implicitSeatsVisible') {
+            if (event.target.name === 'implicitSeatsVisible') {
                 // Toggle
                 newSetting[event.target.name] = event.target.checked;
             }
@@ -55,12 +55,6 @@ class ProjectSettingsDialog extends Component {
                             }
                         ]}
                         name='seatNameLabels' />
-                </div>
-                
-                <div className='text-input-wrapper'>
-                    <Switch checked={this.props.curvedLayout}
-                        onChange={this.onChange}
-                        name='curvedLayout'>Curved layout</Switch>
                 </div>
                 
                 <div className='text-input-wrapper'>

@@ -99,6 +99,7 @@ body {
     text-align: center;
     overflow: auto;
     display: flex;
+    flex-direction: column;
 }
 
 .ensemble-row {
@@ -160,6 +161,10 @@ body {
     position: absolute;
     /* Move seat over by 1/2 its size to correct for CSS positioning (coords were computed as points on a circle) */
     margin-left: -1em;
+}
+
+.rendering-area__stage:not(.rendering-area__stage--curved-layout) .seat:not(:first-child) {
+    margin-left: 1em;
 }
 
 #rendering-toolbar {

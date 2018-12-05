@@ -32,13 +32,15 @@ class MemberEditor extends Component {
 
     render() {
         return <div>
-            <div>
-                <TextField label='Name' name='name' value={this.props.data.name} onChange={this.handleChange} />
-            </div>
-            <br />
-            <div>
-                <TextField textarea label='Notes' name='notes' value={this.props.data.notes} onChange={this.handleChange} />
-            </div>
+            {this.props.data && <React.Fragment>
+                <div>
+                    <TextField label='Name' name='name' value={this.props.data.name} onChange={this.handleChange} />
+                </div>
+                <br />
+                <div>
+                    <TextField textarea label='Notes' name='notes' value={this.props.data.notes} onChange={this.handleChange} />
+                </div>
+            </React.Fragment>}
         </div>
     }
 }

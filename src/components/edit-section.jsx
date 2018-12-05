@@ -107,23 +107,26 @@ class SectionEditor extends Component {
 
     render() {
         return <div>
-            <div><TextField label='Name' name='name' data-setting-type='name' value={this.props.data.name} onChange={this.handleChange} /></div>
-
-            <div>
-                <Typography use='headline6' tag='h2'>Color</Typography>
-                <TwitterPicker color={this.props.data.color} onChange={this.handleColorChange} />
-            </div>
-
-            <div>
-                <Typography use='headline6' tag='h2'>Performers per row</Typography>
-                <Typography use='body1' tag='h3'>Pick how many performers may be seated within each row of this section.</Typography>
+            {this.props.data && <React.Fragment>
+                <div><TextField label='Name' name='name' data-setting-type='name' value={this.props.data.name} onChange={this.handleChange} /></div>
+                
+                <div>
+                    <Typography use='headline6' tag='h2'>Color</Typography>
+                    <TwitterPicker color={this.props.data.color} onChange={this.handleColorChange} />
+                </div>
+                
+                <div>
+                    <Typography use='headline6' tag='h2'>Performers per row</Typography>
+                    <Typography use='body1' tag='h3'>Pick how many performers may be seated within each row of this section.</Typography>
                 {this.props.data.rowSettings.map((current, index) => <div key={index + '-rowSettings'} className='text-input-wrapper'>
                     <TextField label={`Row ${index + 1}`} data-row={index} data-setting-type='rowSettings' name='min' value={current.min} onChange={this.handleChange} onBlur={this.handleRowBlur} />
                     <IconButton icon={<ClearIcon />} label='Remove row' onClick={this.handleClickedRemoveRow} data-row={index} />
                 </div>)}
                 <br />
-                <Button onClick={this.handleClickedAddRow}>Add row</Button>
-            </div>
+                    <Button onClick={this.handleClickedAddRow}>Add row</Button>
+                </div>
+            </React.Fragment>}
+            
         </div>
     }
 }
