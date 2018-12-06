@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
 
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { Fab } from '@rmwc/fab';
-import { Typography } from '@rmwc/typography';
 
-import '@material/fab/dist/mdc.fab.css';
+import { Typography } from '@rmwc/typography';
 import '@material/typography/dist/mdc.typography.css';
 
 import RegionListItem from './region-list-item.jsx';
-import AddIcon from '../icons/baseline-add-24px.jsx';
 
 function sectionsByRegion(regions, sections) {
     return regions.map(currentRegion => {
@@ -27,6 +24,9 @@ const SectionsList = props => {
                 region={currentRegion}
                 sections={props.sections.filter(currentSection => currentSection.region === currentRegion.id)}
                 members={props.members}
+                showRegionName={props.regions.length > 1}
+                forceNewSectionButton={props.regions.length > 1}
+                onRequestNewSection={props.onRequestNewSection}
                 onRequestNewPerson={props.onRequestNewPerson}
                 onRequestBatchAdd={props.onRequestBatchAdd}
 
@@ -40,9 +40,6 @@ const SectionsList = props => {
                 onRequestSelectMember={props.onRequestSelectMember} />
             )}
         </DragDropContext>
-        <Fab icon={<AddIcon />} label='New section' className='sections-list__new-section-button'
-            onClick={props.onNewSectionButtonClick}
-            exited={props.sections.length === 0} />
     </aside>
 };
 

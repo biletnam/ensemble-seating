@@ -19,12 +19,13 @@ class Region extends Component {
     constructor(props) {
         super(props);
 
+        this.handleClickedNewSectionButton = this.handleClickedNewSectionButton.bind(this);
         this.handleMemberSelected = this.handleMemberSelected.bind(this);
     }
 
     handleClickedNewSectionButton() {
         if (typeof this.props.onRequestNewSection === 'function')
-            this.props.onRequestNewSection(this.props.id);
+            this.props.onRequestNewSection(this.props.region.id);
     }
 
     handleMemberSelected(memberId) {
@@ -37,7 +38,7 @@ class Region extends Component {
             return <div className='rendering-area__stage'>
                     <Typography tag='p' use='headline6'>No seats to display</Typography>
                     <div>
-                        <Button raised onClick={this.props.onRequestNewSection}>Create a section</Button>
+                        <Button raised onClick={this.handleClickedNewSectionButton}>Create a section</Button>
                     </div>
                 </div>
         }

@@ -226,7 +226,7 @@ class App extends Component {
     createNewRegion() {
         const newRegions = this.state.project.regions.slice();
         
-        newRegions.push(createRegion());
+        newRegions.unshift(createRegion());
 
         this.setState(Object.assign({}, {
             project: Object.assign({}, this.state.project, {regions: newRegions})
@@ -273,7 +273,7 @@ class App extends Component {
         this.setState(newState, saveProject ? this.saveSession : () => {});
     }
 
-    handleClickedNewSectionButton(regionId = null) {
+    handleClickedNewSectionButton(regionId) {
         const newSections = this.state.project.sections.slice();
         const newRegions = this.state.project.regions.slice();
 
@@ -284,8 +284,8 @@ class App extends Component {
             newSections[newSections.length - 1].region = newRegions[newRegions.length - 1].id;
         }
         else {
-            // Assign the section to the first region
-            newSections[newSections.length - 1].region = newRegions[0].id;
+            // Assign the section to the given region; otherwise, assign it to the first region
+            newSections[newSections.length - 1].region = regionId || newRegions[0].id;
         }
 
         this.setState(Object.assign({}, {
@@ -565,7 +565,7 @@ class App extends Component {
                 sections={this.state.project.sections}
                 members={this.state.project.members}
                 regions={this.state.project.regions}
-                onNewSectionButtonClick={this.handleClickedNewSectionButton}
+                onRequestNewSection={this.handleClickedNewSectionButton}
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}
                 onRequestBatchAdd={this.handleRequestedBatchAddMembers}

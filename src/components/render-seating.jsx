@@ -39,6 +39,7 @@ class SeatingRenderer extends Component {
                 <Region key={currentRegion.id}
                     sections={currentSections} 
                     members={currentMembers}
+                    region={currentRegion}
                     curvedLayout={currentRegion.curvedLayout}
                     downstageTop={this.props.project.settings.downstageTop}
                     editorId={this.props.editorId}
