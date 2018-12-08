@@ -25,7 +25,7 @@ const SectionsList = props => {
                 sections={props.sections.filter(currentSection => currentSection.region === currentRegion.id)}
                 members={props.members}
                 showRegionName={props.regions.length > 1}
-                forceNewSectionButton={props.regions.length > 1}
+                forceNewSectionButton={props.sections.length > 0}
                 onRequestNewSection={props.onRequestNewSection}
                 onRequestNewPerson={props.onRequestNewPerson}
                 onRequestBatchAdd={props.onRequestBatchAdd}

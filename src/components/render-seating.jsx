@@ -43,8 +43,8 @@ class SeatingRenderer extends Component {
                     curvedLayout={currentRegion.curvedLayout}
                     downstageTop={this.props.project.settings.downstageTop}
                     editorId={this.props.editorId}
-                    implicitSeatsVisible={this.props.implicitSeatsVisible}
-                    seatNameLabels={this.props.seatNameLabels}
+                    implicitSeatsVisible={this.props.project.settings.implicitSeatsVisible}
+                    seatNameLabels={this.props.project.settings.seatNameLabels}
                     onRequestSelectMember={this.props.onRequestSelectMember}
                     onRequestNewSection={this.props.onRequestNewSection} />
             );
