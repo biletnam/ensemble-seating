@@ -30,6 +30,8 @@ const SectionsList = props => {
                 onRequestNewPerson={props.onRequestNewPerson}
                 onRequestBatchAdd={props.onRequestBatchAdd}
 
+                onRequestDeleteRegion={props.onRequestDeleteRegion}
+                onRequestMoveRegion={props.onRequestMoveRegion}
                 onRequestEditRegion={props.onRequestEditRegion}
                 onRequestEditSection={props.onRequestEditSection}
                 onRequestEditMember={props.onRequestEditMember}

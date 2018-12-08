@@ -37,6 +37,7 @@
     "@rmwc/fab": "^3.0.9",
     "@rmwc/icon-button": "^3.0.9",
     "@rmwc/list": "^3.0.9",
+    "@rmwc/menu": "^3.0.9",
     "@rmwc/radio": "^3.0.9",
     "@rmwc/ripple": "^3.0.9",
     "@rmwc/select": "^3.0.9",

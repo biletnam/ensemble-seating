@@ -8,6 +8,7 @@ import '@material/icon-button/dist/mdc.icon-button.css';
 import '@material/button/dist/mdc.button.css';
 import '@material/elevation/dist/mdc.elevation.css';
 
+import ListActionMenu from './list-action-menu.jsx';
 import SectionListItem from './section-list-item.jsx';
 import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
 import AddIcon from '../icons/baseline-add-24px.jsx';
@@ -19,7 +20,7 @@ class RegionListItem extends Component {
         super(props);
 
         this.handleClickedNewSection = this.handleClickedNewSection.bind(this);
-        this.handleClickedEditRegion = this.handleClickedEditRegion.bind(this);
+        this.handleActionMenuClick = this.handleActionMenuClick.bind(this);
     }
 
     handleClickedNewSection() {
@@ -27,8 +28,15 @@ class RegionListItem extends Component {
             this.props.onRequestNewSection(this.props.region.id);
     }
 
-    handleClickedEditRegion() {
-        this.props.onRequestEditRegion(this.props.region.id);
+    handleActionMenuClick(action) {
+        if (action === 'edit' && typeof this.props.onRequestEditRegion === 'function')
+            this.props.onRequestEditRegion(this.props.region.id);
+        else if (action === 'delete' && typeof this.props.onRequestDeleteRegion === 'function')
+            this.props.onRequestDeleteRegion(this.props.region.id);
+        else if (typeof this.props.onRequestMoveRegion === 'function') {
+            const splitAction = action.split('-');
+            this.props.onRequestMoveRegion(this.props.region.id, splitAction[splitAction.length - 1]);
+        }
     }
 
     render() {
@@ -38,7 +46,9 @@ class RegionListItem extends Component {
                     {/* Iterate over sections here */}
                     {this.props.showRegionName && <Elevation z='1' className='sections-list__region-heading-container'>
                         <span className='sections-list__region-heading-text'>{this.props.region.name}</span>
-                        <IconButton onClick={this.handleClickedEditRegion} icon={<MoreIcon />} label='Edit region' />
+                        <ListActionMenu handle={<IconButton icon={<MoreIcon />}
+                            label='Edit region' />}
+                            onSelectAction={this.handleActionMenuClick} />
                     </Elevation>}
                     {this.props.sections.map((currentSection, currentIndex) => {
                         return <SectionListItem key={currentSection.id}
