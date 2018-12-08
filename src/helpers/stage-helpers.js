@@ -1,3 +1,5 @@
+const seatSize = 32;
+
 export function sumRows(rows) {
     let sum = 0;
     for (let i=0; i<rows.length; i++) {
@@ -112,7 +114,6 @@ export function getPositionOnCurve (seatNum, rowLength) {
 }
 
 export function curveRows(rows) {
-    const seatSize = 32;
     if (Array.isArray(rows) && rows.length > 0) {
         const firstRowWidth = rows[0].length * (seatSize * .5);
 
@@ -216,5 +217,5 @@ export function getLayoutDimensions (rows) {
         }
     }
 
-    return [maxX - minX, maxY - minY];
+    return [(maxX - minX) + seatSize, (maxY - minY) + seatSize];
 }
