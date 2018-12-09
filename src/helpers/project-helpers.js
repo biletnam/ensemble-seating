@@ -1,12 +1,14 @@
 import {v4 as uuid} from 'uuid';
 import randomColor from 'randomcolor';
 import idb from 'idb';
+import semver from 'semver';
 
 const PROJECTS_KEY = 'projects';
 const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
 const DB_VER = 1;
 const APP_NAME = APP_INFO.NAME;
+const PROJECT_FORMAT_VER = '0.2.0';
 
 const currentDb = idb.open(DB_NAME, DB_VER, upgradeDB => {
     switch (upgradeDB.oldVersion) {
@@ -76,6 +78,28 @@ export function deleteProject(name) {
     });
 }
 
+export function projectNeedsUpgrade(project) {
+    return semver.lt(project.appVersion, PROJECT_FORMAT_VER);
+}
+
+export function upgradeProject(project) {
+    let finalProject = JSON.parse(JSON.stringify(project));
+
+    if (semver.lt(finalProject.appVersion, '0.2.0')) {
+        finalProject.appVersion = '0.2.0';
+        finalProject.regions = [createRegion()];
+        finalProject.regions[finalProject.regions.length - 1].curvedLayout = finalProject.settings.curvedLayout;
+        for (let i=0; i<finalProject.sections.length; i++) {
+            finalProject.sections[i].region = finalProject.regions[finalProject.regions.length -1].id;
+        }
+
+        delete finalProject.settings.curvedLayout;
+        delete finalProject.settings.zoom;
+    }
+
+    return finalProject;
+}
+
 /* Project info and stats */
 export function getUnusedProjectName(name = DEFAULT_NAME) {
     return listProjects().then(projects => {
@@ -117,7 +141,7 @@ export function createEmptyProject () {
             downstageTop: false,
             implicitSeatsVisible: false
         },
-        appVersion: APP_INFO.VERSION
+        appVersion: PROJECT_FORMAT_VER
     };
 }
 

@@ -20,6 +20,8 @@ import {
     saveProject,
     loadProject,
     deleteProject,
+    projectNeedsUpgrade,
+    upgradeProject,
     updateProjectQueryString,
     resetProjectQueryString,
     getUnusedProjectName,
@@ -128,6 +130,8 @@ class App extends Component {
                         projectName: this.state.initProject,
                         initProject: null
                     }
+                    if (projectNeedsUpgrade(project))
+                        newState.project = upgradeProject(project);
                     this.setState(newState, () => {
                         updateProjectQueryString(newState.projectName);
                         hideLoadingScreen();
@@ -523,6 +527,8 @@ class App extends Component {
             const newState = createFreshState();
             if (savedProject) {
                 newState.project = Object.assign({}, savedProject);
+                if (projectNeedsUpgrade(newState.project))
+                    newState.project = upgradeProject(newState.project);
             }
             newState.projectName = projectName;
             this.setState(newState, this.saveSession);
