@@ -19,6 +19,10 @@ class RegionListItem extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {
+            actionMenuOpen: false
+        };
+
         this.handleClickedNewSection = this.handleClickedNewSection.bind(this);
         this.handleActionMenuClick = this.handleActionMenuClick.bind(this);
     }
@@ -44,11 +48,16 @@ class RegionListItem extends Component {
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className='sections-list__droppable-section-area'>
                     {/* Iterate over sections here */}
-                    {this.props.showRegionName && <Elevation z='1' className='sections-list__region-heading-container'>
+                    {this.props.showRegionName && <Elevation z='1'
+                        style={{zIndex: this.state.actionMenuOpen ? '2' : ''}}
+                        className='sections-list__region-heading-container'>
                         <span className='sections-list__region-heading-text'>{this.props.region.name}</span>
-                        <ListActionMenu handle={<IconButton icon={<MoreIcon />}
-                            label='Edit region' />}
-                            onSelectAction={this.handleActionMenuClick} />
+                        <ListActionMenu
+                            onSelectAction={this.handleActionMenuClick}
+                            open={this.state.actionMenuOpen}
+                            onClose={() => this.setState({actionMenuOpen: false})}>
+                            <IconButton icon={<MoreIcon />} label='Edit region' onClick={() => this.setState({actionMenuOpen: !this.state.actionMenuOpen})} />
+                        </ListActionMenu>
                     </Elevation>}
                     {this.props.sections.map((currentSection, currentIndex) => {
                         return <SectionListItem key={currentSection.id}
