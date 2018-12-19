@@ -8,11 +8,14 @@ import { Typography } from '@rmwc/typography';
 import { TextField, TextFieldIcon, TextFieldHelperText } from '@rmwc/textfield';
 import { Button } from '@rmwc/button';
 import { IconButton } from '@rmwc/icon-button';
+import { Radio } from '@rmwc/radio';
 
 import '@material/typography/dist/mdc.typography.css';
 import '@material/textfield/dist/mdc.textfield.css';
 import '@material/button/dist/mdc.button.css';
 import '@material/icon-button/dist/mdc.icon-button.css';
+import '@material/radio/dist/mdc.radio.css';
+import '@material/form-field/dist/mdc.form-field.css';
 
 import ClearIcon from '../icons/baseline-clear-24px.jsx';
 
@@ -38,6 +41,16 @@ class SectionEditor extends Component {
             this.props.onRequestEdit(this.props.data.id, {color: newColor});
     }
 
+    updateSectionOffsetType(newType) {
+        if (this.props.onRequestEdit)
+            this.props.onRequestEdit(this.props.data.id, {offsetType: newType});
+    }
+
+    updateSectionOffsetValue(newValue) {
+        if (this.props.onRequestEdit)
+            this.props.onRequestEdit(this.props.data.id, {offsetValue: newValue});
+    }
+
     updateRowSetting(row, setting, value) {
         const saveData = {};
         saveData.rowSettings = this.props.data.rowSettings.slice();
@@ -52,7 +65,7 @@ class SectionEditor extends Component {
     }
 
     handleChange(event) {
-        const settingType = event.target.getAttribute('data-setting-type');
+        const settingType = event.target.dataset.settingType;
         if (settingType === 'name') {
             this.updateSectionName(event.target.value);
         }
@@ -62,9 +75,12 @@ class SectionEditor extends Component {
             this.updateRowSetting(rowIndex, event.target.name, event.target.value);
         }
 
-        else {
-            const rowIndex = parseInt(event.target.getAttribute('data-row'), 10);
-            this.updateRowSetting(settingType, rowIndex, event.target.value);
+        else if (settingType === 'offsetType') {
+            this.updateSectionOffsetType(event.target.value);
+        }
+
+        else if (settingType === 'offsetValue') {
+            this.updateSectionOffsetValue(event.target.value);
         }
     }
 
@@ -73,11 +89,16 @@ class SectionEditor extends Component {
     }
 
     handleRowBlur(event) {
-        // If it can be converted to an integer, do it
+        const settingType = event.target.dataset.settingType;
+
         const valueAsInt = parseInt(event.target.value, 10);
-        if (!isNaN(valueAsInt)) {
+        if (settingType === 'rowSettings') {
             const rowIndex = parseInt(event.target.getAttribute('data-row'), 10);
-            this.updateRowSetting(rowIndex, event.target.name, valueAsInt);
+            this.updateRowSetting(rowIndex, event.target.name, isNaN(valueAsInt) ? 0 : valueAsInt);
+        }
+
+        else if (settingType === 'offsetValue') {
+            this.updateSectionOffsetValue(isNaN(valueAsInt) ? 0 : valueAsInt);
         }
     }
 
@@ -96,19 +117,24 @@ class SectionEditor extends Component {
     }
 
     handleClickedRemoveRow(event) {
-        const saveData = {};
-        const row = parseInt(event.target.getAttribute('data-row'));
-        saveData.rowSettings = this.props.data.rowSettings.slice();
-        saveData.rowSettings.splice(row, 1);
+        if (this.props.data.rowSettings.length > 1) {
+            const saveData = {};
+            const row = parseInt(event.target.getAttribute('data-row'));
+            saveData.rowSettings = this.props.data.rowSettings.slice();
+            saveData.rowSettings.splice(row, 1);
 
-        if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, saveData);
+            if (this.props.onRequestEdit)
+                this.props.onRequestEdit(this.props.data.id, saveData);
+        }
     }
 
     render() {
         return <div>
             {this.props.data && <React.Fragment>
-                <div><TextField label='Name' name='name' data-setting-type='name' value={this.props.data.name} onChange={this.handleChange} /></div>
+                <div>
+                    <Typography use='headline6' tag='h2'>Name</Typography>
+                    <TextField name='name' data-setting-type='name' value={this.props.data.name} onChange={this.handleChange} />
+                </div>
                 
                 <div>
                     <Typography use='headline6' tag='h2'>Color</Typography>
@@ -124,6 +150,31 @@ class SectionEditor extends Component {
                 </div>)}
                 <br />
                     <Button onClick={this.handleClickedAddRow}>Add row</Button>
+                </div>
+
+                <div>
+                    <Typography use='headline6' tag='h2'>Position</Typography>
+                    <Typography use='body1' tag='h3'>Pick how close to the front of the ensemble this section's seats should begin.</Typography>
+                    <div>
+                        <Radio value='first-row' name='offsetType'
+                            data-setting-type='offsetType'
+                            onChange={this.handleChange}
+                            checked={this.props.data.offsetType === 'first-row'}>Front of ensemble</Radio><br />
+                        <Radio value='custom-row' name='offsetType'
+                            data-setting-type='offsetType'
+                            onChange={this.handleChange}
+                            checked={this.props.data.offsetType === 'custom-row'}>Start on row:</Radio><br />
+                        <TextField pattern='\d+' disabled={this.props.data.offsetType !== 'custom-row'}
+                            data-setting-type='offsetValue'
+                            onChange={this.handleChange}
+                            onBlur={this.handleRowBlur}
+                            value={this.props.data.offsetValue} /><br />
+
+                        <Radio value='last-row' name='offsetType'
+                            data-setting-type='offsetType'
+                            onChange={this.handleChange}
+                            checked={this.props.data.offsetType === 'last-row'}>Back of ensemble</Radio>
+                    </div>
                 </div>
             </React.Fragment>}
             

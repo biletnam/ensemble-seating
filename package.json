@@ -37,6 +37,7 @@
     "@rmwc/icon-button": "^4.0.1",
     "@rmwc/list": "^4.0.1",
     "@rmwc/menu": "^4.0.1",
+    "@rmwc/radio": "^4.0.1",
     "@rmwc/ripple": "^4.0.1",
     "@rmwc/select": "^4.0.1",
     "@rmwc/switch": "^4.0.1",

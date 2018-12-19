@@ -17,13 +17,40 @@ export function getInitials(name) {
     return initials;
 }
 
-export function generateRows(sections) {
+export function generateRows(sectionData) {
+    let numOfRows = Math.max(...sectionData.map(section => {
+        let returnValue = 0;
+        if (section.offsetType === 'first-row' || (section.offsetType === 'custom-row' && parseInt(section.offsetValue, 10) === 0))
+            returnValue = section.rowSettings.length;
+        return returnValue;        
+    }));
+
+    // Check offset settings, and pad the start of its rows if necessary
+    const sections = sectionData.map(currentSection => {
+        if (currentSection.offsetType === 'custom-row' || currentSection.offsetType === 'last-row') {
+            const result = JSON.parse(JSON.stringify(currentSection));
+
+            const offsetValue = currentSection.offsetType === 'last-row' ? numOfRows + 1 : parseInt(currentSection.offsetValue, 10);
+            if (!isNaN(offsetValue)) {
+                for (let i=1; i<offsetValue; i++) {
+                    result.rowSettings.unshift({min: 0, max: 0});
+                }
+            }
+            
+            return result;
+        }
+        else
+            return currentSection;
+    });
+
+    // Update row count, in case it was changed while calculating offsets
+    numOfRows = Math.max(...sections.map(section => section.rowSettings.length));
+
     const rows = [];
-    const numOfRows = Math.max(...sections.map(section => section.rowSettings.length));
+    
     for (let i=0; i<numOfRows; i++) {
         const currentRow = [];
 
-        // Going to need a data type... or, can you just add references to the members themselves?
         for (const currentSection of sections) {
             // If it has seats in the current row, add them to the current row.
             // Otherwise, reuse the settings from the last available row.

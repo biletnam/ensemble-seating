@@ -1,19 +1,5 @@
 import React, {Component} from 'react';
 import Region from './region.jsx';
-import Seat from './seat.jsx';
-
-import {Typography} from '@rmwc/typography';
-import { Button, ButtonIcon } from '@rmwc/button';
-
-import '@material/typography/dist/mdc.typography.css';
-import '@material/button/dist/mdc.button.css';
-
-import {
-    generateRows,
-    curveRows,
-    seatMembers,
-    getLayoutDimensions
-} from '../helpers/stage-helpers.js';
 
 class SeatingRenderer extends Component {
     constructor(props) {

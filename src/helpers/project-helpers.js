@@ -8,7 +8,7 @@ const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
 const DB_VER = 1;
 const APP_NAME = APP_INFO.NAME;
-const PROJECT_FORMAT_VER = '0.2.0';
+const PROJECT_FORMAT_VER = '0.3.0';
 
 const currentDb = idb.open(DB_NAME, DB_VER, upgradeDB => {
     switch (upgradeDB.oldVersion) {
@@ -96,6 +96,15 @@ export function upgradeProject(project) {
         delete finalProject.settings.curvedLayout;
         delete finalProject.settings.zoom;
     }
+    if (semver.lt(finalProject.appVersion, '0.3.0')) {
+        finalProject.appVersion = '0.3.0';
+        finalProject.sections = finalProject.sections.map(currentSection => {
+            return Object.assign({}, currentSection, {
+                offsetType: 'first-row',
+                offsetValue: 0
+            });
+        });
+    }
 
     return finalProject;
 }
@@ -167,6 +176,8 @@ export function createSection (name = 'Untitled', regionId = null) {
         color: randomColor({luminosity: 'light'}),
         id: uuid(),
         region: regionId,
+        offsetType: 'first-row',
+        offsetValue: 0,
         rowSettings: [
             {
                 min: 2,
