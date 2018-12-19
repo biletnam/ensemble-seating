@@ -20,7 +20,7 @@ const APP_INFO = {
 module.exports = {
     entry: './src/main.jsx',
     output: {
-        filename: '[name].[chunkhash].js',
+        filename: '[name].[contenthash].js',
         path: path.resolve(__dirname, 'dist')
     },
     devServer: {
