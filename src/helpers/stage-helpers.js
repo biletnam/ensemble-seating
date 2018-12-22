@@ -167,63 +167,51 @@ export function seatMembers (membersBySection, rows) {
         return Object.assign({}, currentSeat, {member: member ? member.id : null});
     }));
 
-    // Collapse implicit, unoccupied seats that are adjacent to explicit, occupied seats
+    // Collapse implicit, unoccupied seats that are adjacent to explicit seats
     for (let i=0; i<seatedRows.length; i++) {
-        const midpoint = Math.floor((seatedRows[i].length - 1) / 2);
-        const splitLocations = seatedRows[i].reduce((acc, currentSeat, currentIndex) => {
-            const lastSeat = seatedRows[i][currentIndex - 1];
-            if (!lastSeat)
-                acc.push(currentIndex);
-            else if (Boolean(currentSeat.member) !== Boolean(lastSeat.member)) {
-                if (currentSeat.implicit !== lastSeat.implicit)
-                    acc.push(currentIndex);
-            }
-                
-            return acc;
-        }, []);
+        if (seatedRows[i].some(seat => seat.implicit && !seat.member)) {
+            // Row contains at least one empty, implicit seat
+            // Split array into groups of implicit + unoccupied, and explicit.
+            let seatGroups = seatedRows[i].reduce((acc, currentSeat) => {
+                // Check the last seat of the last group to see if we need to start a new group
+                const lastGroup = acc[acc.length - 1];
+                const lastSeat = lastGroup.length > 0 ? lastGroup[lastGroup.length - 1] : null;
+                if (lastSeat && ((lastSeat.implicit && !Boolean(currentSeat.member)) !== (currentSeat.implicit && !Boolean(currentSeat.member))))
+                    acc.push([]);
 
-        for (const currentSplit of splitLocations) {
-            if (currentSplit < midpoint) {
-                // Remove on the right
-                // If the item before the split is occupied, determine how many adjacent occupied seats there are before the split
-                let occupiedSeatsBeforeSplit = 0;
-                let currentCheckingIndex = currentSplit - 1;
-                while (seatedRows[i][currentCheckingIndex] && seatedRows[i][currentCheckingIndex].member) {
-                    occupiedSeatsBeforeSplit++;
-                    currentCheckingIndex--;
-                }
+                // Add the current seat to the last group
+                acc[acc.length - 1].push(currentSeat);
+                return acc;
+            }, [[]]);
 
-                // Then, remove up to occupiedSeatsBeforeSplit seats after the split, starting at the split
-                for (let k=0; k<occupiedSeatsBeforeSplit; k++) {
-                    // If there's a seat, it's implicit, and it's unoccupied, remove it. Otherwise, stop iterating.
-                    const currentSeat = seatedRows[i][currentSplit];
-                    if (currentSeat && currentSeat.implicit && !currentSeat.member)
-                        seatedRows[i].splice(currentSplit, 1);
-                    else
+            // For each group of explicit seats, do the following:
+            seatGroups.forEach((currentGroup, currentIndex) => {
+                let seatsToRemove = currentGroup[0].implicit && !Boolean(currentGroup[0].member) ? 0 : currentGroup.length;
+                while (seatsToRemove > 0) {
+                    // Check if there are implicit/unoccupied seats on either side
+                    let emptyOnLeft = 0, emptyOnRight = 0;
+                    if (currentIndex > 0 && seatGroups[currentIndex - 1].length > 0 && seatGroups[currentIndex - 1][0].implicit && !Boolean(seatGroups[currentIndex - 1][0].member))
+                        emptyOnLeft = seatGroups[currentIndex - 1].length;
+
+                    if (currentIndex + 1 < seatGroups.length && seatGroups[currentIndex + 1].length > 0 && seatGroups[currentIndex + 1][0].implicit && !Boolean(seatGroups[currentIndex + 1][0].member))
+                        emptyOnRight = seatGroups[currentIndex + 1].length;
+
+                    if (emptyOnLeft === 0 && emptyOnRight === 0)
                         break;
-                }
-            }
-            else {
-                // Remove on the left
-                // If the item after the split is occupied, determine how many adjacent occupied seats there are after the split
-                let occupiedSeatsAfterSplit = 0;
-                let currentCheckingIndex = currentSplit;
-                while (seatedRows[i][currentCheckingIndex] && seatedRows[i][currentCheckingIndex].member) {
-                    occupiedSeatsAfterSplit++;
-                    currentCheckingIndex++;
-                }
+                    else {
+                        // Remove implicit/unoccupied seats from groups adjacent to the explicit group,
+                        // favoring whichever side has more adjacent implicit/unoccupied seats.
 
-                // Then, remove up to occupiedSeatsAfterSplit seats before the split, starting just before the split
-                for (let k=0; k<occupiedSeatsAfterSplit; k++) {
-                    // If there's a seat, it's implicit, and it's unoccupied, remove it. Otherwise, stop iterating.
-                    const currentIndex = (currentSplit - 1) - k;
-                    const currentSeat = seatedRows[i][currentIndex];
-                    if (currentSeat && currentSeat.implicit && !currentSeat.member)
-                        seatedRows[i].splice(currentIndex, 1);
-                    else
-                        break;
+                        if (emptyOnLeft > emptyOnRight)
+                            seatGroups[currentIndex - 1].pop();
+                        else
+                            seatGroups[currentIndex + 1].splice(0, 1);
+
+                        seatsToRemove--;
+                    }
                 }
-            }
+            });
+            seatedRows[i] = [].concat(...seatGroups);
         }
     }
 
