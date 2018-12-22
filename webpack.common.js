@@ -89,8 +89,7 @@ module.exports = {
             }
         ]),
         new GenerateSW({
-            navigateFallback: '/',
-            offlineGoogleAnalytics: true
+            navigateFallback: '/'
         })
     ],
     module: {
