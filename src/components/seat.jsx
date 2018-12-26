@@ -39,7 +39,7 @@ class Seat extends Component {
                 backgroundColor: selected ? '#fff' : color,
                 visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
                 left: typeof x === 'number' && !isNaN(x) ? x : 'unset',
-                bottom: typeof y === 'number' && !isNaN(y) ? y : 'unset'
+                top: typeof y === 'number' && !isNaN(y) ? y : 'unset'
             }} >
             {displayText ? displayText : seatNumber}
             <Ripple><span className='seat__click-surface' onClick={this.handleClick} /></Ripple>

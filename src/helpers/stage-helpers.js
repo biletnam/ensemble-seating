@@ -1,4 +1,4 @@
-const seatSize = 32;
+export const seatSize = 32;
 
 export function sumRows(rows) {
     let sum = 0;
@@ -130,12 +130,11 @@ export function generateRows(sectionData) {
 }
 
 export function getPositionOnCurve (seatNum, rowLength) {
-    const percentRadius = 100;
     const position = {x: null, y: null};
     const step = Math.PI / rowLength;
 
-    position.x = (percentRadius * Math.cos(step * seatNum)) / 100;
-    position.y = (percentRadius * Math.sin(step * seatNum)) / 100;
+    position.x = Math.cos(step * seatNum);
+    position.y = Math.sin(step * seatNum);
 
     return position;
 }
@@ -156,6 +155,8 @@ export function curveRows(rows) {
                 // Start at a fixed size for the first row, then increase radius for each row
                 rows[i][k].x = position.x * (firstRowWidth + (i * seatSize * 2));
                 rows[i][k].y = position.y * (firstRowWidth + (i * seatSize * 2));
+
+                rows[i][k].x -= (.5 * seatSize);
             }
         }
     }

@@ -155,6 +155,7 @@ body {
     white-space: normal;
     overflow: visible;
     box-sizing: border-box;
+    position: relative;
 }
 
 .seat--implicit {
@@ -202,8 +203,6 @@ body {
 
 .rendering-area__stage--curved-layout .seat {
     position: absolute;
-    /* Move seat over by 1/2 its size to correct for CSS positioning (coords were computed as points on a circle) */
-    margin-left: -1em;
 }
 
 .rendering-area__stage:not(.rendering-area__stage--curved-layout) .ensemble-row:not(:first-child) {

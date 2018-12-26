@@ -9,6 +9,7 @@ import '@material/typography/dist/mdc.typography.css';
 import '@material/button/dist/mdc.button.css';
 
 import {
+    seatSize,
     generateRows,
     curveRows,
     seatMembers,
@@ -71,10 +72,6 @@ class Region extends Component {
             if (this.props.downstageTop) {
                 for (const currentRow of seatedRows) {
                     currentRow.reverse();
-
-                    for (const currentSeat of currentRow) {
-                        currentSeat.y *= -1;
-                    }
                 }
             }
             else {
@@ -82,7 +79,8 @@ class Region extends Component {
                 seatedRows.reverse();
                 for (const currentRow of seatedRows) {
                     for (const currentSeat of currentRow) {
-                        currentSeat.x *= -1;
+                        currentSeat.x = (currentSeat.x * -1) - seatSize;
+                        currentSeat.y = (currentSeat.y * -1) - seatSize;
                     }
                 }
             }
