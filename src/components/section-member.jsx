@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import { IconButton } from '@rmwc/icon-button';
 import { List, ListItem, ListItemPrimaryText, ListItemMeta } from '@rmwc/list';
@@ -11,7 +11,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import DeleteIcon from '../icons/baseline-delete-24px.jsx';
 import EditIcon from '../icons/baseline-edit-24px.jsx';
 
-class SectionMember extends Component {
+class SectionMember extends PureComponent {
     constructor(props) {
         super(props);
 

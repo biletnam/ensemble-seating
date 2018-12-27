@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import { IconButton } from '@rmwc/icon-button';
 import { Button, ButtonIcon } from '@rmwc/button';
@@ -15,7 +15,7 @@ import AddIcon from '../icons/baseline-add-24px.jsx';
 
 import { Droppable } from 'react-beautiful-dnd';
 
-class RegionListItem extends Component {
+class RegionListItem extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -25,6 +25,8 @@ class RegionListItem extends Component {
 
         this.handleClickedNewSection = this.handleClickedNewSection.bind(this);
         this.handleActionMenuClick = this.handleActionMenuClick.bind(this);
+        this.handleRequestToggleActionMenu = this.handleRequestToggleActionMenu.bind(this);
+        this.handleRequestCloseActionMenu = this.handleRequestCloseActionMenu.bind(this);
     }
 
     handleClickedNewSection() {
@@ -43,6 +45,14 @@ class RegionListItem extends Component {
         }
     }
 
+    handleRequestToggleActionMenu() {
+        this.setState({actionMenuOpen: !this.state.actionMenuOpen})
+    }
+
+    handleRequestCloseActionMenu() {
+        this.setState({actionMenuOpen: false});
+    }
+
     render() {
         return <Droppable droppableId={this.props.region.id} type='section'>
             {(provided, snapshot) => (
@@ -55,8 +65,8 @@ class RegionListItem extends Component {
                         <ListActionMenu
                             onSelectAction={this.handleActionMenuClick}
                             open={this.state.actionMenuOpen}
-                            onClose={() => this.setState({actionMenuOpen: false})}>
-                            <IconButton icon={<MoreIcon />} label='Edit region' onClick={() => this.setState({actionMenuOpen: !this.state.actionMenuOpen})} />
+                            onClose={this.handleRequestCloseActionMenu}>
+                            <IconButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
                         </ListActionMenu>
                     </Elevation>}
                     {this.props.sections.map((currentSection, currentIndex) => {

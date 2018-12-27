@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import { IconButton } from '@rmwc/icon-button';
-import { List, ListItem, ListItemPrimaryText, ListGroup, ListGroupSubheader, ListDivider } from '@rmwc/list';
+import { ListItem, ListGroup } from '@rmwc/list';
 import { Typography } from '@rmwc/typography';
 import { Elevation } from '@rmwc/elevation';
 
@@ -23,7 +23,7 @@ import EditIcon from '../icons/baseline-edit-24px.jsx';
 
 const editStyle = {marginLeft: 'auto'};
 
-class SectionListItem extends Component {
+class SectionListItem extends PureComponent {
     constructor(props) {
         super(props);
 

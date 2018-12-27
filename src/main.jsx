@@ -118,6 +118,14 @@ class App extends Component {
         this.handleAcceptRegionEdits = this.handleAcceptRegionEdits.bind(this);
         this.handleAcceptSectionEdits = this.handleAcceptSectionEdits.bind(this);
         this.handleAcceptMemberEdits = this.handleAcceptMemberEdits.bind(this);
+
+        // Dialog close event listeners
+        this.handleRequestCloseMenuDrawer = this.handleRequestCloseMenuDrawer.bind(this);
+        this.handleRequestCancelRegionEditDialog = this.handleRequestCancelRegionEditDialog.bind(this);
+        this.handleRequestCancelSectionEditDialog = this.handleRequestCancelSectionEditDialog.bind(this);
+        this.handleRequestCancelMemberEditDialog = this.handleRequestCancelMemberEditDialog.bind(this);
+        this.handleRequestCancelBatchAddDialog = this.handleRequestCancelBatchAddDialog.bind(this);
+        this.handleRequestCloseProjectSettingsDialog = this.handleRequestCloseProjectSettingsDialog.bind(this);
     }
 
     componentDidMount() {
@@ -619,10 +627,35 @@ class App extends Component {
         this.deleteProject();
     }
 
+    /* DIALOG CLOSE EVENT LISTENERS */
+    handleRequestCloseMenuDrawer() {
+        this.setState({drawerOpen: false});
+    }
+
+    handleRequestCancelRegionEditDialog() {
+        this.setState({editRegionDialogOpen: false})
+    }
+
+    handleRequestCancelSectionEditDialog() {
+        this.setState({editSectionDialogOpen: false});
+    }
+
+    handleRequestCancelMemberEditDialog() {
+        this.setState({editMemberDialogOpen: false});
+    }
+
+    handleRequestCancelBatchAddDialog() {
+        this.setState({batchAddDialogOpen: false});
+    }
+
+    handleRequestCloseProjectSettingsDialog() {
+        this.setState({projectOptionsDialogOpen: false});
+    }
+
     render() {
         return <React.Fragment>
             <MenuDrawer drawerOpen={this.state.drawerOpen}
-                onClose={() => this.setState({drawerOpen: false})}
+                onClose={this.handleRequestCloseMenuDrawer}
                 onRequestPrintProject={this.handleRequestPrint}
                 onRequestNewProject={this.handleRequestNewProject}
                 onRequestImportProject={this.handleRequestImportProject}
@@ -640,6 +673,10 @@ class App extends Component {
 
             <SeatingRenderer id='rendering-area'
                 project={this.state.project}
+                regions={this.state.project.regions}
+                sections={this.state.project.sections}
+                members={this.state.project.members}
+                settings={this.state.project.settings}
                 editorId={this.state.editorId}
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestNewSection={this.handleClickedNewSectionButton} />
@@ -689,7 +726,7 @@ class App extends Component {
                 cloneFn={cloneRegion}
                 data={this.state.project.regions.find(current => current.id === this.state.editorId)}
                 onAccept={this.handleAcceptRegionEdits}
-                onCancel={() => this.setState({editRegionDialogOpen: false})} />
+                onCancel={this.handleRequestCancelRegionEditDialog} />
 
             <EditDialog open={this.state.editSectionDialogOpen}
                 title='Edit section'
@@ -697,7 +734,7 @@ class App extends Component {
                 cloneFn={cloneSection}
                 data={this.state.project.sections.find(current => current.id === this.state.editorId)}
                 onAccept={this.handleAcceptSectionEdits}
-                onCancel={() => this.setState({editSectionDialogOpen: false})} />
+                onCancel={this.handleRequestCancelSectionEditDialog} />
 
             <EditDialog open={this.state.editMemberDialogOpen}
                 title='Edit section member'
@@ -705,15 +742,15 @@ class App extends Component {
                 cloneFn={clonePerson}
                 data={this.state.project.members.find(current => current.id === this.state.editorId)}
                 onAccept={this.handleAcceptMemberEdits}
-                onCancel={() => this.setState({editMemberDialogOpen: false})} />
+                onCancel={this.handleRequestCancelMemberEditDialog} />
 
             <BatchAddMembersDialog isOpen={this.state.batchAddDialogOpen}
-                onClose={() => this.setState({batchAddDialogOpen: false})}
+                onClose={this.handleRequestCancelBatchAddDialog}
                 onAddMembers={this.handleAcceptedBatchAdd}
                 title={this.state.batchAddSectionName} />
 
             <ProjectSettingsDialog isOpen={this.state.projectOptionsDialogOpen}
-                onClose={() => this.setState({projectOptionsDialogOpen: false})}
+                onClose={this.handleRequestCloseProjectSettingsDialog}
                 onChange={this.handleChangeProjectSetting}
                 {...this.state.project.settings} />
         </React.Fragment>

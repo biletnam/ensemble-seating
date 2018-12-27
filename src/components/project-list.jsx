@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
-import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroupSubheader, ListDivider, ListItemGraphic } from '@rmwc/list';
+import { ListItem, ListGroup } from '@rmwc/list';
 import '@material/list/dist/mdc.list.css';
 
-import {listProjects} from '../helpers/project-helpers.js';
+import { listProjects } from '../helpers/project-helpers.js';
 
-class ProjectList extends Component {
+class ProjectList extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

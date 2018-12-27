@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import Seat from './seat.jsx';
 
 import { Typography } from '@rmwc/typography';
-import { Button, ButtonIcon } from '@rmwc/button';
+import { Button } from '@rmwc/button';
 
 import '@material/typography/dist/mdc.typography.css';
 import '@material/button/dist/mdc.button.css';
@@ -16,7 +16,7 @@ import {
     getLayoutDimensions
 } from '../helpers/stage-helpers.js';
 
-class Region extends Component {
+class Region extends PureComponent {
     constructor(props) {
         super(props);
 

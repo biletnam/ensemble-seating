@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import { Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle } from '@rmwc/drawer';
 import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroupSubheader, ListDivider, ListItemGraphic } from '@rmwc/list';
@@ -20,7 +20,7 @@ import FolderOpenIcon from '../icons/baseline-folder_open-24px.jsx';
 import SaveAltIcon from '../icons/baseline-save_alt-24px.jsx';
 import InfoIcon from '../icons/baseline-info-24px.jsx';
 
-class MenuDrawer extends Component {
+class MenuDrawer extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -37,6 +37,12 @@ class MenuDrawer extends Component {
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
         this.handleAcceptRename = this.handleAcceptRename.bind(this);
         this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
+
+        // Dialog cancel listeners
+        this.handleRequestCancelRename = this.handleRequestCancelRename.bind(this);
+        this.handleRequestCancelDeleteProject = this.handleRequestCancelDeleteProject.bind(this);
+        this.handleRequestCancelRecentProjects = this.handleRequestCancelRecentProjects.bind(this);
+        this.handleRequestCancelAbout = this.handleRequestCancelAbout.bind(this);
     }
 
     handleMenuButtonClick(event) {
@@ -127,6 +133,23 @@ class MenuDrawer extends Component {
         })
     }
 
+    // Dialog cancel listeners
+    handleRequestCancelRename() {
+        this.setState({renameDialogVisible: false});
+    }
+
+    handleRequestCancelDeleteProject() {
+        this.setState({deleteProjectDialogVisible: false});
+    }
+
+    handleRequestCancelRecentProjects() {
+        this.setState({recentProjectsDialogVisible: false});
+    }
+
+    handleRequestCancelAbout() {
+        this.setState({aboutDialogVisible: false});
+    }
+
     render() {
         return <React.Fragment>
             <Drawer modal open={this.props.drawerOpen} onClose={() => this.props.onClose()}>
@@ -157,21 +180,21 @@ class MenuDrawer extends Component {
                 <DrawerSubtitle>"{APP_INFO.CODENAME}"</DrawerSubtitle>
             </DrawerHeader>
         </Drawer>
-        <RenameDialog open={this.state.renameDialogVisible} onCancel={() => this.setState({renameDialogVisible: false})}
+        <RenameDialog open={this.state.renameDialogVisible} onCancel={this.handleRequestCancelRename}
             onAccept={this.handleAcceptRename}
             title='Rename project'
             label='Project name'
             value={this.props.projectName} />
 
-        <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={() => this.setState({deleteProjectDialogVisible: false})}
+        <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={this.handleRequestCancelDeleteProject}
             onAccept={this.handleAcceptDeleteProject}
             title={`Delete "${this.props.projectName}?"`} />
 
         <RecentProjectsDialog open={this.state.recentProjectsDialogVisible} 
-            onClose={() => this.setState({recentProjectsDialogVisible: false})}
+            onClose={this.handleRequestCancelRecentProjects}
             onRequestOpenProject={this.handleRequestOpenProject} />
 
-        <AboutDialog open={this.state.aboutDialogVisible} onClose={() => this.setState({aboutDialogVisible: false})} />
+        <AboutDialog open={this.state.aboutDialogVisible} onClose={this.handleRequestCancelAbout} />
     </React.Fragment>
     }
 }

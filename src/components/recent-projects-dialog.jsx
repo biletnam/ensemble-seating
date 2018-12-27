@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import ProjectList from './project-list.jsx';
 
-import {SimpleDialog} from '@rmwc/dialog';
+import { SimpleDialog } from '@rmwc/dialog';
 import '@material/dialog/dist/mdc.dialog.css';
 
-class RecentProjectsDialog extends Component {
+class RecentProjectsDialog extends PureComponent {
     constructor (props) {
         super(props);
         this.state = {

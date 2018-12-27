@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import './list-action-menu.css';
 
@@ -8,7 +8,7 @@ import '@material/menu-surface/dist/mdc.menu-surface.css';
 import '@material/list/dist/mdc.list.css';
 
 
-class ListActionMenu extends React.Component {
+class ListActionMenu extends PureComponent {
     constructor(props) {
         super(props);
 

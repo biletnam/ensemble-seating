@@ -1,14 +1,13 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
-import {SimpleDialog} from '@rmwc/dialog';
-import {Typography} from '@rmwc/typography';
-import { TextField, TextFieldIcon, TextFieldHelperText } from '@rmwc/textfield';
+import { SimpleDialog } from '@rmwc/dialog';
+import { Typography } from '@rmwc/typography';
 
 import '@material/dialog/dist/mdc.dialog.css';
 import '@material/typography/dist/mdc.typography.css';
 import '@material/textfield/dist/mdc.textfield.css';
 
-class DeleteProjectDialog extends Component {
+class DeleteProjectDialog extends PureComponent {
     constructor(props) {
         super(props);
         this.handleClose = this.handleClose.bind(this);

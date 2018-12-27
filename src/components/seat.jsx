@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import { Ripple } from '@rmwc/ripple';
 
@@ -6,7 +6,7 @@ import '@material/ripple/dist/mdc.ripple.css';
 
 import {getInitials} from '../helpers/stage-helpers.js';
 
-class Seat extends Component {
+class Seat extends PureComponent {
     constructor(props) {
         super(props);
 

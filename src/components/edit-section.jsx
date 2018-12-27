@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import { createSectionRow } from '../helpers/project-helpers.js';
 
 import { TwitterPicker } from 'react-color';
 
 import { Typography } from '@rmwc/typography';
-import { TextField, TextFieldIcon, TextFieldHelperText } from '@rmwc/textfield';
+import { TextField } from '@rmwc/textfield';
 import { Button } from '@rmwc/button';
 import { IconButton } from '@rmwc/icon-button';
 import { Radio } from '@rmwc/radio';
@@ -19,7 +19,7 @@ import '@material/form-field/dist/mdc.form-field.css';
 
 import ClearIcon from '../icons/baseline-clear-24px.jsx';
 
-class SectionEditor extends Component {
+class SectionEditor extends PureComponent {
     constructor(props) {
         super(props);
 

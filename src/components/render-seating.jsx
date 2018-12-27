@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 import Region from './region.jsx';
 
-class SeatingRenderer extends Component {
+class SeatingRenderer extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -16,10 +16,10 @@ class SeatingRenderer extends Component {
     render() {
         const regionsToRender = [];
 
-        for (let i=0; i< this.props.project.regions.length; i++) {
-            const currentRegion =  this.props.project.regions[i];
-            const currentSections = this.props.project.sections.filter(section => section.region === currentRegion.id);
-            const currentMembers = this.props.project.members.filter(member => currentSections.some(section => member.section === section.id));
+        for (let i=0; i< this.props.regions.length; i++) {
+            const currentRegion =  this.props.regions[i];
+            const currentSections = this.props.sections.filter(section => section.region === currentRegion.id);
+            const currentMembers = this.props.members.filter(member => currentSections.some(section => member.section === section.id));
 
             regionsToRender.push(
                 <Region key={currentRegion.id}
@@ -27,16 +27,16 @@ class SeatingRenderer extends Component {
                     members={currentMembers}
                     region={currentRegion}
                     curvedLayout={currentRegion.curvedLayout}
-                    downstageTop={this.props.project.settings.downstageTop}
+                    downstageTop={this.props.settings.downstageTop}
                     editorId={this.props.editorId}
-                    implicitSeatsVisible={this.props.project.settings.implicitSeatsVisible}
-                    seatNameLabels={this.props.project.settings.seatNameLabels}
+                    implicitSeatsVisible={this.props.settings.implicitSeatsVisible}
+                    seatNameLabels={this.props.settings.seatNameLabels}
                     onRequestSelectMember={this.props.onRequestSelectMember}
                     onRequestNewSection={this.props.onRequestNewSection} />
             );
         }
 
-        if (this.props.project.settings.downstageTop)
+        if (this.props.settings.downstageTop)
             regionsToRender.reverse();
 
         return <div id={this.props.id}>{regionsToRender}</div>;

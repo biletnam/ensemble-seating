@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
@@ -7,42 +7,37 @@ import '@material/typography/dist/mdc.typography.css';
 
 import RegionListItem from './region-list-item.jsx';
 
-function sectionsByRegion(regions, sections) {
-    return regions.map(currentRegion => {
-        return sections.filter(currentSection => currentSection.region === currentRegion.id);
-    });
-}
+class SectionsList extends PureComponent {
+    render() {
+        return <aside id={this.props.id} className={this.props.sections.length === 0 ? `${this.props.id}--empty` : ''}>
+            {this.props.sections.length === 0 && <Typography tag='p' use='subtitle1'>No sections to display</Typography>}
+            <DragDropContext onDragEnd={this.props.onDragEnd}>
+                {this.props.regions.map(currentRegion => <RegionListItem
+                    key={currentRegion.id}
+                    editorId={this.props.editorId}
+                    region={currentRegion}
+                    sections={this.props.sections.filter(currentSection => currentSection.region === currentRegion.id)}
+                    members={this.props.members}
+                    showRegionName={this.props.regions.length > 1}
+                    forceNewSectionButton={this.props.sections.length > 0}
+                    onRequestNewSection={this.props.onRequestNewSection}
+                    onRequestNewPerson={this.props.onRequestNewPerson}
+                    onRequestBatchAdd={this.props.onRequestBatchAdd}
 
-const SectionsList = props => {
-    const regions = sectionsByRegion(props.regions, props.sections);
-    return <aside id={props.id} className={props.sections.length === 0 ? `${props.id}--empty` : ''}>
-        {props.sections.length === 0 && <Typography tag='p' use='subtitle1'>No sections to display</Typography>}
-        <DragDropContext onDragEnd={props.onDragEnd}>
-            {props.regions.map(currentRegion => <RegionListItem
-                key={currentRegion.id}
-                editorId={props.editorId}
-                region={currentRegion}
-                sections={props.sections.filter(currentSection => currentSection.region === currentRegion.id)}
-                members={props.members}
-                showRegionName={props.regions.length > 1}
-                forceNewSectionButton={props.sections.length > 0}
-                onRequestNewSection={props.onRequestNewSection}
-                onRequestNewPerson={props.onRequestNewPerson}
-                onRequestBatchAdd={props.onRequestBatchAdd}
+                    onRequestDeleteRegion={this.props.onRequestDeleteRegion}
+                    onRequestMoveRegion={this.props.onRequestMoveRegion}
+                    onRequestEditRegion={this.props.onRequestEditRegion}
+                    onRequestEditSection={this.props.onRequestEditSection}
+                    onRequestEditMember={this.props.onRequestEditMember}
 
-                onRequestDeleteRegion={props.onRequestDeleteRegion}
-                onRequestMoveRegion={props.onRequestMoveRegion}
-                onRequestEditRegion={props.onRequestEditRegion}
-                onRequestEditSection={props.onRequestEditSection}
-                onRequestEditMember={props.onRequestEditMember}
+                    onRequestDeleteSection={this.props.onRequestDeleteSection}
+                    onRequestDeleteMember={this.props.onRequestDeleteMember}
 
-                onRequestDeleteSection={props.onRequestDeleteSection}
-                onRequestDeleteMember={props.onRequestDeleteMember}
-
-                onRequestSelectMember={props.onRequestSelectMember} />
-            )}
-        </DragDropContext>
-    </aside>
+                    onRequestSelectMember={this.props.onRequestSelectMember} />
+                )}
+            </DragDropContext>
+        </aside>
+    }
 };
 
 export default SectionsList;

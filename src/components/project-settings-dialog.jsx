@@ -1,9 +1,8 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
-import {SimpleDialog} from '@rmwc/dialog';
-import {Typography} from '@rmwc/typography';
-import {Select} from '@rmwc/select';
-import {Switch} from '@rmwc/switch';
+import { SimpleDialog } from '@rmwc/dialog';
+import { Select } from '@rmwc/select';
+import { Switch } from '@rmwc/switch';
 
 import '@material/dialog/dist/mdc.dialog.css';
 import '@material/typography/dist/mdc.typography.css';
@@ -14,7 +13,7 @@ import '@material/line-ripple/dist/mdc.line-ripple.css';
 import '@material/switch/dist/mdc.switch.css';
 import '@material/form-field/dist/mdc.form-field.css';
 
-class ProjectSettingsDialog extends Component {
+class ProjectSettingsDialog extends PureComponent {
     constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);

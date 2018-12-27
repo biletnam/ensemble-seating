@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
 import { TextField } from '@rmwc/textfield';
 import { SimpleDialog } from '@rmwc/dialog';
@@ -15,7 +15,7 @@ import '@material/line-ripple/dist/mdc.line-ripple.css';
 
 import '@material/dialog/dist/mdc.dialog.css';
 
-class BatchAddMembersDialog extends Component {
+class BatchAddMembersDialog extends PureComponent {
     constructor(props) {
         super(props);
 

@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
-import {Switch} from '@rmwc/switch';
-import { TextField, TextFieldIcon, TextFieldHelperText } from '@rmwc/textfield';
+import { Switch } from '@rmwc/switch';
+import { TextField } from '@rmwc/textfield';
 
 import '@material/switch/dist/mdc.switch.css';
 import '@material/textfield/dist/mdc.textfield.css';
 
-class RegionEditor extends Component {
+class RegionEditor extends PureComponent {
     constructor(props) {
         super(props);
 

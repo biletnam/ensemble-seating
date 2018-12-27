@@ -1,14 +1,12 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 
-import { Typography } from '@rmwc/typography';
-import { TextField, TextFieldIcon, TextFieldHelperText } from '@rmwc/textfield';
-import { IconButton } from '@rmwc/icon-button';
+import { TextField } from '@rmwc/textfield';
 
 import '@material/typography/dist/mdc.typography.css';
 import '@material/textfield/dist/mdc.textfield.css';
 import '@material/icon-button/dist/mdc.icon-button.css';
 
-class MemberEditor extends Component {
+class MemberEditor extends PureComponent {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
