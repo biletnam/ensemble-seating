@@ -9,8 +9,8 @@ import RegionListItem from './region-list-item.jsx';
 
 class SectionsList extends PureComponent {
     render() {
-        return <aside id={this.props.id} className={this.props.sections.length === 0 ? `${this.props.id}--empty` : ''}>
-            {this.props.sections.length === 0 && <Typography tag='p' use='subtitle1'>No sections to display</Typography>}
+        return <aside id={this.props.id} className={this.props.sections.length === 0 && this.props.regions.length === 1 ? `${this.props.id}--empty` : ''}>
+            {this.props.sections.length === 0 && this.props.regions.length === 1 && <Typography tag='p' use='subtitle1'>No sections to display</Typography>}
             <DragDropContext onDragEnd={this.props.onDragEnd}>
                 {this.props.regions.map(currentRegion => <RegionListItem
                     key={currentRegion.id}
@@ -19,7 +19,7 @@ class SectionsList extends PureComponent {
                     sections={this.props.sections.filter(currentSection => currentSection.region === currentRegion.id)}
                     members={this.props.members}
                     showRegionName={this.props.regions.length > 1}
-                    forceNewSectionButton={this.props.sections.length > 0}
+                    forceNewSectionButton={this.props.sections.length > 0 || this.props.regions.length > 1}
                     onRequestNewSection={this.props.onRequestNewSection}
                     onRequestNewPerson={this.props.onRequestNewPerson}
                     onRequestBatchAdd={this.props.onRequestBatchAdd}
