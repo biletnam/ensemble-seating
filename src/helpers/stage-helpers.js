@@ -170,49 +170,32 @@ export function seatMembers (membersBySection, rows) {
 
     // Collapse implicit, unoccupied seats that are adjacent to explicit seats
     for (let i=0; i<seatedRows.length; i++) {
-        if (seatedRows[i].some(seat => seat.implicit && !seat.member)) {
-            // Row contains at least one empty, implicit seat
-            // Split array into groups of implicit + unoccupied, and explicit.
-            let seatGroups = seatedRows[i].reduce((acc, currentSeat) => {
-                // Check the last seat of the last group to see if we need to start a new group
-                const lastGroup = acc[acc.length - 1];
-                const lastSeat = lastGroup.length > 0 ? lastGroup[lastGroup.length - 1] : null;
-                if (lastSeat && ((lastSeat.implicit && !Boolean(currentSeat.member)) !== (currentSeat.implicit && !Boolean(currentSeat.member))))
-                    acc.push([]);
+        let explicitCount = seatedRows[i].filter(current => !(current.implicit && current.member === null)).length;
+        while (explicitCount > 0) {
+            // Find an implicit, unoccupied seat adjacent to a seat that is explicit, occupied, or both
+            let indexToRemove = seatedRows[i].findIndex((current, index) => {
+                let found = false;
+                if (current.implicit && current.member === null) {
+                    const previousSeat = seatedRows[i][index - 1];
+                    const nextSeat = seatedRows[i][index + 1];
 
-                // Add the current seat to the last group
-                acc[acc.length - 1].push(currentSeat);
-                return acc;
-            }, [[]]);
-
-            // For each group of explicit seats, do the following:
-            seatGroups.forEach((currentGroup, currentIndex) => {
-                let seatsToRemove = currentGroup[0].implicit && !Boolean(currentGroup[0].member) ? 0 : currentGroup.length;
-                while (seatsToRemove > 0) {
-                    // Check if there are implicit/unoccupied seats on either side
-                    let emptyOnLeft = 0, emptyOnRight = 0;
-                    if (currentIndex > 0 && seatGroups[currentIndex - 1].length > 0 && seatGroups[currentIndex - 1][0].implicit && !Boolean(seatGroups[currentIndex - 1][0].member))
-                        emptyOnLeft = seatGroups[currentIndex - 1].length;
-
-                    if (currentIndex + 1 < seatGroups.length && seatGroups[currentIndex + 1].length > 0 && seatGroups[currentIndex + 1][0].implicit && !Boolean(seatGroups[currentIndex + 1][0].member))
-                        emptyOnRight = seatGroups[currentIndex + 1].length;
-
-                    if (emptyOnLeft === 0 && emptyOnRight === 0)
-                        break;
-                    else {
-                        // Remove implicit/unoccupied seats from groups adjacent to the explicit group,
-                        // favoring whichever side has more adjacent implicit/unoccupied seats.
-
-                        if (emptyOnLeft > emptyOnRight)
-                            seatGroups[currentIndex - 1].pop();
-                        else
-                            seatGroups[currentIndex + 1].splice(0, 1);
-
-                        seatsToRemove--;
-                    }
+                    if ((previousSeat && !(previousSeat.implicit && previousSeat.member === null)) || (nextSeat && !(nextSeat.implicit && nextSeat.member === null)))
+                        found = true;
                 }
+                return found;
             });
-            seatedRows[i] = [].concat(...seatGroups);
+
+            // If no implicit, unoccupied seats are adjacent to an explict seat, select the first implicit, unoccupied seat
+            if (indexToRemove === -1)
+                indexToRemove = seatedRows[i].findIndex(current => current.implicit && current.member === null);
+                
+            if (indexToRemove > -1) {
+                seatedRows[i].splice(indexToRemove, 1);
+                explicitCount--;
+            }
+            else {
+                explicitCount = 0;
+            }
         }
     }
 
