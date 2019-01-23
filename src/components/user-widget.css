@@ -1,0 +1,28 @@
+.user-widget {
+    margin-bottom: 1em;
+    display: grid;
+    grid-template-rows: 25px 25px;
+    grid-template-columns: 50px 1fr;
+    grid-template-areas: 'thumbnail name' 'thumbnail email';
+    grid-column-gap: .5em;
+    align-items: center;
+}
+
+.user-widget > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-widget__thumbnail {
+    grid-area: thumbnail;
+}
+
+.user-widget__display-name {
+    grid-area: name;
+}
+
+.user-widget__email {
+    grid-area: email;
+}

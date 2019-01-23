@@ -15,11 +15,24 @@ import SectionEditor from './components/edit-section.jsx';
 import MemberEditor from './components/edit-member.jsx';
 import BatchAddMembersDialog from './components/batch-add-members.jsx';
 import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
+import firebase, { auth, provider } from './helpers/firebase-helpers.js';
 
 import {
     saveProject,
+    saveRegionOrder,
+    saveSectionOrder,
+    saveMemberOrder,
+    saveNewRegion,
+    saveNewSection,
+    saveNewMember,
+    saveRegionEdits,
+    saveSectionEdits,
+    saveMemberEdits,
     loadProject,
     deleteProject,
+    deleteRegionData,
+    deleteSectionData,
+    deleteMemberData,
     projectNeedsUpgrade,
     upgradeProject,
     updateProjectQueryString,
@@ -39,7 +52,7 @@ import {
 
 import './main.css';
 
-function createFreshState() {
+function createFreshState(user) {
     return {
         deleteRegionId: null,
         deleteRegionName: null,
@@ -62,7 +75,8 @@ function createFreshState() {
         editorId: null,
         project: null,
         initProject: false,
-        projectName: null
+        projectName: null,
+        user
     }
 }
 
@@ -74,13 +88,10 @@ class App extends Component {
     constructor(props) {
         super(props);
 
+        this.firstLaunch = true;
+
         this.state = createFreshState();
         this.state.project = createEmptyProject();
-
-        const urlParams = new URLSearchParams(location.search);
-        const nameParam = urlParams.get('project');
-        if (nameParam)
-            this.state.initProject = decodeURIComponent(nameParam);
 
         this.saveSession = this.saveSession.bind(this);
         this.deleteSection = this.deleteSection.bind(this);
@@ -126,38 +137,118 @@ class App extends Component {
         this.handleRequestCancelMemberEditDialog = this.handleRequestCancelMemberEditDialog.bind(this);
         this.handleRequestCancelBatchAddDialog = this.handleRequestCancelBatchAddDialog.bind(this);
         this.handleRequestCloseProjectSettingsDialog = this.handleRequestCloseProjectSettingsDialog.bind(this);
+
+        // Auth
+        this.handleRequestLogin = this.handleRequestLogin.bind(this);
+        this.handleRequestLogout = this.handleRequestLogout.bind(this);
+        this.handleAuthStateChanged = this.handleAuthStateChanged.bind(this);
+
+        // Check to see if the user is logged in before trying to load projects
+        auth.onAuthStateChanged(this.handleAuthStateChanged);
     }
 
     componentDidMount() {
-        if (this.state.initProject) {
-            // Initial setup
-            loadProject(this.state.initProject).then(project => {
-                if (project) {
-                    const newState = {
-                        project: Object.assign({}, project),
-                        projectName: this.state.initProject,
-                        initProject: null
-                    }
-                    if (projectNeedsUpgrade(project))
-                        newState.project = upgradeProject(project);
-                    this.setState(newState, () => {
-                        updateProjectQueryString(newState.projectName);
-                        hideLoadingScreen();
+        // Do nothing?
+    }
+
+    initFirstLaunch(user) {
+        // Todo: if the user is already logged in, restore settings and open project (if there is one in the query string)
+        // If project source is local, load from the local DB
+
+        const urlParams = new URLSearchParams(location.search);
+        const nameParam = urlParams.get('project');
+
+        let initProject;
+        if (nameParam)
+           initProject = decodeURIComponent(nameParam);
+
+        if (user) {
+            listProjects(user).then(projects => {
+                if (projects.indexOf(initProject) !== -1) {
+                    loadProject(user, initProject).then(project => {
+                        if (project) {
+                            const newState = {
+                                project: Object.assign({}, project),
+                                projectName: initProject,
+                                user
+                            }
+                            if (projectNeedsUpgrade(project))
+                            newState.project = upgradeProject(project);
+                            this.setState(newState, () => {
+                                updateProjectQueryString(newState.projectName, user);
+                                hideLoadingScreen();
+                            });
+                        }
+                    });
+                }
+                else {
+                    getUnusedProjectName(user).then(projectName => {
+                        this.setState({
+                            project: createEmptyProject(),
+                            projectName,
+                            user
+                        }, () => {
+                            updateProjectQueryString(projectName, user);
+                            hideLoadingScreen();
+                        });
                     });
                 }
             });
         }
         else {
-            getUnusedProjectName().then(name => {
-                this.setState({
-                    projectName: name
-                }, hideLoadingScreen);
+            hideLoadingScreen();
+        }
+    }
+
+    handleAuthStateChanged(user) {
+        console.log(`User is logged ${user ? 'in' : 'out'}.`);
+
+        if (this.firstLaunch) {
+            this.firstLaunch = false;
+            this.initFirstLaunch(user);
+        }
+        else {
+            // App is already running. User logged in or out.
+            this.setState({user}, () => {
+                if (user) {
+                    // Cases:
+                    listProjects().then(localProjects => {
+                        // 1.) User logs in; has local projects
+                        if (localProjects.length > 0) {
+                            // Import all into cloud in background
+                            for (let i=0; i<localProjects.length; i++) {
+                                const projectName = localProjects[i];
+                                loadProject(null, projectName).then(project => {
+                                    saveProject(user, project, projectName);
+                                    deleteProject(null, projectName);
+                                });
+                            }
+                        }
+
+                        // 2.) User logs in; has a "fresh" (unmodified, just started) project
+                        if (JSON.stringify(this.state.project) === JSON.stringify(createEmptyProject())) {
+                            listProjects(user).then(cloudProjects => {
+                                if (cloudProjects.indexOf(this.state.projectName) !== -1) {
+                                    // Project already exists in cloud. Load it now.
+                                    this.handleRequestOpenProject(this.state.projectName);
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    // Cases:
+                    // 1.) User logs out; has a cloud project open
+                    this.handleRequestNewProject();
+                }
             });
+            
         }
     }
 
     saveSession() {
-        saveProject(this.state.project, this.state.projectName)
+        if (this.state.user)
+            saveProject(this.state.user, this.state.project, this.state.projectName)
     }
 
     deleteRegion() {
@@ -165,7 +256,9 @@ class App extends Component {
         
         const regions = this.state.project.regions.filter(current => current.id !== regionId);
         const sections = this.state.project.sections.filter(current => current.region !== regionId);
+        const sectionsToRemove = this.state.project.sections.filter(current => current.region === regionId);
         const members = this.state.project.members.filter(current => sections.some(currentSection => currentSection.id === current.section));
+        const membersToRemove = this.state.promega.members.filter(current => sectionsToRemove.some(currentSection => currentSection.id === current.section));
         this.setState({
             project: Object.assign({}, this.state.project, {regions, sections, members}),
             editorId: null,
@@ -173,20 +266,45 @@ class App extends Component {
             deleteRegionId: null,
             deleteRegionAffectedSections: [],
             deleteRegionDialogOpen: false
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user) {
+                saveRegionOrder(this.state.user, this.state.projectName, regions.map(current => current.id));
+                saveSectionOrder(this.state.user, this.state.projectName, sections.map(current => current.id));
+                saveMemberOrder(this.state.user, this.state.projectName, members.map(current => current.id));
+    
+                deleteRegionData(this.state.user, regionId);
+                for (let i=0; i<sectionsToRemove.length; i++) {
+                    deleteSectionData(this.state.user, sectionsToRemove[i].id);
+                }
+                for (let i=0; i<membersToRemove.length; i++) {
+                    deleteMemberData(this.state.user, membersToRemove[i].id);
+                }
+            }
+        });
     }
 
     deleteSection() {
         const sectionId = this.state.deleteSectionId;
         const sections = this.state.project.sections.filter(currentSection => currentSection.id !== sectionId);
         const members = this.state.project.members.filter(currentMember => currentMember.section !== sectionId);
+        const membersToRemove = this.state.project.members.filter(currentMember => currentMember.section === sectionId);
         this.setState({
             project: Object.assign({}, this.state.project, {sections, members}),
             editorId: null,
             deleteSectionName: null,
             deleteSectionId: null,
             deleteSectionDialogOpen: false
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user) {
+                saveSectionOrder(this.state.user, this.state.projectName, sections.map(current => current.id));
+                saveMemberOrder(this.state.user, this.state.projectName, members.map(current => current.id));
+    
+                deleteSectionData(this.state.user, sectionId);
+                for (let i=0; i<membersToRemove.length; i++) {
+                    deleteMemberData(this.state.user, membersToRemove[i].id);
+                }
+            }
+        });
     }
 
     deleteMember() {
@@ -199,20 +317,32 @@ class App extends Component {
             deleteMemberName: null,
             deleteMemberId: null,
             deleteMemberDialogOpen: false
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user) {
+                saveMemberOrder(this.state.user, this.state.projectName, members.map(current => current.id));
+                deleteMemberData(this.state.user, memberId);
+            }
+        });
     }
 
-    batchAddMembers(members, sectionId) {
-        const newMembers = this.state.project.members.slice();
-        for (let i=0; i<members.length; i++) {
-            newMembers.push(createPerson(members[i] ? members[i] : undefined, sectionId));
-        }
+    batchAddMembers(memberNames, sectionId) {
+        const newMembers = memberNames.map(current => createPerson(current ? current : undefined, sectionId));
         
         this.setState(Object.assign({}, {
-            project: Object.assign({}, this.state.project, {members: newMembers}),
+            project: Object.assign({}, this.state.project, {
+                members: this.state.project.members.slice().concat(newMembers)
+            }),
             editorId: newMembers[newMembers.length - 1].id,
             batchAddDialogOpen: false
-        }), this.saveSession);
+        }), () => {
+            if (this.state.user) {
+                saveMemberOrder(this.state.user, this.state.projectName, this.state.project.members.map(current => current.id));
+                
+                for (let i=0; i<newMembers.length; i++) {
+                    saveNewMember(this.state.user, this.state.projectName, newMembers[i]);
+                }
+            }
+        });
     }
 
     moveMemberToSection(memberId, sectionId, index) {
@@ -232,7 +362,12 @@ class App extends Component {
         members.push(...destinationSectionMembers);
         this.setState({
             project: Object.assign({}, this.state.project, {members})
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user) {
+                saveMemberOrder(this.state.user, this.state.projectName, this.state.project.members.map(current => current.id));
+                saveMemberEdits(this.state.user, this.state.projectName, {section: sectionId});
+            }
+        });
     }
 
     moveRegionToIndex(regionId, destinationIndex) {
@@ -244,7 +379,10 @@ class App extends Component {
 
         this.setState({
             project: Object.assign({}, this.state.project, {regions})
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user)
+                saveRegionOrder(this.state.user, this.state.projectName, this.state.project.regions.map(current => current.id));
+        });
     }
 
     moveSectionToIndex(sectionId, destinationId, destinationIndex) {
@@ -267,23 +405,33 @@ class App extends Component {
 
         this.setState({
             project: Object.assign({}, this.state.project, {sections})
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user) {
+                saveSectionOrder(this.state.user, this.state.projectName, this.state.project.sections.map(current => current.id));
+                saveSectionEdits(this.state.user, this.state.projectName, {region: destinationId});
+            }
+        });
     }
 
     createNewRegion() {
-        const newRegions = this.state.project.regions.slice();
-        
-        newRegions.unshift(createRegion());
+        const regions = this.state.project.regions.slice();
+        const newRegion = createRegion();
+        regions.unshift(newRegion);
 
         this.setState(Object.assign({}, {
-            project: Object.assign({}, this.state.project, {regions: newRegions})
-        }), this.saveSession);
+            project: Object.assign({}, this.state.project, {regions})
+        }), () => {
+            if (this.state.user) {
+                saveRegionOrder(this.state.user, this.state.projectName, this.state.project.regions.map(current => current.id));
+                saveNewRegion(this.state.user, this.state.projectName, newRegion);
+            }
+        });
     }
 
     deleteProject() {
-        deleteProject(this.state.projectName).then(() => {
-            getUnusedProjectName().then(name => {
-                const newState = Object.assign({}, createFreshState(), {
+        deleteProject(this.state.user, this.state.projectName).then(() => {
+            getUnusedProjectName(this.state.user).then(name => {
+                const newState = Object.assign({}, createFreshState(this.state.user), {
                     project: createEmptyProject(),
                     projectName: name
                 })
@@ -297,16 +445,16 @@ class App extends Component {
 
     handleClickedToolbarButton(event) {
         const newState = {};
-        let saveProject = true;
+        let saveProject = false;
         if (event.target.name === 'sort') {
             newState.project = Object.assign({}, this.state.project);
             newState.project.settings = Object.assign({}, this.state.project.settings);
             newState.project.settings.downstageTop = !this.state.project.settings.downstageTop;
+            saveProject = true;
         }
 
         if (event.target.name === 'menu') {
             newState.drawerOpen = true;
-            saveProject = false;
         }
 
         if (event.target.name === 'region') {
@@ -315,30 +463,40 @@ class App extends Component {
 
         if (event.target.name === 'project-settings') {
             newState.projectOptionsDialogOpen = true;
-            saveProject = false;
         }
         this.setState(newState, saveProject ? this.saveSession : () => {});
     }
 
     handleClickedNewSectionButton(regionId) {
-        const newSections = this.state.project.sections.slice();
-        const newRegions = this.state.project.regions.slice();
+        const sections = this.state.project.sections.slice();
+        const regions = this.state.project.regions.slice();
 
-        newSections.push(createSection());
-        if (newRegions.length === 0) {
+        let newSection, newRegion;
+
+        newSection = createSection();
+        sections.push(newSection);
+        if (regions.length === 0) {
             // There are no regions. Create one and assign the new section to it.
-            newRegions.push(createRegion());
-            newSections[newSections.length - 1].region = newRegions[newRegions.length - 1].id;
+            newRegion = createRegion();
+            regions.push(newRegion);
+            sections[sections.length - 1].region = regions[regions.length - 1].id;
         }
         else {
             // Assign the section to the given region; otherwise, assign it to the first region
-            newSections[newSections.length - 1].region = regionId || newRegions[0].id;
+            sections[sections.length - 1].region = regionId || regions[0].id;
         }
 
         this.setState(Object.assign({}, {
-            project: Object.assign({}, this.state.project, {sections: newSections, regions: newRegions}),
-            editorId: newSections[newSections.length - 1].id
-        }), this.saveSession);
+            project: Object.assign({}, this.state.project, {sections: sections, regions: regions}),
+            editorId: sections[sections.length - 1].id
+        }), () => {
+            if (this.state.user) {
+                saveSectionOrder(this.state.user, this.state.projectName, this.state.project.sections.map(current => current.id));
+                saveNewSection(this.state.user, this.state.projectName, newSection);
+                if (newRegion)
+                    saveNewRegion(this.state.user, this.state.projectName, newRegion);
+            }
+        });
     }
 
     handleRequestedNewPerson(sectionId) {
@@ -435,15 +593,13 @@ class App extends Component {
         this.setState({
             editSectionDialogOpen: true,
             editorId: sectionId
-        }, this.saveSession)
+        })
     }
 
     handleRequestedSelectMember(memberId) {
-        const newState = {
+        this.setState({
             editorId: memberId
-        };
-
-        this.setState(newState, this.saveSession)
+        })
     }
 
     handleRequestedEditMember(memberId) {
@@ -478,40 +634,56 @@ class App extends Component {
     }
 
     handleRequestNewProject() {
-        getUnusedProjectName().then(name => {
+        if (this.state.user) {
+            getUnusedProjectName(this.state.user).then(name => {
+                this.setState(Object.assign({},
+                    createFreshState(this.state.user),
+                    {
+                        project: createEmptyProject(),
+                        projectName: name
+                    }
+                ));
+                resetProjectQueryString();
+            });
+        }
+        else {
             this.setState(Object.assign({},
-                createFreshState(),
+                createFreshState(this.state.user),
                 {
                     project: createEmptyProject(),
-                    projectName: name
                 }
-            ), this.saveSession);
-        });
+            ));
+        }
     }
 
     handleRequestImportProject(project, name) {
         if (validateProject(project)) {
             const newState = Object.assign({},
-                createFreshState(),
+                createFreshState(this.state.user),
                 {
                     project: Object.assign({}, project),
-                    projectName: name
+                    projectName: name,
+                    user: this.state.user
                 }
             );
 
-            listProjects().then(existingProjects => {
-                if (existingProjects.indexOf(name) === -1) {
-                    // No name conflict: go ahead with import.
-                    this.setState(newState, this.saveSession);
-                }
-                else {
-                    // Name conflict. Generate new name.
-                    getUnusedProjectName(name).then(newName => {
-                        newState.projectName = newName;
+            if (this.state.user) {
+                listProjects(this.state.user).then(existingProjects => {
+                    if (existingProjects.indexOf(name) === -1) {
+                        // No name conflict: go ahead with import.
                         this.setState(newState, this.saveSession);
-                    })
-                }
-            });
+                    }
+                    else {
+                        // Name conflict. Generate new name.
+                        getUnusedProjectName(this.state.user, name).then(newName => {
+                            newState.projectName = newName;
+                            this.setState(newState, this.saveSession);
+                        })
+                    }
+                });
+            }
+            else 
+                this.setState(newState);
         }
         else {
             console.error(new Error('Unable to load project - invalid format.'));
@@ -531,15 +703,18 @@ class App extends Component {
     }
 
     handleRequestOpenProject(projectName) {
-        loadProject(projectName).then(savedProject => {
-            const newState = createFreshState();
+        loadProject(this.state.user, projectName).then(savedProject => {
+            const newState = createFreshState(this.state.user);
+            let upgradedProject = false;
             if (savedProject) {
                 newState.project = Object.assign({}, savedProject);
-                if (projectNeedsUpgrade(newState.project))
+                if (projectNeedsUpgrade(newState.project)) {
+                    upgradedProject = true;
                     newState.project = upgradeProject(newState.project);
+                }
             }
             newState.projectName = projectName;
-            this.setState(newState, this.saveSession);
+            this.setState(newState, upgradedProject ? this.saveSession : () => null);
         })        
     }
 
@@ -571,15 +746,19 @@ class App extends Component {
         const newRegions = this.state.project.regions.slice();
 
         const originalData = newRegions.find(current => current.id === regionId);
+        const updatedRegion = Object.assign({}, originalData, data);
         const indexOfRegion = newRegions.indexOf(originalData);
-        newRegions.splice(indexOfRegion, 1, Object.assign({}, originalData, data));
+        newRegions.splice(indexOfRegion, 1, updatedRegion);
 
         this.setState({
             project: Object.assign({}, this.state.project, {
                 regions: newRegions
             }),
             editRegionDialogOpen: false
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user)
+                saveRegionEdits(this.state.user, this.state.projectName, updatedRegion);
+        });
     }
 
     handleAcceptSectionEdits(sectionId, data) {
@@ -588,14 +767,18 @@ class App extends Component {
 
         const originalData = newSections.find(current => current.id === sectionId);
         const indexOfSection = newSections.indexOf(originalData);
-        newSections.splice(indexOfSection, 1, Object.assign({}, originalData, data));
+        const updatedSection = Object.assign({}, originalData, data);
+        newSections.splice(indexOfSection, 1, updatedSection);
 
         this.setState({
             project: Object.assign({}, this.state.project, {
                 sections: newSections
             }),
             editSectionDialogOpen: false
-        }, this.saveSession)
+        }, () => {
+            if (this.state.user)
+                saveSectionEdits(this.state.user, this.state.projectName, updatedSection);
+        });
     }
 
     handleAcceptMemberEdits (memberId, data) {
@@ -604,19 +787,23 @@ class App extends Component {
         
         const originalData = newMembers.find(current => current.id === memberId);
         const indexOfMember = newMembers.indexOf(originalData);
-        newMembers.splice(indexOfMember, 1, Object.assign({}, originalData, data));
+        const updatedMember = Object.assign({}, originalData, data);
+        newMembers.splice(indexOfMember, 1, updatedMember);
 
         this.setState({
             project: Object.assign({}, this.state.project, {
                 members: newMembers
             }),
             editMemberDialogOpen: false
-        }, this.saveSession)
+        }, () => {
+            if (this.state.user)
+                saveMemberEdits(this.state.user, this.state.projectName, updatedMember);
+        });
     }
 
     handleAcceptRenameProject (newName) {
         const oldName = this.state.projectName;
-        renameProject(oldName, newName).then(() => {
+        renameProject(this.state.user, oldName, newName).then(() => {
             this.setState({projectName: newName});
         }).catch(() => {
             console.error(new Error(`Unable to rename project: a project ${newName} already exists.`));
@@ -652,6 +839,23 @@ class App extends Component {
         this.setState({projectOptionsDialogOpen: false});
     }
 
+    // AUTH
+
+    handleRequestLogin() {
+        auth.signInWithPopup(provider).then(result => {
+            const user = result.user;
+            this.setState({user});
+        });
+    }
+
+    handleRequestLogout() {
+        auth.signOut().then(() => {
+            this.setState({
+                user: null
+            });
+        });
+    }
+
     render() {
         return <React.Fragment>
             <MenuDrawer drawerOpen={this.state.drawerOpen}
@@ -663,7 +867,10 @@ class App extends Component {
                 onRequestOpenProject={this.handleRequestOpenProject}
                 onRequestRenameProject={this.handleAcceptRenameProject}
                 onRequestDeleteProject={this.handleAcceptDeleteProject}
-                projectName={this.state.projectName} />
+                onRequestLogin={this.handleRequestLogin}
+                onRequestLogout={this.handleRequestLogout}
+                projectName={this.state.projectName}
+                user={this.state.user} />
 
             <MainToolbar id='rendering-toolbar'
                 implicitSeatsVisible={this.state.project.settings.implicitSeatsVisible}

@@ -115,6 +115,10 @@ body {
     padding-bottom: 5em;
 }
 
+.mdc-drawer__subtitle + .mdc-drawer__subtitle {
+    margin-top: 1em;
+}
+
 .mdc-list-item {
     cursor: pointer;
     user-select: none;

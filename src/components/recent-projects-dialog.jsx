@@ -21,7 +21,7 @@ class RecentProjectsDialog extends PureComponent {
     render() {
         return <SimpleDialog open={this.props.open} onClose={this.props.onClose}
             title='Recent projects'
-            body={<ProjectList onProjectItemClick={this.props.onRequestOpenProject} lastUpdated={this.state.lastShown} />}
+            body={<ProjectList user={this.props.user} onProjectItemClick={this.props.onRequestOpenProject} lastUpdated={this.state.lastShown} />}
             acceptLabel={null} />;
     }
     

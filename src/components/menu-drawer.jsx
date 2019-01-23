@@ -2,14 +2,17 @@ import React, { PureComponent } from 'react';
 
 import { Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle } from '@rmwc/drawer';
 import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroupSubheader, ListDivider, ListItemGraphic } from '@rmwc/list';
+import { Button } from '@rmwc/button';
 
 import '@material/drawer/dist/mdc.drawer.css';
 import '@material/list/dist/mdc.list.css';
+import '@material/button/dist/mdc.button.css';
 
 import RenameDialog from './rename-dialog.jsx';
 import DeleteProjectDialog from './delete-project-dialog.jsx';
 import RecentProjectsDialog from './recent-projects-dialog.jsx';
 import AboutDialog from './about-dialog.jsx';
+import UserWidget from './user-widget.jsx';
 
 import PrintIcon from '../icons/baseline-print-24px.jsx';
 import EditIcon from '../icons/baseline-edit-24px.jsx';
@@ -166,7 +169,7 @@ class MenuDrawer extends PureComponent {
                     <ListDivider />
 
                     <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart</ListItem>
-                    <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open recent</ListItem>
+                    <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open project</ListItem>
                     <ListItem data-name='import' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Import</ListItem>
                     <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export</ListItem>
 
@@ -176,8 +179,16 @@ class MenuDrawer extends PureComponent {
                 </List>
             </DrawerContent>
             <DrawerHeader>
-                <DrawerSubtitle>v{APP_INFO.VERSION}</DrawerSubtitle>
-                <DrawerSubtitle>"{APP_INFO.CODENAME}"</DrawerSubtitle>
+                <DrawerSubtitle>
+                    {!this.props.user && <Button raised onClick={this.props.onRequestLogin}>Sign in with Google</Button>}
+                    {this.props.user && <React.Fragment>
+                        <UserWidget thumbnail={this.props.user.photoURL}
+                            displayName={this.props.user.displayName}
+                            email={this.props.user.email} />
+                        <Button raised onClick={this.props.onRequestLogout}>Sign out</Button>
+                    </React.Fragment>}
+                </DrawerSubtitle>
+                <DrawerSubtitle>v{APP_INFO.VERSION}<br />"{APP_INFO.CODENAME}"</DrawerSubtitle>
             </DrawerHeader>
         </Drawer>
         <RenameDialog open={this.state.renameDialogVisible} onCancel={this.handleRequestCancelRename}
@@ -192,7 +203,8 @@ class MenuDrawer extends PureComponent {
 
         <RecentProjectsDialog open={this.state.recentProjectsDialogVisible} 
             onClose={this.handleRequestCancelRecentProjects}
-            onRequestOpenProject={this.handleRequestOpenProject} />
+            onRequestOpenProject={this.handleRequestOpenProject}
+            user={this.props.user} />
 
         <AboutDialog open={this.state.aboutDialogVisible} onClose={this.handleRequestCancelAbout} />
     </React.Fragment>

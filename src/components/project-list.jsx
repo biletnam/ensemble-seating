@@ -27,10 +27,12 @@ class ProjectList extends PureComponent {
     }
 
     updateProjectList() {
-        listProjects().then(projects => {
-            if (projects)
-                this.setState({projects});
-        });
+        if (this.props.user) {
+            listProjects(this.props.user).then(projects => {
+                if (projects)
+                    this.setState({projects});
+            });
+        }
     }
 
     handleListItemClick (event) {
