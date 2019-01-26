@@ -21,6 +21,7 @@ import NoteAddIcon from '../icons/baseline-note_add-24px.jsx';
 import HistoryIcon from '../icons/baseline-history-24px.jsx';
 import FolderOpenIcon from '../icons/baseline-folder_open-24px.jsx';
 import SaveAltIcon from '../icons/baseline-save_alt-24px.jsx';
+import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
 import InfoIcon from '../icons/baseline-info-24px.jsx';
 
 class MenuDrawer extends PureComponent {
@@ -180,7 +181,7 @@ class MenuDrawer extends PureComponent {
 
                     <ListDivider />
 
-                    
+                    <ListItem data-name='feedback' tag='a' href='https://goo.gl/forms/UJ0XwlMNNjrskdQ33' target='_blank' rel='noopener'><ListItemGraphic icon={<FeedbackIcon />} />Feedback</ListItem>
                     <ListItem data-name='about' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<InfoIcon />} />About</ListItem>
                 </List>
             </DrawerContent>
