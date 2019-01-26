@@ -162,19 +162,25 @@ class MenuDrawer extends PureComponent {
             </DrawerHeader>
             <DrawerContent>
                 <List>
+                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart</ListItem>
                     <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
-                    <ListItem data-name='rename-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<EditIcon />} />Rename this project&hellip;</ListItem>
-                    <ListItem data-name='delete-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<DeleteForeverIcon />} />Delete this project&hellip;</ListItem>
 
                     <ListDivider />
 
-                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart</ListItem>
-                    <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open project</ListItem>
+                    {this.props.user && <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open project</ListItem>}
                     <ListItem data-name='import' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Import</ListItem>
                     <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export</ListItem>
 
+                    {this.props.user && <React.Fragment>
+                        <ListDivider />
+                    
+                        <ListItem data-name='rename-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<EditIcon />} />Rename this project&hellip;</ListItem>
+                        <ListItem data-name='delete-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<DeleteForeverIcon />} />Delete this project&hellip;</ListItem>
+                    </React.Fragment>}
+
                     <ListDivider />
 
+                    
                     <ListItem data-name='about' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<InfoIcon />} />About</ListItem>
                 </List>
             </DrawerContent>

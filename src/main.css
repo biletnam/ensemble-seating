@@ -115,6 +115,10 @@ body {
     padding-bottom: 5em;
 }
 
+.mdc-drawer__header:last-child {
+    padding-bottom: 1em;
+}
+
 .mdc-drawer__subtitle + .mdc-drawer__subtitle {
     margin-top: 1em;
 }
