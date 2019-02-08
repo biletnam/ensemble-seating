@@ -714,6 +714,7 @@ class App extends Component {
                 }
             }
             newState.projectName = projectName;
+            updateProjectQueryString(newState.projectName);
             this.setState(newState, upgradedProject ? this.saveSession : () => null);
         })        
     }
