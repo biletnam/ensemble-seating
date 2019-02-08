@@ -4,13 +4,11 @@ import { createSectionRow } from '../helpers/project-helpers.js';
 
 import { TwitterPicker } from 'react-color';
 
-import { Typography } from '@rmwc/typography';
 import { TextField } from '@rmwc/textfield';
 import { Button } from '@rmwc/button';
 import { IconButton } from '@rmwc/icon-button';
 import { Radio } from '@rmwc/radio';
 
-import '@material/typography/dist/mdc.typography.css';
 import '@material/textfield/dist/mdc.textfield.css';
 import '@material/button/dist/mdc.button.css';
 import '@material/icon-button/dist/mdc.icon-button.css';
@@ -132,18 +130,18 @@ class SectionEditor extends PureComponent {
         return <div>
             {this.props.data && <React.Fragment>
                 <div>
-                    <Typography use='headline6' tag='h2'>Name</Typography>
+                    <h2>Name</h2>
                     <TextField name='name' data-setting-type='name' value={this.props.data.name} onChange={this.handleChange} />
                 </div>
                 
                 <div>
-                    <Typography use='headline6' tag='h2'>Color</Typography>
+                    <h2>Color</h2>
                     <TwitterPicker color={this.props.data.color} onChange={this.handleColorChange} />
                 </div>
                 
                 <div>
-                    <Typography use='headline6' tag='h2'>Performers per row</Typography>
-                    <Typography use='body1' tag='h3'>Pick how many performers may be seated within each row of this section.</Typography>
+                    <h2>Performers per row</h2>
+                    <p>Pick how many performers may be seated within each row of this section.</p>
                 {this.props.data.rowSettings.map((current, index) => <div key={index + '-rowSettings'} className='text-input-wrapper'>
                     <TextField label={`Row ${index + 1}`} data-row={index} data-setting-type='rowSettings' name='min' value={current.min} onChange={this.handleChange} onBlur={this.handleRowBlur} />
                     <IconButton icon={<ClearIcon />} label='Remove row' onClick={this.handleClickedRemoveRow} data-row={index} />
@@ -153,8 +151,8 @@ class SectionEditor extends PureComponent {
                 </div>
 
                 <div>
-                    <Typography use='headline6' tag='h2'>Position</Typography>
-                    <Typography use='body1' tag='h3'>Pick how close to the front of the ensemble this section's seats should begin.</Typography>
+                    <h2>Position</h2>
+                    <p>Pick how close to the front of the ensemble this section's seats should begin.</p>
                     <div>
                         <Radio value='first-row' name='offsetType'
                             data-setting-type='offsetType'

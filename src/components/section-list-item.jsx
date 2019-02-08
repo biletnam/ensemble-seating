@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 
 import { IconButton } from '@rmwc/icon-button';
 import { ListItem, ListGroup } from '@rmwc/list';
-import { Typography } from '@rmwc/typography';
 import { Elevation } from '@rmwc/elevation';
 
 import SectionMember from './section-member.jsx';
@@ -10,7 +9,6 @@ import ColorSquare from './color-square.jsx';
 
 import '@material/textfield/dist/mdc.textfield.css';
 import '@material/list/dist/mdc.list.css';
-import '@material/typography/dist/mdc.typography.css';
 import '@material/icon-button/dist/mdc.icon-button.css';
 import '@material/elevation/dist/mdc.elevation.css';
 
@@ -75,7 +73,7 @@ class SectionListItem extends PureComponent {
                         <Elevation z={1}>
                             <ListGroup>
                                 <ListItem {...provided.dragHandleProps} key={this.props.data.id} onClick={this.handleClickedSectionButton} selected={this.props.data.id === this.props.editorId}>
-                                    <Typography use='headline6'>{this.props.data.name}</Typography>
+                                    <p>{this.props.data.name}</p>
                                     <ColorSquare color={this.props.data.color} />
                                     {this.props.data.id === this.props.editorId && <React.Fragment>
                                         <IconButton onClick={this.handleClickedDeleteSection} icon={<DeleteIcon />} label='Delete section' style={editStyle} />

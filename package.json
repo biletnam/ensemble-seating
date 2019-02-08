@@ -43,7 +43,6 @@
     "@rmwc/switch": "^4.0.6",
     "@rmwc/textfield": "^4.0.6",
     "@rmwc/toolbar": "^4.0.6",
-    "@rmwc/typography": "^4.0.6",
     "autoprefixer": "^9.4.6",
     "babel-loader": "^8.0.5",
     "clean-webpack-plugin": "^1.0.1",

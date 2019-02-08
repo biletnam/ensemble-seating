@@ -2,15 +2,12 @@ import React, { PureComponent } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
-import { Typography } from '@rmwc/typography';
-import '@material/typography/dist/mdc.typography.css';
-
 import RegionListItem from './region-list-item.jsx';
 
 class SectionsList extends PureComponent {
     render() {
         return <aside id={this.props.id} className={this.props.sections.length === 0 && this.props.regions.length === 1 ? `${this.props.id}--empty` : ''}>
-            {this.props.sections.length === 0 && this.props.regions.length === 1 && <Typography tag='p' use='subtitle1'>No sections to display</Typography>}
+            {this.props.sections.length === 0 && this.props.regions.length === 1 && <p>No sections to display</p>}
             <DragDropContext onDragEnd={this.props.onDragEnd}>
                 {this.props.regions.map(currentRegion => <RegionListItem
                     key={currentRegion.id}

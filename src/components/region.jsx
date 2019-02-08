@@ -2,10 +2,7 @@ import React, { PureComponent } from 'react';
 
 import Seat from './seat.jsx';
 
-import { Typography } from '@rmwc/typography';
 import { Button } from '@rmwc/button';
-
-import '@material/typography/dist/mdc.typography.css';
 import '@material/button/dist/mdc.button.css';
 
 import {
@@ -37,7 +34,7 @@ class Region extends PureComponent {
     render() {
         if (this.props.sections.length === 0) {
             return <div className='rendering-area__stage'>
-                    <Typography tag='p' use='headline6'>No seats to display</Typography>
+                    <p>No seats to display</p>
                     <div>
                         <Button raised onClick={this.handleClickedNewSectionButton}>Create a section</Button>
                     </div>

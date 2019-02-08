@@ -1,18 +1,15 @@
 import React, {Component} from 'react';
 
 import {SimpleDialog} from '@rmwc/dialog';
-import {Typography} from '@rmwc/typography';
-
 import '@material/dialog/dist/mdc.dialog.css';
-import '@material/typography/dist/mdc.typography.css';
 
 const BODY_CONTENT = <div>
-    <Typography tag='h3' use='subtitle1'>
+    <h3>
         {APP_INFO.NAME} v{APP_INFO.VERSION} "{APP_INFO.CODENAME}"
-    </Typography>
+    </h3>
     
-    <Typography tag='p' use='body1'>Ensemble Seating helps you create a seating chart for your musical ensembles, section by section.</Typography>
-    <Typography tag='p' use='body1'>This project is open source. <a target='_blank' href='https://github.com/acmertz/ensemble-seating' rel='noopener'>View the source on GitHub</a></Typography>
+    <p>Ensemble Seating helps you create a seating chart for your musical ensembles, section by section.</p>
+    <p>This project is open source. <a target='_blank' href='https://github.com/acmertz/ensemble-seating' rel='noopener'>View the source on GitHub</a></p>
 </div>;
 
 const AboutDialog = props => (
