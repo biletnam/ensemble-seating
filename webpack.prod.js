@@ -23,15 +23,15 @@ module.exports = merge(common, {
         new HtmlWebpackIncludeAssetsPlugin({
             assets: [
                 {
-                    path: 'https://unpkg.com/react@16.7.0/umd/react.production.min.js',
+                    path: 'https://unpkg.com/react@16.8.1/umd/react.production.min.js',
                     attributes: externalAttributes
                 },
                 {
-                    path: 'https://unpkg.com/react-dom@16.7.0/umd/react-dom.production.min.js',
+                    path: 'https://unpkg.com/react-dom@16.8.1/umd/react-dom.production.min.js',
                     attributes: externalAttributes
                 },
                 {
-                    path: 'https://unpkg.com/react-beautiful-dnd@10.0.3/dist/react-beautiful-dnd.min.js',
+                    path: 'https://unpkg.com/react-beautiful-dnd@10.0.4/dist/react-beautiful-dnd.min.js',
                     attributes: externalAttributes
                 }
             ],
