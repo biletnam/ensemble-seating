@@ -19,6 +19,7 @@ import firebase, { auth, provider } from './helpers/firebase-helpers.js';
 
 import {
     saveProject,
+    saveMetadata,
     saveRegionOrder,
     saveSectionOrder,
     saveMemberOrder,
@@ -74,6 +75,7 @@ function createFreshState(user) {
         drawerOpen: false,
         editorId: null,
         project: null,
+        needFullSave: false,
         initProject: false,
         projectName: null,
         user
@@ -94,6 +96,7 @@ class App extends Component {
         this.state.project = createEmptyProject();
 
         this.saveSession = this.saveSession.bind(this);
+        this.fullSaveIfNeeded = this.fullSaveIfNeeded.bind(this);
         this.deleteSection = this.deleteSection.bind(this);
         this.deleteMember = this.deleteMember.bind(this);
         this.batchAddMembers = this.batchAddMembers.bind(this);
@@ -153,7 +156,6 @@ class App extends Component {
 
     initFirstLaunch(user) {
         // Todo: if the user is already logged in, restore settings and open project (if there is one in the query string)
-        // If project source is local, load from the local DB
 
         const urlParams = new URLSearchParams(location.search);
         const nameParam = urlParams.get('project');
@@ -164,6 +166,7 @@ class App extends Component {
 
         if (user) {
             listProjects(user).then(projects => {
+                // If project exists, open it
                 if (projects.indexOf(initProject) !== -1) {
                     loadProject(user, initProject).then(project => {
                         if (project) {
@@ -181,14 +184,16 @@ class App extends Component {
                         }
                     });
                 }
+
+                // Otherwise, create fresh project and schedule save for next interaction
                 else {
                     getUnusedProjectName(user).then(projectName => {
                         this.setState({
-                            project: createEmptyProject(),
                             projectName,
-                            user
+                            user,
+                            needFullSave: true
                         }, () => {
-                            updateProjectQueryString(projectName, user);
+                            resetProjectQueryString();
                             hideLoadingScreen();
                         });
                     });
@@ -196,6 +201,8 @@ class App extends Component {
             });
         }
         else {
+            // Not logged in. Create fresh project (app launches with fresh project)
+            resetProjectQueryString();
             hideLoadingScreen();
         }
     }
@@ -211,30 +218,33 @@ class App extends Component {
             // App is already running. User logged in or out.
             this.setState({user}, () => {
                 if (user) {
-                    // Cases:
-                    listProjects().then(localProjects => {
-                        // 1.) User logs in; has local projects
-                        if (localProjects.length > 0) {
-                            // Import all into cloud in background
-                            for (let i=0; i<localProjects.length; i++) {
-                                const projectName = localProjects[i];
-                                loadProject(null, projectName).then(project => {
-                                    saveProject(user, project, projectName);
-                                    deleteProject(null, projectName);
-                                });
+                    // User logs in; has a "fresh" (unmodified, just started) project
+                    if (JSON.stringify(this.state.project) === JSON.stringify(createEmptyProject())) {
+                        listProjects(user).then(cloudProjects => {
+                            // Load project if it already exists
+                            if (cloudProjects.indexOf(this.state.projectName) !== -1) {
+                                this.handleRequestOpenProject(this.state.projectName);
                             }
-                        }
+                            
+                            // Schedule save for the next interaction
+                            else {
+                                this.setState({needFullSave: true});
+                            }
+                        });
+                    }
 
-                        // 2.) User logs in; has a "fresh" (unmodified, just started) project
-                        if (JSON.stringify(this.state.project) === JSON.stringify(createEmptyProject())) {
-                            listProjects(user).then(cloudProjects => {
-                                if (cloudProjects.indexOf(this.state.projectName) !== -1) {
-                                    // Project already exists in cloud. Load it now.
-                                    this.handleRequestOpenProject(this.state.projectName);
+                    else {
+                        // Project is not fresh. Generate fresh name and immediately save
+                        getUnusedProjectName(user).then(name => {
+                            this.setState(Object.assign({},
+                                createFreshState(this.state.user),
+                                {
+                                    project: this.state.project,
+                                    projectName: name
                                 }
-                            });
-                        }
-                    });
+                            ), this.saveSession);
+                        });
+                    }
                 }
                 else {
                     // Cases:
@@ -249,6 +259,14 @@ class App extends Component {
     saveSession() {
         if (this.state.user)
             saveProject(this.state.user, this.state.project, this.state.projectName)
+    }
+
+    fullSaveIfNeeded() {
+        if (this.state.user && this.state.needFullSave) {
+            this.setState({needFullSave: false}, () =>{
+                this.saveSession();
+            });
+        }
     }
 
     deleteRegion() {
@@ -279,6 +297,8 @@ class App extends Component {
                 for (let i=0; i<membersToRemove.length; i++) {
                     deleteMemberData(this.state.user, membersToRemove[i].id);
                 }
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -303,6 +323,8 @@ class App extends Component {
                 for (let i=0; i<membersToRemove.length; i++) {
                     deleteMemberData(this.state.user, membersToRemove[i].id);
                 }
+
+                this.fullSaveIfNeeded()
             }
         });
     }
@@ -321,6 +343,8 @@ class App extends Component {
             if (this.state.user) {
                 saveMemberOrder(this.state.user, this.state.projectName, members.map(current => current.id));
                 deleteMemberData(this.state.user, memberId);
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -341,6 +365,8 @@ class App extends Component {
                 for (let i=0; i<newMembers.length; i++) {
                     saveNewMember(this.state.user, this.state.projectName, newMembers[i]);
                 }
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -366,6 +392,8 @@ class App extends Component {
             if (this.state.user) {
                 saveMemberOrder(this.state.user, this.state.projectName, this.state.project.members.map(current => current.id));
                 saveMemberEdits(this.state.user, this.state.projectName, {section: sectionId});
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -380,8 +408,11 @@ class App extends Component {
         this.setState({
             project: Object.assign({}, this.state.project, {regions})
         }, () => {
-            if (this.state.user)
+            if (this.state.user) {
                 saveRegionOrder(this.state.user, this.state.projectName, this.state.project.regions.map(current => current.id));
+
+                this.fullSaveIfNeeded();
+            }
         });
     }
 
@@ -409,6 +440,8 @@ class App extends Component {
             if (this.state.user) {
                 saveSectionOrder(this.state.user, this.state.projectName, this.state.project.sections.map(current => current.id));
                 saveSectionEdits(this.state.user, this.state.projectName, {region: destinationId});
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -424,6 +457,8 @@ class App extends Component {
             if (this.state.user) {
                 saveRegionOrder(this.state.user, this.state.projectName, this.state.project.regions.map(current => current.id));
                 saveNewRegion(this.state.user, this.state.projectName, newRegion);
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -433,7 +468,8 @@ class App extends Component {
             getUnusedProjectName(this.state.user).then(name => {
                 const newState = Object.assign({}, createFreshState(this.state.user), {
                     project: createEmptyProject(),
-                    projectName: name
+                    projectName: name,
+                    needFullSave: true
                 })
         
                 this.setState(newState, () => {
@@ -445,12 +481,12 @@ class App extends Component {
 
     handleClickedToolbarButton(event) {
         const newState = {};
-        let saveProject = false;
+        let saveNeeded = false;
         if (event.target.name === 'sort') {
             newState.project = Object.assign({}, this.state.project);
             newState.project.settings = Object.assign({}, this.state.project.settings);
             newState.project.settings.downstageTop = !this.state.project.settings.downstageTop;
-            saveProject = true;
+            saveNeeded = true;
         }
 
         if (event.target.name === 'menu') {
@@ -464,7 +500,14 @@ class App extends Component {
         if (event.target.name === 'project-settings') {
             newState.projectOptionsDialogOpen = true;
         }
-        this.setState(newState, saveProject ? this.saveSession : () => {});
+        this.setState(newState, () => {
+            if (this.state.user && saveNeeded) {
+                saveMetadata(this.state.user, this.state.projectName, Object.assign({},
+                    this.state.project.settings,
+                    {appVersion: this.state.project.appVersion}
+                ));
+            }
+        });
     }
 
     handleClickedNewSectionButton(regionId) {
@@ -495,6 +538,8 @@ class App extends Component {
                 saveNewSection(this.state.user, this.state.projectName, newSection);
                 if (newRegion)
                     saveNewRegion(this.state.user, this.state.projectName, newRegion);
+
+                this.fullSaveIfNeeded();
             }
         });
     }
@@ -521,7 +566,16 @@ class App extends Component {
         const newSettings = Object.assign({}, this.state.project.settings, newSetting);
         this.setState({
             project: Object.assign({}, this.state.project, {settings: newSettings})
-        }, this.saveSession);
+        }, () => {
+            if (this.state.user) {
+                saveMetadata(this.state.user, this.state.projectName, Object.assign({},
+                    this.state.project.settings,
+                    {appVersion: this.state.project.appVersion}
+                ));
+
+                this.fullSaveIfNeeded();
+            }
+        });
     }
 
     handleRequestedDeleteRegion(regionId) {
@@ -640,7 +694,8 @@ class App extends Component {
                     createFreshState(this.state.user),
                     {
                         project: createEmptyProject(),
-                        projectName: name
+                        projectName: name,
+                        needFullSave: true
                     }
                 ));
                 resetProjectQueryString();
@@ -651,8 +706,10 @@ class App extends Component {
                 createFreshState(this.state.user),
                 {
                     project: createEmptyProject(),
+                    needFullSave: true
                 }
             ));
+            resetProjectQueryString();
         }
     }
 
@@ -757,8 +814,11 @@ class App extends Component {
             }),
             editRegionDialogOpen: false
         }, () => {
-            if (this.state.user)
+            if (this.state.user) {
                 saveRegionEdits(this.state.user, this.state.projectName, updatedRegion);
+
+                this.fullSaveIfNeeded();
+            }
         });
     }
 
@@ -777,8 +837,11 @@ class App extends Component {
             }),
             editSectionDialogOpen: false
         }, () => {
-            if (this.state.user)
+            if (this.state.user) {
                 saveSectionEdits(this.state.user, this.state.projectName, updatedSection);
+
+                this.fullSaveIfNeeded();
+            }
         });
     }
 
@@ -797,8 +860,11 @@ class App extends Component {
             }),
             editMemberDialogOpen: false
         }, () => {
-            if (this.state.user)
+            if (this.state.user) {
                 saveMemberEdits(this.state.user, this.state.projectName, updatedMember);
+
+                this.fullSaveIfNeeded();
+            }
         });
     }
 
