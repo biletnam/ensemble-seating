@@ -104,6 +104,10 @@ export function saveProject(user, project, name) {
     });
 }
 
+export function saveMetadata(user, name, metadata) {
+    return firebase.database().ref(`projects/${user.uid}/${name}`).set(metadata);
+}
+
 export function saveRegionOrder(user, projectName, regions) {
     return firebase.database().ref(`regions/${user.uid}/${projectName}`).set(regions);
 }
