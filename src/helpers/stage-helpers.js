@@ -88,10 +88,10 @@ export function generateRows(sectionData) {
     }, {});
 
     for (const currentRow of rows) {
-        const midpoint = Math.floor((currentRow.length - 1) / 2);
+        const midpoint = Math.floor(currentRow.length / 2);
         for (let i=0; i<currentRow.length; i++) {
             const currentSeat = currentRow[i];
-            if (i < midpoint) {
+            if (i <= midpoint) {
                 sectionDirectionTotals[currentSeat.section].firstHalf++
             }
             else
