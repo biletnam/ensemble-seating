@@ -276,7 +276,7 @@ class App extends Component {
         const sections = this.state.project.sections.filter(current => current.region !== regionId);
         const sectionsToRemove = this.state.project.sections.filter(current => current.region === regionId);
         const members = this.state.project.members.filter(current => sections.some(currentSection => currentSection.id === current.section));
-        const membersToRemove = this.state.promega.members.filter(current => sectionsToRemove.some(currentSection => currentSection.id === current.section));
+        const membersToRemove = this.state.project.members.filter(current => sectionsToRemove.some(currentSection => currentSection.id === current.section));
         this.setState({
             project: Object.assign({}, this.state.project, {regions, sections, members}),
             editorId: null,
@@ -585,7 +585,7 @@ class App extends Component {
             editorId: regionId,
             deleteRegionId: regionId,
             deleteRegionName: requestedRegion.name,
-            deleteRegionAffectedSections: affectedSections.map(current => current.name),
+            deleteRegionAffectedSections: affectedSections.slice(),
             deleteRegionDialogOpen: true
         });
     }
@@ -978,7 +978,7 @@ class App extends Component {
                 body={<React.Fragment>
                     <p>This will also delete the following sections and all their section members:</p>
                     <ul>
-                        {this.state.deleteRegionAffectedSections.map(current => <li>{current}</li>)}
+                        {this.state.deleteRegionAffectedSections.map(current => <li key={current.id}>{current.name}</li>)}
                     </ul>
                 </React.Fragment>}
                 open={this.state.deleteRegionDialogOpen}
