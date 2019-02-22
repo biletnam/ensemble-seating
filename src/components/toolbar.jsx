@@ -8,6 +8,8 @@ import '@material/floating-label/dist/mdc.floating-label.css';
 import '@material/notched-outline/dist/mdc.notched-outline.css';
 import '@material/line-ripple/dist/mdc.line-ripple.css';
 
+import InlineInput from './inline-input.jsx';
+
 import MenuIcon from '../icons/baseline-menu-24px.jsx';
 import HorizontalSplitIcon from '../icons/baseline-horizontal_split-24px.jsx';
 import RotateIcon from '../icons/baseline-rotate_90_degrees_ccw-24px.jsx';
@@ -22,7 +24,9 @@ const MainToolbar = props => (
                     title='Menu'
                     icon={<MenuIcon />}
                     onClick={props.onToolbarButtonClick} />
-                <ToolbarTitle>{props.projectName}</ToolbarTitle>
+                <ToolbarTitle>
+                    <InlineInput value={props.projectName} placeholder='Untitled project' onChange={props.onRequestRenameProject} autosaveTimeout={10000} />
+                </ToolbarTitle>
             </ToolbarSection>
 
             <ToolbarSection alignEnd>

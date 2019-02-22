@@ -1,0 +1,25 @@
+.inline-input {
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    color: currentColor;
+    background-color: transparent;
+    border-bottom: 1px solid #fff;
+    font-size: 1em;
+    padding-left: .25em;
+    padding-right: .25em;
+    transition: background-color .1s ease-in-out;
+}
+
+.inline-input:not(:disabled):hover {
+    background-color: rgba(255, 255, 255, .05);
+}
+
+.inline-input:not(:disabled):focus {
+    background-color: rgba(255, 255, 255, .1);
+}
+
+.inline-input::placeholder {
+    color: currentColor;
+    opacity: .75;
+}

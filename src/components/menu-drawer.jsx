@@ -8,14 +8,12 @@ import '@material/drawer/dist/mdc.drawer.css';
 import '@material/list/dist/mdc.list.css';
 import '@material/button/dist/mdc.button.css';
 
-import RenameDialog from './rename-dialog.jsx';
 import DeleteProjectDialog from './delete-project-dialog.jsx';
 import RecentProjectsDialog from './recent-projects-dialog.jsx';
 import AboutDialog from './about-dialog.jsx';
 import UserWidget from './user-widget.jsx';
 
 import PrintIcon from '../icons/baseline-print-24px.jsx';
-import EditIcon from '../icons/baseline-edit-24px.jsx';
 import DeleteForeverIcon from '../icons/baseline-delete_forever-24px.jsx';
 import NoteAddIcon from '../icons/baseline-note_add-24px.jsx';
 import HistoryIcon from '../icons/baseline-history-24px.jsx';
@@ -30,7 +28,6 @@ class MenuDrawer extends PureComponent {
 
         this.state = {
             aboutDialogVisible: false,
-            renameDialogVisible: false,
             recentProjectsDialogVisible: false,
             deleteProjectDialogVisible: false
         }
@@ -39,11 +36,9 @@ class MenuDrawer extends PureComponent {
         this.handleSelectFileForImport = this.handleSelectFileForImport.bind(this);
         this.handleFileReaderLoaded = this.handleFileReaderLoaded.bind(this);
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
-        this.handleAcceptRename = this.handleAcceptRename.bind(this);
         this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
 
         // Dialog cancel listeners
-        this.handleRequestCancelRename = this.handleRequestCancelRename.bind(this);
         this.handleRequestCancelDeleteProject = this.handleRequestCancelDeleteProject.bind(this);
         this.handleRequestCancelRecentProjects = this.handleRequestCancelRecentProjects.bind(this);
         this.handleRequestCancelAbout = this.handleRequestCancelAbout.bind(this);
@@ -54,9 +49,6 @@ class MenuDrawer extends PureComponent {
             case 'print-project':
                 if (typeof this.props.onRequestPrintProject === 'function')
                     this.props.onRequestPrintProject();
-                break;
-            case 'rename-project':
-                this.setState({renameDialogVisible: true});
                 break;
             case 'delete-project':
                 this.setState({deleteProjectDialogVisible: true});
@@ -123,13 +115,6 @@ class MenuDrawer extends PureComponent {
         })
     }
 
-    handleAcceptRename(newName) {
-        this.setState({renameDialogVisible: false}, () => {
-            if (typeof this.props.onRequestRenameProject === 'function')
-                this.props.onRequestRenameProject(newName);
-        });
-    }
-
     handleAcceptDeleteProject() {
         this.setState({deleteProjectDialogVisible: false}, () => {
             if (typeof this.props.onRequestDeleteProject === 'function')
@@ -138,10 +123,6 @@ class MenuDrawer extends PureComponent {
     }
 
     // Dialog cancel listeners
-    handleRequestCancelRename() {
-        this.setState({renameDialogVisible: false});
-    }
-
     handleRequestCancelDeleteProject() {
         this.setState({deleteProjectDialogVisible: false});
     }
@@ -174,8 +155,6 @@ class MenuDrawer extends PureComponent {
 
                     {this.props.user && <React.Fragment>
                         <ListDivider />
-                    
-                        <ListItem data-name='rename-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<EditIcon />} />Rename this project&hellip;</ListItem>
                         <ListItem data-name='delete-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<DeleteForeverIcon />} />Delete this project&hellip;</ListItem>
                     </React.Fragment>}
 
@@ -201,11 +180,6 @@ class MenuDrawer extends PureComponent {
                 </DrawerSubtitle>
             </DrawerHeader>
         </Drawer>
-        <RenameDialog open={this.state.renameDialogVisible} onCancel={this.handleRequestCancelRename}
-            onAccept={this.handleAcceptRename}
-            title='Rename project'
-            label='Project name'
-            value={this.props.projectName} />
 
         <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={this.handleRequestCancelDeleteProject}
             onAccept={this.handleAcceptDeleteProject}

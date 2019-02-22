@@ -869,12 +869,16 @@ class App extends Component {
     }
 
     handleAcceptRenameProject (newName) {
-        const oldName = this.state.projectName;
-        renameProject(this.state.user, oldName, newName).then(() => {
+        if (this.state.user) {
+            const oldName = this.state.projectName;
+            renameProject(this.state.user, oldName, newName).then(() => {
+                this.setState({projectName: newName});
+            }).catch(() => {
+                console.error(new Error(`Unable to rename project: a project ${newName} already exists.`));
+            });
+        }
+        else
             this.setState({projectName: newName});
-        }).catch(() => {
-            console.error(new Error(`Unable to rename project: a project ${newName} already exists.`));
-        });
     }
 
     handleAcceptDeleteProject () {
@@ -932,7 +936,6 @@ class App extends Component {
                 onRequestImportProject={this.handleRequestImportProject}
                 onRequestExportProject={this.handleRequestExportProject}
                 onRequestOpenProject={this.handleRequestOpenProject}
-                onRequestRenameProject={this.handleAcceptRenameProject}
                 onRequestDeleteProject={this.handleAcceptDeleteProject}
                 onRequestLogin={this.handleRequestLogin}
                 onRequestLogout={this.handleRequestLogout}
@@ -942,6 +945,7 @@ class App extends Component {
             <MainToolbar id='rendering-toolbar'
                 implicitSeatsVisible={this.state.project.settings.implicitSeatsVisible}
                 downstageTop={this.state.project.settings.downstageTop}
+                onRequestRenameProject={this.handleAcceptRenameProject}
                 projectName={this.state.projectName}
                 onToolbarButtonClick={this.handleClickedToolbarButton} />
 
