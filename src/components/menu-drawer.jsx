@@ -195,7 +195,10 @@ class MenuDrawer extends PureComponent {
                         <Button raised onClick={this.props.onRequestLogout}>Sign out</Button>
                     </React.Fragment>}
                 </DrawerSubtitle>
-                <DrawerSubtitle>v{APP_INFO.VERSION}<br />"{APP_INFO.CODENAME}"</DrawerSubtitle>
+                <DrawerSubtitle>
+                    <a target='_blank' rel='noopener' href={`https://github.com/acmertz/ensemble-seating/releases/tag/v${APP_INFO.VERSION}`}>v{APP_INFO.VERSION}</a><br />
+                    "{APP_INFO.CODENAME}"
+                </DrawerSubtitle>
             </DrawerHeader>
         </Drawer>
         <RenameDialog open={this.state.renameDialogVisible} onCancel={this.handleRequestCancelRename}
