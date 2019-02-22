@@ -238,7 +238,7 @@ body {
     margin-top: 1em;
 }
 
-button > svg {
+button > svg, button > .rmwc-icon {
     pointer-events: none;
 }
 
