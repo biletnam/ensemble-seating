@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import './inline-input.css';
 
-class TitleInput extends Component {
+class InlineInput extends Component {
     constructor(props) {
         super(props);
 
@@ -84,4 +84,4 @@ class TitleInput extends Component {
     }
 }
 
-export default TitleInput;
+export default InlineInput;
