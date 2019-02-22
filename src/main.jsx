@@ -73,6 +73,7 @@ function createFreshState(user) {
         editMemberDialogOpen: false,
         projectOptionsDialogOpen: false,
         drawerOpen: false,
+        rosterOpen: true,
         editorId: null,
         project: null,
         needFullSave: false,
@@ -124,6 +125,8 @@ class App extends Component {
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
         this.handleAcceptRenameProject = this.handleAcceptRenameProject.bind(this);
         this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
+
+        this.handleToggleRoster = this.handleToggleRoster.bind(this);
 
         // Dialogs
         this.handleDeleteRegionDialogClosed = this.handleDeleteRegionDialogClosed.bind(this);
@@ -776,6 +779,10 @@ class App extends Component {
         })        
     }
 
+    handleToggleRoster(event) {
+        this.setState({rosterOpen: !this.state.rosterOpen});
+    }
+
     /* DIALOG EVENTS */
     handleDeleteRegionDialogClosed(event) {
         if (event.detail.action === 'accept')
@@ -956,6 +963,7 @@ class App extends Component {
                 members={this.state.project.members}
                 settings={this.state.project.settings}
                 editorId={this.state.editorId}
+                expanded={!this.state.rosterOpen}
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestNewSection={this.handleClickedNewSectionButton} />
 
@@ -964,6 +972,8 @@ class App extends Component {
                 sections={this.state.project.sections}
                 members={this.state.project.members}
                 regions={this.state.project.regions}
+                expanded={this.state.rosterOpen}
+                onToggleVisibility={this.handleToggleRoster}
                 onRequestNewSection={this.handleClickedNewSectionButton}
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}

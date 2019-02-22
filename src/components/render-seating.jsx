@@ -39,7 +39,11 @@ class SeatingRenderer extends PureComponent {
         if (this.props.settings.downstageTop)
             regionsToRender.reverse();
 
-        return <div id={this.props.id}>{regionsToRender}</div>;
+        let className = '';
+        if (this.props.expanded)
+            className = `${this.props.id}--expanded`
+
+        return <div id={this.props.id} className={className}>{regionsToRender}</div>;
     }
 }
 
