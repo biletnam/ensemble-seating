@@ -3,6 +3,7 @@ import randomColor from 'randomcolor';
 import idb from 'idb';
 import semver from 'semver';
 import firebase, { auth, provider } from './firebase-helpers.js';
+import {templates} from '../templates/index.js';
 
 const PROJECTS_KEY = 'projects';
 const DEFAULT_NAME = 'Untitled';
@@ -368,18 +369,34 @@ export function listProjects(user) {
 }
 
 /* Create types */
-export function createEmptyProject () {
-    return {
-        regions: [createRegion()],
-        sections: new Array(),
-        members: new Array(),
-        settings: {
-            seatNameLabels: 'initials',
-            downstageTop: false,
-            implicitSeatsVisible: false
-        },
-        appVersion: PROJECT_FORMAT_VER
-    };
+export function createEmptyProject (templateId = 'blank') {
+    // Get project from templates
+    const project = templates.find(template => template.id === templateId).data;
+
+    // Update regions
+    for (const region of project.regions) {
+        const newId = uuid();
+
+        project.sections.filter(section => section.region === region.id).forEach(section => {
+            section.region = newId;
+        });
+        region.id = newId;
+    }
+
+    // Update sections
+    for (const section of project.sections) {
+        const newId = uuid();
+
+        project.members.filter(member => member.section === section.id).forEach(member => {
+            member.section = newId;
+        });
+        section.id = newId;
+    }
+
+    // Update any other metadata
+    project.appVersion = PROJECT_FORMAT_VER;
+    
+    return project;
 }
 
 

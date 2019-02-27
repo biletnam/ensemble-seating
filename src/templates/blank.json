@@ -1,0 +1,17 @@
+{
+    "regions": [
+      {
+        "name": "Untitled region",
+        "id": "region-1",
+        "curvedLayout": true
+      }
+    ],
+    "sections": [],
+    "members": [],
+    "settings": {
+      "seatNameLabels": "initials",
+      "downstageTop": false,
+      "implicitSeatsVisible": false
+    },
+    "appVersion": null
+  }

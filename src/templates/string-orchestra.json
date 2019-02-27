@@ -1,0 +1,119 @@
+{
+    "regions": [
+      {
+        "name": "Untitled region",
+        "id": "region-1",
+        "curvedLayout": true
+      }
+    ],
+    "sections": [
+      {
+        "name": "Violin 1",
+        "color": "#83d8fc",
+        "id": "section-1",
+        "region": "region-1",
+        "offsetType": "first-row",
+        "offsetValue": 0,
+        "rowSettings": [
+          {
+            "min": 2,
+            "max": 2
+          },
+          {
+            "min": 4,
+            "max": 6
+          },
+          {
+              "min": 4,
+              "max": 6
+          }
+        ]
+      },
+      {
+        "name": "Violin 2",
+        "color": "#a6fcc6",
+        "id": "section-2",
+        "region": "region-1",
+        "offsetType": "first-row",
+        "offsetValue": 0,
+        "rowSettings": [
+          {
+            "min": 2,
+            "max": 2
+          },
+          {
+            "min": 4,
+            "max": 6
+          },
+          {
+              "min": 4,
+              "max": 6
+          }
+        ]
+      },
+      {
+        "name": "Viola",
+        "color": "#00d084",
+        "id": "section-3",
+        "region": "region-1",
+        "offsetType": "first-row",
+        "offsetValue": 0,
+        "rowSettings": [
+          {
+            "min": 2,
+            "max": 2
+          },
+          {
+            "min": 4,
+            "max": 6
+          },
+          {
+              "min": 4,
+              "max": 6
+          }
+        ]
+      },
+      {
+        "name": "Cello",
+        "color": "#7bdcb5",
+        "id": "section-4",
+        "region": "region-1",
+        "offsetType": "first-row",
+        "offsetValue": 0,
+        "rowSettings": [
+          {
+            "min": 2,
+            "max": 2
+          },
+          {
+            "min": 4,
+            "max": 6
+          },
+          {
+              "min": 4,
+              "max": 6
+          }
+        ]
+      },
+      {
+        "name": "Bass",
+        "color": "#abb8c3",
+        "id": "section-5",
+        "region": "region-1",
+        "offsetType": "last-row",
+        "offsetValue": 0,
+        "rowSettings": [
+          {
+            "min": 3,
+            "max": 3
+          }
+        ]
+      }
+    ],
+    "members": [],
+    "settings": {
+      "seatNameLabels": "initials",
+      "downstageTop": false,
+      "implicitSeatsVisible": false
+    }
+  }

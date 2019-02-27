@@ -12,6 +12,7 @@ import SeatingRenderer from './components/render-seating.jsx';
 import MenuDrawer from './components/menu-drawer.jsx';
 import MainToolbar from './components/toolbar.jsx';
 import SectionsList from './components/sections-list.jsx';
+import NewProjectDialog from './components/new-project-dialog.jsx';
 import EditDialog from './components/edit-dialog.jsx';
 import RegionEditor from './components/edit-region.jsx';
 import SectionEditor from './components/edit-section.jsx';
@@ -75,6 +76,7 @@ function createFreshState(user) {
         editSectionDialogOpen: false,
         editMemberDialogOpen: false,
         projectOptionsDialogOpen: false,
+        newProjectDialogOpen: false,
         drawerOpen: false,
         rosterOpen: true,
         editorId: null,
@@ -133,6 +135,8 @@ class App extends Component {
         this.handleToggleRoster = this.handleToggleRoster.bind(this);
 
         // Dialogs
+        this.handleNewProjectDialogClosed = this.handleNewProjectDialogClosed.bind(this);
+        this.handleSelectNewProjectTemplate = this.handleSelectNewProjectTemplate.bind(this);
         this.handleDeleteRegionDialogClosed = this.handleDeleteRegionDialogClosed.bind(this);
         this.handleDeleteSectionDialogClosed = this.handleDeleteSectionDialogClosed.bind(this);
         this.handleDeleteMemberDialogClosed = this.handleDeleteMemberDialogClosed.bind(this);
@@ -254,9 +258,8 @@ class App extends Component {
                     }
                 }
                 else {
-                    // Cases:
-                    // 1.) User logs out; has a cloud project open
-                    this.handleRequestNewProject();
+                    // User has logged out
+                    this.handleSelectNewProjectTemplate();
                 }
             });
             
@@ -695,29 +698,7 @@ class App extends Component {
     }
 
     handleRequestNewProject() {
-        if (this.state.user) {
-            getUnusedProjectName(this.state.user).then(name => {
-                this.setState(Object.assign({},
-                    createFreshState(this.state.user),
-                    {
-                        project: createEmptyProject(),
-                        projectName: name,
-                        needFullSave: true
-                    }
-                ));
-                resetProjectQueryString();
-            });
-        }
-        else {
-            this.setState(Object.assign({},
-                createFreshState(this.state.user),
-                {
-                    project: createEmptyProject(),
-                    needFullSave: true
-                }
-            ));
-            resetProjectQueryString();
-        }
+        this.setState({drawerOpen: false, newProjectDialogOpen: true});
     }
 
     handleRequestImportProject(project, name) {
@@ -788,6 +769,37 @@ class App extends Component {
     }
 
     /* DIALOG EVENTS */
+    handleNewProjectDialogClosed() {
+        this.setState({newProjectDialogOpen: false});
+    }
+
+    handleSelectNewProjectTemplate(template) {
+        const project = createEmptyProject(template);
+        if (this.state.user) {
+            getUnusedProjectName(this.state.user).then(name => {
+                this.setState(Object.assign({},
+                    createFreshState(this.state.user),
+                    {
+                        project,
+                        projectName: name,
+                        needFullSave: true
+                    }
+                ));
+                resetProjectQueryString();
+            });
+        }
+        else {
+            this.setState(Object.assign({},
+                createFreshState(this.state.user),
+                {
+                    project,
+                    needFullSave: true
+                }
+            ));
+            resetProjectQueryString();
+        }
+    }
+
     handleDeleteRegionDialogClosed(event) {
         if (event.detail.action === 'accept')
             this.deleteRegion();
@@ -1018,6 +1030,10 @@ class App extends Component {
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestEditMember={this.handleRequestedEditMember}
                 onRequestDeleteMember={this.handleRequestedDeleteMember} />
+
+            <NewProjectDialog open={this.state.newProjectDialogOpen}
+                onSelectTemplate={this.handleSelectNewProjectTemplate}
+                onClose={this.handleNewProjectDialogClosed} />
 
             <SimpleDialog title={`Delete "${this.state.deleteRegionName}" region?`}
                 body={<React.Fragment>
