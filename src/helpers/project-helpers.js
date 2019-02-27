@@ -169,8 +169,23 @@ export function renameProject(user, oldName, newName) {
                         });
                     });
                 }
-                else
-                    reject(new Error('Unable to rename project: user is not authenticated'));
+                else {
+                    const errorObj = new Error();
+                    if (!user) {
+                        errorObj.name = 'NotAuthenticatedError';
+                        errorObj.message = 'Unable to rename project: user is not authenticated';
+                    }
+                    else if (!existingProject) {
+                        errorObj.name = 'NotFoundError';
+                        errorObj.message = `Unable to rename project: original project "${oldName}" does not exist`;
+                    }
+                    else if (newLocation) {
+                        errorObj.name = 'NameCollisionError';
+                        errorObj.message = `Unable to rename project: a project by the name of "${newName}" already exists.`;
+                    }
+
+                    reject(errorObj);
+                }
             });
     });
 }

@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 import { SimpleDialog } from '@rmwc/dialog';
+import { Snackbar, SnackbarAction } from '@rmwc/snackbar';
 
 import '@material/dialog/dist/mdc.dialog.css';
+import '@material/snackbar/dist/mdc.snackbar.css';
+import '@material/button/dist/mdc.button.css';
 
 import SeatingRenderer from './components/render-seating.jsx';
 import MenuDrawer from './components/menu-drawer.jsx';
@@ -79,6 +82,7 @@ function createFreshState(user) {
         needFullSave: false,
         initProject: false,
         projectName: null,
+        message: null,
         user
     }
 }
@@ -880,8 +884,35 @@ class App extends Component {
             const oldName = this.state.projectName;
             renameProject(this.state.user, oldName, newName).then(() => {
                 this.setState({projectName: newName});
-            }).catch(() => {
-                console.error(new Error(`Unable to rename project: a project ${newName} already exists.`));
+            }).catch((err) => {
+                if (err.name === 'NotAuthenticatedError') {
+                    // User is not authenticated. Swallow the error and keep the new name locally.
+                    this.setState({
+                        projectName: newName,
+                        needFullSave: true
+                    });
+                }
+                else if (err.name == 'NotFoundError') {
+                    // Project with that name does not exist. Keep the new name, and do a full save.
+                    this.setState({
+                        projectName: newName,
+                        needFullSave: true
+                    }, () => {
+                        this.fullSaveIfNeeded();
+                    });
+                }
+                else if (err.name == 'NameCollisionError') {
+                    // Project with that name already exists.
+                    // Temporary logic: reset back to the original name
+                    // Todo: resolve collision (notify user and/or generate unique name)
+                    this.setState({projectName: newName}, () => {
+                        this.setState({projectName: oldName, message: err.message});
+                    });
+                }
+                else {
+                    // Unknown error
+                    console.error(err);
+                }
             });
         }
         else
@@ -1041,6 +1072,9 @@ class App extends Component {
                 onClose={this.handleRequestCloseProjectSettingsDialog}
                 onChange={this.handleChangeProjectSetting}
                 {...this.state.project.settings} />
+
+            <Snackbar open={this.state.message} onClose={() => {this.setState({message: null})}}
+                message={this.state.message} />
         </React.Fragment>
     }
 }
