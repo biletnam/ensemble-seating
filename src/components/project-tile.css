@@ -1,0 +1,31 @@
+.project-tile {
+    text-align: center;
+    padding: 0;
+    background-color: transparent;
+    border: 1px solid #aaa;
+    font-size: 1em;
+    padding: .5em;
+}
+
+.project-tile:hover {
+    background-color: rgba(0, 0, 0, .05);
+}
+
+.project-tile:active {
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.project-tile * {
+    pointer-events: none;
+}
+
+.project-tile > span {
+    display: block;
+}
+
+.project-tile > svg {
+    display: block;
+    width: var(--project-thumbnail-width);
+    height: var(--project-thumbnail-width);
+    transform: rotateZ(180deg);
+}

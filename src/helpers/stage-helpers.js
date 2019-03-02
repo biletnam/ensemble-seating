@@ -1,4 +1,6 @@
 export const seatSize = 32;
+export const seatGap = .5 * seatSize;
+export const regionGap = 2 * seatSize;
 
 export function sumRows(rows) {
     let sum = 0;
@@ -67,7 +69,8 @@ export function generateRows(sectionData) {
                     section: currentSection.id,
                     seat: sumRows(currentSection.rowSettings.slice(0, i)) + k,
                     member: null,
-                    implicit
+                    implicit,
+                    color: currentSection.color
                 });
             }
         }
@@ -139,13 +142,14 @@ export function getPositionOnCurve (seatNum, rowLength) {
     return position;
 }
 
-export function curveRows(rows) {
+export function curveRows(rowData) {
+    const rows = JSON.parse(JSON.stringify(rowData));
+
     if (Array.isArray(rows) && rows.length > 0) {
-        const firstRowWidth = rows[0].length * (seatSize * .5);
+        const firstRowWidth = rows[0].length * seatGap;
 
         for (let i=0; i<rows.length; i++) {
             const count = rows[i].length - 1;
-
 
             for (let k=0; k<rows[i].length; k++) {
                 // Get position as a percentage 0.0-1.0
@@ -159,13 +163,59 @@ export function curveRows(rows) {
                 rows[i][k].x -= (.5 * seatSize);
             }
         }
+
+        // Normalize dimensions (shift values to the right so they don't arc around 0,0)
+        const [regionWidth, regionHeight] = getLayoutDimensions(rows.flat());
+        const offset = .5 * regionWidth;
+        for (let i=0; i<rows.length; i++) {
+            for (const seat of rows[i])
+                seat.x += offset;
+        }
     }
+
+    return rows;
+}
+
+export function straightenRows(rowData) {
+    const rows = JSON.parse(JSON.stringify(rowData));
+
+    if (Array.isArray(rows) && rows.length > 0) {
+        let xMax = 0,
+            xMin = 0;
+        for (let i=0; i<rows.length; i++) {
+            for (let k=0; k<rows[i].length; k++) {
+                // Temporary: use 1/2 seat of space between all seats
+                const xVal = (k * seatSize) + (k * seatGap);
+                const yVal = (i * seatSize) + (i * seatGap);
+                rows[i][k].x = xVal;
+                rows[i][k].y = yVal;
+
+                if (xVal > xMax)
+                    xMax = xVal;
+                else if (xVal < xMin)
+                    xMin = xVal;
+            }
+        }
+
+        // Center rows
+        const maxRowWidth = (xMax - xMin) + seatSize;
+        for (let i=0; i<rows.length; i++) {
+            const [width, height] = getLayoutDimensions(rows[i]);
+            const diff = maxRowWidth - width;
+            const offset = diff * .5;
+            for (const seat of rows[i]) {
+                seat.x += offset;
+            }
+        }
+    }
+
+    return rows;
 }
 
 export function seatMembers (membersBySection, rows) {
     const seatedRows = rows.map(currentRow => currentRow.map(currentSeat => {
         const member = membersBySection[currentSeat.section][currentSeat.seat];
-        return Object.assign({}, currentSeat, {member: member ? member.id : null});
+        return Object.assign({}, currentSeat, {member: member ? member : null});
     }));
 
     // Collapse implicit, unoccupied seats that are adjacent to explicit seats
@@ -202,19 +252,90 @@ export function seatMembers (membersBySection, rows) {
     return seatedRows;
 }
 
-export function getLayoutDimensions (rows) {
+export function getLayoutDimensions (positionedSeats) {
     let minX = 0, maxX = 0, minY = 0, maxY = 0;
-    for (let i=0; i<rows.length; i++) {
-        for (let k=0; k<rows[i].length; k++) {
-            const currentX = rows[i][k].x,
-                currentY = rows[i][k].y;
-            
-            if (currentX < minX) minX = currentX;
-            if (currentX > maxX) maxX = currentX;
-            if (currentY < minY) minY = currentY;
-            if (currentY > maxY) maxY = currentY;
-        }
+    for (let i=0; i<positionedSeats.length; i++) {
+        const currentX = positionedSeats[i].x,
+            currentY = positionedSeats[i].y;
+        
+        if (currentX < minX) minX = currentX;
+        if (currentX > maxX) maxX = currentX;
+        if (currentY < minY) minY = currentY;
+        if (currentY > maxY) maxY = currentY;
     }
 
     return [(maxX - minX) + seatSize, (maxY - minY) + seatSize];
+}
+
+export function calculateSeatPositions(regions, sections, members) {
+    const seatsByRegion = [];
+
+    for (let i=0; i<regions.length; i++) {
+        const region = regions[i];
+        const includedSections = sections.filter(section => section.region === region.id);
+
+        let rows = generateRows(includedSections);
+
+        const membersBySection = {};
+        for (let k = 0; k < sections.length; k++) {
+            const currentSection = sections[k];
+            membersBySection[currentSection.id] = members.filter(member => member.section === currentSection.id);
+        }
+
+        // Seat members if any are passed
+        let seatedRows = seatMembers(membersBySection, rows);
+
+        // Curve rows if necessary, and set container dimensions for scrolling
+        if (region.curvedLayout)
+            seatedRows = curveRows(seatedRows);
+        else
+            seatedRows = straightenRows(seatedRows);
+
+        // Flatten seatedRows
+        const flattenedSeats = seatedRows.flat();
+
+        // Find the max Y coordinate of seats in seatsToRender, and offset this region by that amount
+        let regionOffset = 0;
+        if (i > 0) {
+            // Get the maximum y coordinate of the last region
+            const [previousRegionWidth, previousRegionHeight] = getLayoutDimensions(seatsByRegion[i - 1]);
+            regionOffset = previousRegionHeight + regionGap;
+        }
+        
+        for (let k=0; k<flattenedSeats.length; k++) {
+            flattenedSeats[k].y += regionOffset;
+        }
+
+        seatsByRegion.push(flattenedSeats);
+    }
+
+    // Curved rows arc around 0,0
+    // Find the maximum x coordinate, and center everything based on that
+    let maxX = 0,
+        minX = 0;
+
+    seatsByRegion.forEach(region => {
+        region.forEach(seat => {
+            if (seat.x > maxX)
+                maxX = seat.x;
+            if (seat.x < minX)
+                minX = seat.x;
+        });
+    });
+
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seatsByRegion.flat());
+
+    for (const region of seatsByRegion) {
+        // Get the width of the current region
+        const [regionWidth, regionHeight] = getLayoutDimensions(region);
+
+        const diff = layoutWidth - regionWidth;
+        const offset = diff * .5;
+
+        // Add the difference to the X value of every seat in the region
+        for (const seat of region)
+            seat.x += offset;
+    }
+    
+    return seatsByRegion.flat();
 }

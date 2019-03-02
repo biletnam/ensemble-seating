@@ -1,46 +1,14 @@
+:root {
+    --project-thumbnail-width: 10em;
+}
+
 .project-template-grid {
-    --button-width: 7.5em;
     display: grid;
-    grid-template-columns: repeat(auto-fit, var(--button-width));
+    grid-template-columns: repeat(auto-fit, var(--project-thumbnail-width));
     grid-auto-rows: max-content;
     grid-gap: 1em;
 }
 
 .new-project-dialog .mdc-dialog__surface {
     width: 560px;
-}
-
-.project-template-button {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    padding: 0;
-    background-color: transparent;
-    border: none;
-    font-size: 1em;
-}
-
-.project-template-button:hover {
-    background-color: rgba(0, 0, 0, .05);
-}
-
-.project-template-button:active {
-    background-color: rgba(0, 0, 0, .1);
-}
-
-.project-template-button * {
-    pointer-events: none;
-}
-
-.project-template-button > span {
-    display: block;
-    margin: .5em;
-}
-
-.project-template-button > img {
-    border: 1px solid #aaa;
-    display: block;
-    width: var(--button-width);
-    height: var(--button-width);
-    box-sizing: border-box;
 }

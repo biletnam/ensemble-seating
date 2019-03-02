@@ -219,7 +219,7 @@ body {
     white-space: normal;
     overflow: visible;
     box-sizing: border-box;
-    position: relative;
+    position: absolute;
 }
 
 .seat--implicit {
@@ -241,10 +241,7 @@ body {
 .rendering-area__stage {
     margin: auto;
     flex-shrink: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    position: relative;
 }
 
 .rendering-area__stage:not(:only-child):not(:last-child) {
@@ -253,28 +250,6 @@ body {
 
 .rendering-area__stage:not(:only-child):not(:first-child) {
     margin-top: 1em;
-}
-
-.rendering-area__stage--curved-layout {
-    position: relative;
-    align-items: flex-end;
-    flex-direction: row;
-}
-
-.rendering-area__stage--curved-layout.rendering-area__stage--downstage-top {
-    align-items: flex-start;
-}
-
-.rendering-area__stage--curved-layout .seat {
-    position: absolute;
-}
-
-.rendering-area__stage:not(.rendering-area__stage--curved-layout) .ensemble-row:not(:first-child) {
-    margin-top: 1em;
-}
-
-.rendering-area__stage:not(.rendering-area__stage--curved-layout) .seat:not(:first-child) {
-    margin-left: 1em;
 }
 
 #rendering-toolbar {

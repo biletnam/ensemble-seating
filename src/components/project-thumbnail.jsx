@@ -1,0 +1,30 @@
+import React, {PureComponent} from 'react';
+import './project-thumbnail.css';
+import {calculateSeatPositions, getLayoutDimensions, seatSize} from '../helpers/stage-helpers.js';
+
+class ProjectThumbnail extends PureComponent {
+    constructor(props) {
+        super(props);
+
+        const seats = calculateSeatPositions(props.data.regions, props.data.sections, props.data.members);
+        const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+
+        this.state = {
+            seats, layoutWidth, layoutHeight
+        };
+    }
+
+    render() {
+        return <svg className='project-thumbnail' width={this.state.layoutWidth} height={this.state.layoutHeight}
+            viewBox={`0 0 ${this.state.layoutWidth} ${this.state.layoutHeight}`}>
+            {this.state.seats.filter(seat => !(seat.implicit && !this.props.data.settings.implicitSeatsVisible && !seat.member)).map((seat, index) => (
+                <rect width={seatSize} height={seatSize} stroke="black" strokeWidth="1" fill={seat.color}
+                    x={seat.x}
+                    y={seat.y}
+                    key={`seat-${index}`} />
+            ))}
+        </svg>
+    }
+}
+
+export default ProjectThumbnail;

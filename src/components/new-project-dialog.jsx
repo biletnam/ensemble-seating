@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 
 import './new-project-dialog.css';
 import {templates} from '../templates/index.js';
@@ -6,7 +6,9 @@ import {templates} from '../templates/index.js';
 import {SimpleDialog} from '@rmwc/dialog';
 import '@material/dialog/dist/mdc.dialog.css';
 
-class NewProjectDialog extends Component {
+import ProjectTile from './project-tile.jsx';
+
+class NewProjectDialog extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -27,13 +29,11 @@ class NewProjectDialog extends Component {
             body={
                 <div className='project-template-grid'>
                     {templates.map(template => (
-                        <button type='button' key={template.id}
+                        <ProjectTile key={template.id}
                             name={template.id}
                             onClick={this.handleClick}
-                            className='project-template-button'>
-                            <img src={template.thumbnail} alt={`${template.name} seating chart`} />
-                            <span>{template.name}</span>
-                        </button>
+                            title={template.name}
+                            data={JSON.parse(JSON.stringify(template.data))} />
                     ))}
                 </div>
             }

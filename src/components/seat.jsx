@@ -20,7 +20,7 @@ class Seat extends PureComponent {
     }
 
     render() {
-        const { implicit, implicitSeatsVisible, seatNameLabels, member, seatNumber, color, selected, onRequestSelectMember, x, y, ...props } = this.props;
+        const { implicit, implicitSeatsVisible, seatNameLabels, member, seatNumber, color, selected, onRequestSelectMember, x, y, downstageTop, ...props } = this.props;
         let displayText = null;
         if (member) {
             switch (seatNameLabels) {
@@ -32,15 +32,33 @@ class Seat extends PureComponent {
                     break;
             }
         }
+
+        const style = {
+            backgroundColor: selected ? '#fff' : color,
+            visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
+            left: 'unset',
+            top: 'unset',
+            right: 'unset',
+            bottom: 'unset'
+        };
+
+        let xStyle, yStyle;
+        if (downstageTop) {
+            xStyle = 'left';
+            yStyle = 'top';
+        }
+        else {
+            xStyle = 'right';
+            yStyle = 'bottom';
+        }
+
+        style[xStyle] = typeof x === 'number' && !isNaN(x) ? x : 'unset';
+        style[yStyle] = typeof y === 'number' && !isNaN(y) ? y : 'unset';
+
         return <span {...props} className={`seat${implicit ? ' seat--implicit' : ''}${member ? ' seat--occupied' : ''}`}
             title={member ? member.name : '' } 
             data-seat-number={seatNumber + 1}
-            style={{
-                backgroundColor: selected ? '#fff' : color,
-                visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
-                left: typeof x === 'number' && !isNaN(x) ? x : 'unset',
-                top: typeof y === 'number' && !isNaN(y) ? y : 'unset'
-            }} >
+            style={style} >
             {displayText ? displayText : seatNumber}
             <Ripple><span className='seat__click-surface' onClick={this.handleClick} /></Ripple>
         </span>
