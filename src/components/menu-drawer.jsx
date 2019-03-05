@@ -144,7 +144,7 @@ class MenuDrawer extends PureComponent {
             </DrawerHeader>
             <DrawerContent>
                 <List>
-                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart</ListItem>
+                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart&hellip;</ListItem>
                     <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
 
                     <ListDivider />
