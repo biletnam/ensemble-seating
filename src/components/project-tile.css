@@ -28,4 +28,6 @@
     width: var(--project-thumbnail-width);
     height: var(--project-thumbnail-width);
     transform: rotateZ(180deg);
+    margin-left: auto;
+    margin-right: auto;
 }
