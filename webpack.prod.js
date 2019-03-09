@@ -23,11 +23,11 @@ module.exports = merge(common, {
         new HtmlWebpackIncludeAssetsPlugin({
             assets: [
                 {
-                    path: 'https://unpkg.com/react@16.8.3/umd/react.production.min.js',
+                    path: 'https://unpkg.com/react@16.8.4/umd/react.production.min.js',
                     attributes: externalAttributes
                 },
                 {
-                    path: 'https://unpkg.com/react-dom@16.8.3/umd/react-dom.production.min.js',
+                    path: 'https://unpkg.com/react-dom@16.8.4/umd/react-dom.production.min.js',
                     attributes: externalAttributes
                 },
                 {
