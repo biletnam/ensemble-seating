@@ -3,7 +3,8 @@
       {
         "name": "Untitled region",
         "id": "region-1",
-        "curvedLayout": true
+        "curvedLayout": true,
+        "angle": 180
       }
     ],
     "sections": [

@@ -10,7 +10,7 @@ const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
 const DB_VER = 1;
 const APP_NAME = APP_INFO.NAME;
-const PROJECT_FORMAT_VER = '0.3.0';
+const PROJECT_FORMAT_VER = '0.8.0';
 
 const currentDb = openDb(DB_NAME, DB_VER, upgradeDB => {
     switch (upgradeDB.oldVersion) {
@@ -275,6 +275,14 @@ export function upgradeProject(project) {
             });
         });
     }
+    if (semver.lt(finalProject.appVersion, '0.8.0')) {
+        finalProject.appVersion = '0.8.0';
+        finalProject.regions = finalProject.regions.map(currentRegion => {
+            return Object.assign({}, currentRegion, {
+                angle: 180
+            });
+        });
+    }
 
     return finalProject;
 }
@@ -411,7 +419,8 @@ export function createRegion (name = 'Untitled region') {
     return {
         name,
         id: uuid(),
-        curvedLayout: true
+        curvedLayout: true,
+        angle: 180
     }
 }
 

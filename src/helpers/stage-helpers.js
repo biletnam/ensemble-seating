@@ -132,17 +132,43 @@ export function generateRows(sectionData) {
     return rows;
 }
 
-export function getPositionOnCurve (seatNum, rowLength) {
+/**
+ * 
+ * @param {Number} cx X coordinate of the central point for the rotation
+ * @param {Number} cy Y coordinate of the central point for the rotation
+ * @param {Number} x The original X coordinate
+ * @param {Number} y The original Y coordinate
+ * @param {Number} angle An angle, in degrees, by which to rotate the point
+ * @returns {Array<Number>}
+ */
+function rotate(cx, cy, x, y, angle) {
+    var radians = (Math.PI / 180) * angle,
+        cos = Math.cos(radians),
+        sin = Math.sin(radians),
+        nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
+        ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
+    return [nx, ny];
+}
+
+export function getPositionOnCurve (seatNum, rowLength, angle) {
+    const percentOfArc = angle / 180;
+
     const position = {x: null, y: null};
-    const step = Math.PI / rowLength;
+    const step = (Math.PI * percentOfArc) / rowLength;
 
     position.x = Math.cos(step * seatNum);
     position.y = Math.sin(step * seatNum);
 
+    // If there's an angle, rotate the point
+    const rotationInDegrees = -.5 *  (180 - angle);
+    const [rotatedX, rotatedY] = rotate(0, 0, position.x, position.y, rotationInDegrees);
+    position.x = rotatedX;
+    position.y = rotatedY;
+
     return position;
 }
 
-export function curveRows(rowData) {
+export function curveRows(rowData, angle) {
     const rows = JSON.parse(JSON.stringify(rowData));
 
     if (Array.isArray(rows) && rows.length > 0) {
@@ -153,7 +179,7 @@ export function curveRows(rowData) {
 
             for (let k=0; k<rows[i].length; k++) {
                 // Get position as a percentage 0.0-1.0
-                const position = getPositionOnCurve(k, count);
+                const position = getPositionOnCurve(k, count, angle);
 
                 // Multiply by the on-screen dimensions of each row to get pixel values
                 // Start at a fixed size for the first row, then increase radius for each row
@@ -210,6 +236,19 @@ export function straightenRows(rowData) {
     }
 
     return rows;
+}
+
+function trimOuterSpacing (seats) {
+    const result = JSON.parse(JSON.stringify(seats));
+    const minX = Math.min(...result.map(seat => seat.x));
+    const minY = Math.min(...result.map(seat => seat.y));
+
+    for (let i=0; i<result.length; i++) {
+        result[i].x -= minX;
+        result[i].y -= minY;
+    }
+
+    return result;
 }
 
 export function seatMembers (membersBySection, rows) {
@@ -287,12 +326,12 @@ export function calculateSeatPositions(regions, sections, members) {
 
         // Curve rows if necessary, and set container dimensions for scrolling
         if (region.curvedLayout)
-            seatedRows = curveRows(seatedRows);
+            seatedRows = curveRows(seatedRows, region.angle);
         else
             seatedRows = straightenRows(seatedRows);
 
         // Flatten seatedRows
-        const flattenedSeats = seatedRows.flat();
+        const flattenedSeats = trimOuterSpacing(seatedRows.flat());
 
         // Find the max Y coordinate of seats in seatsToRender, and offset this region by that amount
         let regionOffset = 0;

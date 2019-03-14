@@ -3,12 +3,14 @@
       {
         "name": "Wind and percussion",
         "id": "region-1",
-        "curvedLayout": false
+        "curvedLayout": false,
+        "angle": 180
       },
       {
         "name": "Strings",
         "id": "region-2",
-        "curvedLayout": true
+        "curvedLayout": true,
+        "angle": 180
       }
     ],
     "sections": [

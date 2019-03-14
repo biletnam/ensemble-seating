@@ -2,15 +2,18 @@ import React, { PureComponent } from 'react';
 
 import { Switch } from '@rmwc/switch';
 import { TextField } from '@rmwc/textfield';
+import { Slider } from '@rmwc/slider';
 
 import '@material/switch/dist/mdc.switch.css';
 import '@material/textfield/dist/mdc.textfield.css';
+import '@material/slider/dist/mdc.slider.css';
 
 class RegionEditor extends PureComponent {
     constructor(props) {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleSliderInput = this.handleSliderInput.bind(this);
     }
 
     handleChange(event) {
@@ -25,6 +28,11 @@ class RegionEditor extends PureComponent {
             this.props.onRequestEdit(this.props.data.id, saveData);
     }
 
+    handleSliderInput(event) {
+        if (this.props.onRequestEdit)
+            this.props.onRequestEdit(this.props.data.id, { angle: event.target.value });
+    }
+
     render() {
         return <div>
             {this.props.data && <React.Fragment>
@@ -32,10 +40,19 @@ class RegionEditor extends PureComponent {
                     <TextField label='Name' name='name' value={this.props.data.name} onChange={this.handleChange} />
                 </div>
 
+                <h2>Shape</h2>
                 <div className='text-input-wrapper'>
                     <Switch checked={this.props.data.curvedLayout}
                         onChange={this.handleChange}
-                        name='curvedLayout'>Curved layout</Switch>
+                        name='curvedLayout'>&nbsp;Curved layout</Switch>
+                </div>
+
+                <div className='text-input-wrapper'>
+                    <Slider min={90} max={180} discrete
+                        disabled={!this.props.data.curvedLayout}
+                        value={this.props.data.angle}
+                        onInput={this.handleSliderInput} />
+                    <span>Angle: {this.props.data.angle}&deg;</span>
                 </div>
             </React.Fragment>}
         </div>
