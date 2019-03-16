@@ -89,7 +89,7 @@ module.exports = {
             }
         ]),
         new GenerateSW({
-            navigateFallback: '/'
+            navigateFallback: 'index.html'
         })
     ],
     module: {
