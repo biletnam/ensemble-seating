@@ -2,13 +2,6 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
 
-import { SimpleDialog } from '@rmwc/dialog';
-import { Snackbar, SnackbarAction } from '@rmwc/snackbar';
-
-import '@material/dialog/dist/mdc.dialog.css';
-import '@material/snackbar/dist/mdc.snackbar.css';
-import '@material/button/dist/mdc.button.css';
-
 import SeatingRenderer from './components/render-seating.jsx';
 import MenuDrawer from './components/menu-drawer.jsx';
 import MainToolbar from './components/toolbar.jsx';
@@ -21,6 +14,12 @@ import MemberEditor from './components/edit-member.jsx';
 import BatchAddMembersDialog from './components/batch-add-members.jsx';
 import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
 import firebase, { auth, provider } from './helpers/firebase-helpers.js';
+
+import { SimpleDialog } from '@rmwc/dialog';
+import { Snackbar, SnackbarAction } from '@rmwc/snackbar';
+
+import '@material/dialog/dist/mdc.dialog.css';
+import '@material/snackbar/dist/mdc.snackbar.css';
 
 import {
     saveProject,
