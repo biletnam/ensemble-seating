@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { Workbox } from 'workbox-window';
 
 import { SimpleDialog } from '@rmwc/dialog';
 import { Snackbar, SnackbarAction } from '@rmwc/snackbar';
@@ -85,6 +86,7 @@ function createFreshState(user) {
         initProject: false,
         projectName: null,
         message: null,
+        updateAvailable: false,
         user
     }
 }
@@ -97,11 +99,13 @@ class App extends Component {
     constructor(props) {
         super(props);
 
+        this.worker = null;
         this.firstLaunch = true;
 
         this.state = createFreshState();
         this.state.project = createEmptyProject();
 
+        this.handleUserTriggeredUpdate = this.handleUserTriggeredUpdate.bind(this);
         this.saveSession = this.saveSession.bind(this);
         this.fullSaveIfNeeded = this.fullSaveIfNeeded.bind(this);
         this.deleteSection = this.deleteSection.bind(this);
@@ -162,7 +166,24 @@ class App extends Component {
     }
 
     componentDidMount() {
-        // Do nothing?
+        // Register service worker and listen for updates
+        if ('serviceWorker' in navigator) {
+            this.worker = new Workbox('/service-worker.js');
+        
+            this.worker.addEventListener('waiting', event => {
+                this.setState({updateAvailable: true});
+            });
+        
+            this.worker.register();
+        }
+    }
+
+    handleUserTriggeredUpdate() {
+        this.worker.addEventListener('controlling', event => {
+            window.location.reload();
+        });
+
+        this.worker.messageSW({ type: 'SKIP_WAITING' });
     }
 
     initFirstLaunch(user) {
@@ -1091,14 +1112,12 @@ class App extends Component {
 
             <Snackbar open={this.state.message} onClose={() => {this.setState({message: null})}}
                 message={this.state.message} />
+
+            <Snackbar open={this.state.updateAvailable} onClose={event => this.setState({updateAvailable: false})}
+                message={`A new version of ${APP_INFO.NAME} available`} timeout={24 * 60 * 60 * 1000}
+                action={<SnackbarAction label='Reload' onClick={this.handleUserTriggeredUpdate} />} />
         </React.Fragment>
     }
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js');
-    });
-}

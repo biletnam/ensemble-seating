@@ -41,7 +41,7 @@
     "@rmwc/ripple": "^5.1.8",
     "@rmwc/select": "^5.1.8",
     "@rmwc/slider": "^5.2.0",
-    "@rmwc/snackbar": "^5.1.8",
+    "@rmwc/snackbar": "^5.2.1",
     "@rmwc/switch": "^5.1.8",
     "@rmwc/textfield": "^5.1.8",
     "@rmwc/toolbar": "^5.1.8",
@@ -74,6 +74,7 @@
     "webpack-dev-server": "^3.2.1",
     "webpack-merge": "^4.2.1",
     "webpack-pwa-manifest": "^4.0.0",
-    "workbox-webpack-plugin": "^4.1.0"
+    "workbox-webpack-plugin": "^4.1.0",
+    "workbox-window": "^4.1.0"
   }
 }
