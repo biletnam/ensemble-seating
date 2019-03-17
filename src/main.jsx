@@ -712,13 +712,11 @@ class App extends Component {
     /* MAIN MENU */
 
     handleRequestPrint() {
-        this.setState({drawerOpen: false}, () => {
-            window.print();
-        });
+        window.print();
     }
 
     handleRequestNewProject() {
-        this.setState({drawerOpen: false, newProjectDialogOpen: true});
+        this.setState({ newProjectDialogOpen: true });
     }
 
     handleRequestImportProject(project, name) {
