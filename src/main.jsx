@@ -1111,7 +1111,7 @@ class App extends Component {
                 message={this.state.message} />
 
             <Snackbar open={this.state.updateAvailable} onClose={event => this.setState({updateAvailable: false})}
-                message={`A new version of ${APP_INFO.NAME} available`} timeout={24 * 60 * 60 * 1000}
+                message={`A new version of ${APP_INFO.NAME} is available`} timeout={24 * 60 * 60 * 1000}
                 action={<SnackbarAction label='Reload' onClick={this.handleUserTriggeredUpdate} />} />
         </React.Fragment>
     }
