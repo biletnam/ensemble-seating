@@ -11,6 +11,7 @@ class EditDialog extends Component {
         this.state = props.data ? props.cloneFn(props.data) : null;
 
         this.handleClose = this.handleClose.bind(this);
+        this.handleStateChange = this.handleStateChange.bind(this);
         this.handleEdit = this.handleEdit.bind(this);
     }
 
@@ -43,6 +44,12 @@ class EditDialog extends Component {
         }
     }
 
+    handleStateChange(state) {
+        // Workaround for MDC bug: slider handle positioned incorrectly in Dialog
+        if (state === 'opened')
+            window.dispatchEvent(new Event('resize'));
+    }
+
     handleEdit(id, data) {
         this.setState(data);
     }
@@ -51,6 +58,7 @@ class EditDialog extends Component {
         return <SimpleDialog open={this.props.open}
             title={this.props.title}
             onClose={this.handleClose}
+            onStateChange={this.handleStateChange}
             body={<this.CurrentEditor data={this.state} onRequestEdit={this.handleEdit} />}
         />
     }

@@ -21,11 +21,11 @@ class ListActionMenu extends PureComponent {
     }
 
     render() {
-        const { onSelectAction, ...props } = this.props;
+        const { onSelectAction, showEditAndDeleteControls, ...props } = this.props;
         return <MenuSurfaceAnchor>
             <Menu {...props}>
                 <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='edit'>Edit&hellip;</MenuItem>
-                {this.props.showEditAndDeleteControls && <>
+                {showEditAndDeleteControls && <>
                     <hr className='list-action-menu__divider' />
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-top'>Move to top</MenuItem>
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-up'>Move up</MenuItem>
