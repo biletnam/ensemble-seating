@@ -17,7 +17,8 @@ module.exports = merge(common, {
     externals: {
         "react": "React",
         "react-dom": "ReactDOM",
-        "react-beautiful-dnd": 'ReactBeautifulDnd'
+        "react-beautiful-dnd": 'ReactBeautifulDnd',
+        'workbox-window': 'window.workbox'
     },
     plugins: [
         new HtmlWebpackIncludeAssetsPlugin({
@@ -32,6 +33,10 @@ module.exports = merge(common, {
                 },
                 {
                     path: 'https://unpkg.com/react-beautiful-dnd@10.1.0/dist/react-beautiful-dnd.min.js',
+                    attributes: externalAttributes
+                },
+                {
+                    path: 'https://unpkg.com/workbox-window@4.1.1/build/workbox-window.prod.umd.js',
                     attributes: externalAttributes
                 }
             ],
