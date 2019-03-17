@@ -58,17 +58,18 @@ class RegionListItem extends PureComponent {
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className='sections-list__droppable-section-area'>
                     {/* Iterate over sections here */}
-                    {this.props.showRegionName && <Elevation z='1'
+                    <Elevation z='1'
                         style={{zIndex: this.state.actionMenuOpen ? '2' : ''}}
                         className='sections-list__region-heading-container'>
                         <span className='sections-list__region-heading-text'>{this.props.region.name}</span>
                         <ListActionMenu
                             onSelectAction={this.handleActionMenuClick}
                             open={this.state.actionMenuOpen}
-                            onClose={this.handleRequestCloseActionMenu}>
+                            onClose={this.handleRequestCloseActionMenu}
+                            showEditAndDeleteControls={this.props.showEditAndDeleteControls}>
                             <IconButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
                         </ListActionMenu>
-                    </Elevation>}
+                    </Elevation>
                     {this.props.sections.map((currentSection, currentIndex) => {
                         return <SectionListItem key={currentSection.id}
                             editorId={this.props.editorId}

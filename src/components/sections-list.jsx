@@ -30,7 +30,7 @@ class SectionsList extends PureComponent {
                         region={currentRegion}
                         sections={this.props.sections.filter(currentSection => currentSection.region === currentRegion.id)}
                         members={this.props.members}
-                        showRegionName={this.props.regions.length > 1}
+                        showEditAndDeleteControls={this.props.regions.length > 1}
                         forceNewSectionButton={this.props.sections.length > 0 || this.props.regions.length > 1}
                         onRequestNewSection={this.props.onRequestNewSection}
                         onRequestNewPerson={this.props.onRequestNewPerson}
