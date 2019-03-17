@@ -31,7 +31,7 @@ module.exports = merge(common, {
                     attributes: externalAttributes
                 },
                 {
-                    path: 'https://unpkg.com/react-beautiful-dnd@10.0.4/dist/react-beautiful-dnd.min.js',
+                    path: 'https://unpkg.com/react-beautiful-dnd@10.1.0/dist/react-beautiful-dnd.min.js',
                     attributes: externalAttributes
                 }
             ],
