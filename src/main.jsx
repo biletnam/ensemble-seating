@@ -186,8 +186,6 @@ class App extends Component {
     }
 
     initFirstLaunch(user) {
-        // Todo: if the user is already logged in, restore settings and open project (if there is one in the query string)
-
         const urlParams = new URLSearchParams(location.search);
         const nameParam = urlParams.get('project');
 
@@ -206,12 +204,15 @@ class App extends Component {
                                 projectName: initProject,
                                 user
                             }
-                            if (projectNeedsUpgrade(project))
-                            newState.project = upgradeProject(project);
+                            let upgradedProject = false;
+                            if (projectNeedsUpgrade(project)) {
+                                upgradedProject = true;
+                                newState.project = upgradeProject(project);
+                            }
                             this.setState(newState, () => {
                                 updateProjectQueryString(newState.projectName, user);
                                 hideLoadingScreen();
-                            });
+                            }, upgradedProject ? this.saveSession : () => {});
                         }
                     });
                 }
