@@ -762,7 +762,9 @@ class App extends Component {
         const download = document.createElement('a');
         download.download = `${this.state.projectName}.json`;
         download.href = URL.createObjectURL(blob);
+        document.body.appendChild(download);
         download.click();
+        document.body.removeChild(download);
         URL.revokeObjectURL(download.href);
     }
 
