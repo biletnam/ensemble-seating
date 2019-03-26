@@ -99,7 +99,6 @@ body {
         -webkit-appearance: none;
         background-color: transparent;
         border: 1px solid #aaa;
-        border-right-color: #fff;
         border-top-left-radius: .25em;
         border-bottom-left-radius: .25em;
         transition: background-color .1s ease;
