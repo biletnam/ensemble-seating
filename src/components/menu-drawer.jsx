@@ -12,6 +12,8 @@ import DeleteProjectDialog from './delete-project-dialog.jsx';
 import RecentProjectsDialog from './recent-projects-dialog.jsx';
 import AboutDialog from './about-dialog.jsx';
 import UserWidget from './user-widget.jsx';
+import ExportActionMenu from './export-action-menu.jsx';
+import ExportImageDialog from './export-image-dialog.jsx';
 
 import PrintIcon from '../icons/baseline-print-24px.jsx';
 import DeleteForeverIcon from '../icons/baseline-delete_forever-24px.jsx';
@@ -29,7 +31,9 @@ class MenuDrawer extends PureComponent {
         this.state = {
             aboutDialogVisible: false,
             recentProjectsDialogVisible: false,
-            deleteProjectDialogVisible: false
+            deleteProjectDialogVisible: false,
+            exportMenuVisible: false,
+            exportDialogVisible: false
         }
 
         this.handleMenuButtonClick = this.handleMenuButtonClick.bind(this);
@@ -37,6 +41,7 @@ class MenuDrawer extends PureComponent {
         this.handleFileReaderLoaded = this.handleFileReaderLoaded.bind(this);
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
         this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
+        this.handleSelectExportOption = this.handleSelectExportOption.bind(this);
 
         // Dialog cancel listeners
         this.handleRequestCancelDeleteProject = this.handleRequestCancelDeleteProject.bind(this);
@@ -70,8 +75,7 @@ class MenuDrawer extends PureComponent {
                 input.click();
                 break;
             case 'export':
-                if (typeof this.props.onRequestExportProject === 'function')
-                    this.props.onRequestExportProject();
+                this.setState({ exportMenuVisible: true });
                 break;
             case 'about':
                 this.setState({
@@ -122,6 +126,14 @@ class MenuDrawer extends PureComponent {
         })
     }
 
+    handleSelectExportOption(action) {
+        if (action === 'project' && typeof this.props.onRequestExportProject === 'function')
+            this.props.onRequestExportProject({format: action});
+
+        else
+            this.setState({ exportDialogVisible: true });
+    }
+
     // Dialog cancel listeners
     handleRequestCancelDeleteProject() {
         this.setState({deleteProjectDialogVisible: false});
@@ -151,7 +163,11 @@ class MenuDrawer extends PureComponent {
 
                     {this.props.user && <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open project</ListItem>}
                     <ListItem data-name='import' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Import</ListItem>
-                    <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export</ListItem>
+                    <ExportActionMenu open={this.state.exportMenuVisible} anchorCorner='topRight' fixed
+                        onClose={() => this.setState({exportMenuVisible: false})}
+                        onSelectAction={this.handleSelectExportOption}>
+                        <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export&hellip;</ListItem>
+                    </ExportActionMenu>
 
                     {this.props.user && <React.Fragment>
                         <ListDivider />
@@ -191,6 +207,9 @@ class MenuDrawer extends PureComponent {
             user={this.props.user} />
 
         <AboutDialog open={this.state.aboutDialogVisible} onClose={this.handleRequestCancelAbout} />
+
+        <ExportImageDialog open={this.state.exportDialogVisible} onCancel={() => this.setState({exportDialogVisible: false})}
+            onAccept={options => { this.setState({ exportDialogVisible: false }); this.props.onRequestExportProject(options) }} />
     </React.Fragment>
     }
 }

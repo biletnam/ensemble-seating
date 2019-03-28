@@ -1,10 +1,3 @@
 .list-action-menu__item {
     white-space: nowrap;
 }
-
-.list-action-menu__divider {
-    border-bottom: 1px solid #aaa;
-    border-top: none;
-    border-right: none;
-    border-left: none;
-}

@@ -56,6 +56,7 @@ import {
 } from './helpers/project-helpers.js';
 
 import './main.css';
+import { renderSVG, renderImage } from './helpers/stage-helpers.js';
 
 function createFreshState(user) {
     return {
@@ -754,18 +755,61 @@ class App extends Component {
         }
     }
 
-    handleRequestExportProject() {
+    handleRequestExportProject(options) {
         const projectForExport = this.state.project;
+        const regions = projectForExport.regions;
+        const sections = projectForExport.sections;
+        const members = projectForExport.members;
+        const settings = Object.assign({}, options, projectForExport.settings);
 
-        const blob = new Blob([JSON.stringify(projectForExport)], {type: 'text/json'});
+        let result = null,
+            mime = null,
+            extension = null;
+
+        if (options.format == 'project') {
+            result = JSON.stringify(projectForExport);
+            mime = 'text/json';
+            extension = 'json';
+        }
+        else {
+            if (options.format == 'svg') {
+                const svg = renderSVG(regions, sections, members, settings);
+                result = svg.outerHTML;
+                mime = 'image/svg+xml;charset=utf-8';
+                extension = 'svg';
+            }
+            else {
+                result = renderImage(regions, sections, members, options);
+                if (options.format == 'jpeg') {
+                    mime = 'image/jpeg';
+                    extension = 'jpg';
+                }
+                else {
+                    mime = 'image/png';
+                    extension = 'png';
+                }
+            }
+        }
+
+        // Export the data
+        
         
         const download = document.createElement('a');
-        download.download = `${this.state.projectName}.json`;
-        download.href = URL.createObjectURL(blob);
+        download.download = `${this.state.projectName}.${extension}`;
+
+        if (options.format === 'svg' || options.format === 'project') {
+            const blob = new Blob([result], {type: mime});
+            download.href = URL.createObjectURL(blob);
+        }
+        else
+            download.href = result;
+
         document.body.appendChild(download);
         download.click();
         document.body.removeChild(download);
-        URL.revokeObjectURL(download.href);
+
+        if (options.format === 'svg' || options.format === 'project')
+            URL.revokeObjectURL(download.href);
     }
 
     handleRequestOpenProject(projectName) {

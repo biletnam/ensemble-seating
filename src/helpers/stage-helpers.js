@@ -378,3 +378,81 @@ export function calculateSeatPositions(regions, sections, members) {
     
     return seatsByRegion.flat();
 }
+
+function flipStageDirection(positionedSeats) {
+    const seats = JSON.parse(JSON.stringify(positionedSeats));
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+    for (const seat of seats) {
+        seat.x = (seat.x * -1) + layoutWidth;
+        seat.y = (seat.y * -1) + layoutHeight;
+    }
+    return trimOuterSpacing(seats);
+}
+
+export function renderSVG (regions, sections, members, settings) {
+    let seats = calculateSeatPositions(regions, sections, members);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+
+    if (!settings.downstageTop)
+        seats = flipStageDirection(seats);
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    svg.setAttribute('width', layoutWidth);
+    svg.setAttribute('height', layoutHeight);
+    svg.setAttribute('viewbox', `0 0 ${layoutWidth} ${layoutHeight}`);
+
+    seats.filter(seat => !(seat.implicit && !settings.implicitSeatsVisible && !seat.member)).forEach((seat, index) => {
+        const rect = document.createElementNS(ns, 'rect');
+        rect.setAttribute('width', seatSize);
+        rect.setAttribute('height', seatSize);
+        rect.setAttributeNS(ns, 'stroke', 'black');
+        rect.setAttributeNS(ns, 'strokeWidth', '1');
+        rect.setAttributeNS(ns, 'fill', seat.color);
+        rect.setAttributeNS(ns, 'x', seat.x);
+        rect.setAttributeNS(ns, 'y', seat.y);
+        svg.appendChild(rect);
+    });
+
+    return svg;
+}
+
+export function renderImage (regions, sections, members, options) {
+    let seats = calculateSeatPositions(regions, sections, members);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+
+    if (!options.downstageTop)
+        seats = flipStageDirection(seats);
+
+    const exportWidth = options.width || layoutWidth;
+    const exportHeight = options.height || layoutHeight;
+    const scale = exportWidth / layoutWidth;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = exportWidth;
+    canvas.height = exportHeight;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Todo: option to control PNG transparency
+    if (!(options.format === 'png' && options.transparency)) {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, exportWidth, exportHeight);
+    }
+
+    ctx.strokeStyle = '#000';
+
+    seats.filter(seat => !(seat.implicit && !options.implicitSeatsVisible && !seat.member)).forEach((seat, index) => {
+        ctx.fillStyle = seat.color;
+        const x = Math.floor(seat.x * scale) + .5;
+        const y = Math.floor(seat.y * scale) + .5;
+        const width = Math.floor(seatSize * scale);
+        const height = Math.floor(seatSize * scale);
+        ctx.fillRect(x, y, width, height);
+        ctx.strokeRect(x, y, width, height);
+    });
+
+    return canvas.toDataURL(`image/${options.format}`, options.quality);
+}

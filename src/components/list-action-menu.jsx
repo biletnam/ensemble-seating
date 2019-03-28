@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import './list-action-menu.css';
 
 import { Menu, MenuItem, MenuSurfaceAnchor } from '@rmwc/menu';
+import { ListDivider } from '@rmwc/list';
 import '@material/menu/dist/mdc.menu.css';
 import '@material/menu-surface/dist/mdc.menu-surface.css';
 import '@material/list/dist/mdc.list.css';
@@ -26,12 +27,12 @@ class ListActionMenu extends PureComponent {
             <Menu {...props}>
                 <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='edit'>Edit&hellip;</MenuItem>
                 {showEditAndDeleteControls && <>
-                    <hr className='list-action-menu__divider' />
+                    <ListDivider  />
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-top'>Move to top</MenuItem>
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-up'>Move up</MenuItem>
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-down'>Move down</MenuItem>
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-bottom'>Move to bottom</MenuItem>
-                    <hr className='list-action-menu__divider' />
+                    <ListDivider  />
                     <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='delete'>Delete</MenuItem>
                 </>}
             </Menu>
