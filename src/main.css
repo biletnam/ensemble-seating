@@ -150,6 +150,7 @@ body {
 .sections-list__section-container {
     background-color: #fff;
     margin: 1em 1em 0 1em;
+    border: 1px solid #ddd;
 }
 
 *:not(.sections-list__section-container) + .sections-list__section-container {
