@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
+import semver from 'semver';
 
 import SeatingRenderer from './components/render-seating.jsx';
 import MenuDrawer from './components/menu-drawer.jsx';
@@ -52,7 +53,9 @@ import {
     listProjects,
     cloneRegion,
     cloneSection,
-    clonePerson
+    clonePerson,
+    idbGetLastAppVersion,
+    idbSetLastAppVersion
 } from './helpers/project-helpers.js';
 
 import './main.css';
@@ -238,6 +241,18 @@ class App extends Component {
             resetProjectQueryString();
             hideLoadingScreen();
         }
+
+        idbGetLastAppVersion().then(version => {
+            if (version) {
+                if (semver.lt(version, APP_INFO.VERSION)) {
+                    // On a new version
+                }
+            }
+            else {
+                // First time running
+            }
+            idbSetLastAppVersion(APP_INFO.VERSION);
+        });
     }
 
     handleAuthStateChanged(user) {

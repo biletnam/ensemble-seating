@@ -8,7 +8,7 @@ import {templates} from '../templates/index.js';
 const PROJECTS_KEY = 'projects';
 const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
-const DB_VER = 1;
+const DB_VER = 2;
 const APP_NAME = APP_INFO.NAME;
 const PROJECT_FORMAT_VER = '0.8.0';
 
@@ -17,8 +17,25 @@ const currentDb = openDb(DB_NAME, DB_VER, upgradeDB => {
         case 0:
             // Brand new DB
             upgradeDB.createObjectStore(PROJECTS_KEY);
+        case 1:
+            upgradeDB.createObjectStore('env');
     }
 });
+
+export function idbSetLastAppVersion (ver) {
+    return currentDb.then(db => {
+        const tx = db.transaction('env', 'readwrite');
+        tx.objectStore('env').put(ver, 'lastVersionUsed');
+        return tx.complete;
+    });
+}
+
+export function idbGetLastAppVersion () {
+    return currentDb.then(db => {
+        const tx = db.transaction('env', 'readonly');
+        return tx.objectStore('env').get('lastVersionUsed');
+    });
+}
 
 /* DOM/window updates */
 export function updateProjectQueryString(name) {
