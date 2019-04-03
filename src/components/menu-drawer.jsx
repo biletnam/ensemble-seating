@@ -209,7 +209,8 @@ class MenuDrawer extends PureComponent {
         <AboutDialog open={this.state.aboutDialogVisible} onClose={this.handleRequestCancelAbout} />
 
         <ExportImageDialog open={this.state.exportDialogVisible} onCancel={() => this.setState({exportDialogVisible: false})}
-            onAccept={options => { this.setState({ exportDialogVisible: false }); this.props.onRequestExportProject(options) }} />
+            onAccept={options => { this.setState({ exportDialogVisible: false }); this.props.onRequestExportProject(options) }}
+            imageWidth={this.props.layoutWidth} imageHeight={this.props.layoutHeight} />
     </React.Fragment>
     }
 }

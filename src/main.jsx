@@ -56,7 +56,7 @@ import {
 } from './helpers/project-helpers.js';
 
 import './main.css';
-import { renderSVG, renderImage } from './helpers/stage-helpers.js';
+import { renderSVG, renderImage, getLayoutDimensions, calculateSeatPositions } from './helpers/stage-helpers.js';
 
 function createFreshState(user) {
     return {
@@ -1043,6 +1043,9 @@ class App extends Component {
     }
 
     render() {
+        const [layoutWidth, layoutHeight] = getLayoutDimensions(
+            calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members)
+        );
         return <React.Fragment>
             <MenuDrawer drawerOpen={this.state.drawerOpen}
                 onClose={this.handleRequestCloseMenuDrawer}
@@ -1055,6 +1058,8 @@ class App extends Component {
                 onRequestLogin={this.handleRequestLogin}
                 onRequestLogout={this.handleRequestLogout}
                 projectName={this.state.projectName}
+                layoutWidth={layoutWidth}
+                layoutHeight={layoutHeight}
                 user={this.state.user} />
 
             <MainToolbar id='rendering-toolbar'

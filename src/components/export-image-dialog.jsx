@@ -21,13 +21,15 @@ function ExportImageDialog (props) {
     const [transparency, setTransparency] = useState(false);
     const [originalWidth, setOriginalWidth] = useState(props.imageWidth);
     const [originalHeight, setOriginalHeight] = useState(props.imageHeight);
-    const [width, setWidth] = useState(originalWidth || 640);
-    const [height, setHeight] = useState(originalHeight || 360);
+    const [width, setWidth] = useState(Math.floor(originalWidth) || 640);
+    const [height, setHeight] = useState(Math.floor(originalHeight) || 360);
 
     useEffect(() => {
         if ((props.imageWidth != originalWidth) || (props.imageHeight != originalHeight)) {
             setOriginalWidth(props.imageWidth);
             setOriginalHeight(props.imageHeight);
+            setWidth(Math.floor(props.imageWidth));
+            setHeight(Math.floor(props.imageHeight));
         }
     });
 
@@ -83,7 +85,7 @@ function ExportImageDialog (props) {
                         onChange={event => setWidth(event.target.value)}
                         onBlur={event => {
                             const newWidth = parseInt(event.target.value),
-                                newHeight = width * (height / width);
+                                newHeight = Math.floor(width * (height / width));
                             setWidth(newWidth);
                             setHeight(newHeight);
                         }}
@@ -95,7 +97,7 @@ function ExportImageDialog (props) {
                         onChange={event => setHeight(event.target.value)}
                         onBlur={event => {
                             const newHeight = parseInt(event.target.value),
-                                newWidth = newHeight * (width / height);
+                                newWidth = Math.floor(newHeight * (width / height));
                             setHeight(newHeight);
                             setWidth(newWidth)
                         }}
