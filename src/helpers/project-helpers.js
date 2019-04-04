@@ -1,10 +1,9 @@
 import {v4 as uuid} from 'uuid';
 import randomColor from 'randomcolor';
-import { openDb } from 'idb';
+import { openDB } from 'idb';
 import semver from 'semver';
 import firebase, { auth, provider } from './firebase-helpers.js';
 import {templates} from '../templates/index.js';
-
 const PROJECTS_KEY = 'projects';
 const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
@@ -12,13 +11,15 @@ const DB_VER = 2;
 const APP_NAME = APP_INFO.NAME;
 const PROJECT_FORMAT_VER = '0.8.0';
 
-const currentDb = openDb(DB_NAME, DB_VER, upgradeDB => {
-    switch (upgradeDB.oldVersion) {
-        case 0:
-            // Brand new DB
-            upgradeDB.createObjectStore(PROJECTS_KEY);
-        case 1:
-            upgradeDB.createObjectStore('env');
+const currentDb = openDB(DB_NAME, DB_VER, {
+    upgrade(db, oldVersion, newVersion, transaction) {
+        switch (oldVersion) {
+            case 0:
+                // Brand new DB
+                db.createObjectStore(PROJECTS_KEY);
+            case 1:
+                db.createObjectStore('env');
+        }
     }
 });
 
