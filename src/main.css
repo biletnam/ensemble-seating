@@ -150,6 +150,9 @@ body {
 .sections-list__section-container {
     background-color: #fff;
     margin: 1em 1em 0 1em;
+}
+
+.sections-list__section-container  .mdc-list-group {
     border: 1px solid #ddd;
 }
 
