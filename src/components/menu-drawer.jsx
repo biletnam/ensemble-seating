@@ -3,10 +3,12 @@ import React, { PureComponent } from 'react';
 import { Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle } from '@rmwc/drawer';
 import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroupSubheader, ListDivider, ListItemGraphic } from '@rmwc/list';
 import { Button } from '@rmwc/button';
+import { SimpleDialog } from '@rmwc/dialog';
 
 import '@material/drawer/dist/mdc.drawer.css';
 import '@material/list/dist/mdc.list.css';
 import '@material/button/dist/mdc.button.css';
+import '@material/dialog/dist/mdc.dialog.css';
 
 import DeleteProjectDialog from './delete-project-dialog.jsx';
 import RecentProjectsDialog from './recent-projects-dialog.jsx';
@@ -33,10 +35,12 @@ class MenuDrawer extends PureComponent {
             recentProjectsDialogVisible: false,
             deleteProjectDialogVisible: false,
             exportMenuVisible: false,
-            exportDialogVisible: false
+            exportDialogVisible: false,
+            confirmImportDialogVisible: false
         }
 
         this.handleMenuButtonClick = this.handleMenuButtonClick.bind(this);
+        this.triggerFileImportDialog = this.triggerFileImportDialog.bind(this);
         this.handleSelectFileForImport = this.handleSelectFileForImport.bind(this);
         this.handleFileReaderLoaded = this.handleFileReaderLoaded.bind(this);
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
@@ -68,11 +72,10 @@ class MenuDrawer extends PureComponent {
                 });
                 break;
             case 'import':
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.addEventListener('change', this.handleSelectFileForImport);
-                input.click();
+                if (this.props.user)
+                    this.triggerFileImportDialog();
+                else
+                    this.setState({ confirmImportDialogVisible: true });
                 break;
             case 'export':
                 this.setState({ exportMenuVisible: true });
@@ -83,6 +86,17 @@ class MenuDrawer extends PureComponent {
                 });
                 break;
         }
+    }
+
+    triggerFileImportDialog (event) {
+        if ((event && event.detail.action == 'accept') || !event) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.addEventListener('change', this.handleSelectFileForImport);
+            input.click();
+        }
+        this.setState({ confirmImportDialogVisible: false });
     }
 
     handleSelectFileForImport(event) {
@@ -211,6 +225,15 @@ class MenuDrawer extends PureComponent {
         <ExportImageDialog open={this.state.exportDialogVisible} onCancel={() => this.setState({exportDialogVisible: false})}
             onAccept={options => { this.setState({ exportDialogVisible: false }); this.props.onRequestExportProject(options) }}
             imageWidth={this.props.layoutWidth} imageHeight={this.props.layoutHeight} />
+
+        <SimpleDialog title='Abandon current seating chart?'
+            open={this.state.confirmImportDialogVisible}
+            acceptLabel='Continue'
+            body={<>
+                <p>If you import a seating chart, the contents of the current seating chart will be lost. This can't be undone.</p>
+                <p>Are you sure you want to continue?</p>
+            </>}
+            onClose={this.triggerFileImportDialog} />
     </React.Fragment>
     }
 }
