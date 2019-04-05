@@ -55,7 +55,10 @@ import {
     cloneSection,
     clonePerson,
     idbGetLastAppVersion,
-    idbSetLastAppVersion
+    idbSetLastAppVersion,
+    idbSaveTemporaryProject,
+    idbLoadTemporaryProject,
+    idbDeleteTemporaryProject
 } from './helpers/project-helpers.js';
 
 import './main.css';
@@ -187,7 +190,14 @@ class App extends Component {
             window.location.reload();
         });
 
-        this.worker.messageSW({ type: 'SKIP_WAITING' });
+        if (this.state.user)
+            this.worker.messageSW({ type: 'SKIP_WAITING' });
+        else {
+            // Save project to a temporary location to load after refresh
+            idbSaveTemporaryProject(this.state.project).then(() => {
+                this.worker.messageSW({ type: 'SKIP_WAITING' });
+            });
+        }
     }
 
     initFirstLaunch(user) {
@@ -239,8 +249,21 @@ class App extends Component {
         }
         else {
             // Not logged in. Create fresh project (app launches with fresh project)
-            resetProjectQueryString();
-            hideLoadingScreen();
+            idbLoadTemporaryProject().then(idbProject => {
+                if (idbProject) {
+                    this.setState({
+                        project: projectNeedsUpgrade(idbProject) ? upgradeProject(idbProject) : idbProject
+                    }, () => {
+                        resetProjectQueryString();
+                        hideLoadingScreen();
+                        idbDeleteTemporaryProject();
+                    });
+                }
+                else {
+                    resetProjectQueryString();
+                    hideLoadingScreen();
+                }
+            });
         }
 
         idbGetLastAppVersion().then(version => {

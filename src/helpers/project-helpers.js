@@ -38,6 +38,27 @@ export function idbGetLastAppVersion () {
     });
 }
 
+export function idbSaveTemporaryProject (project) {
+    return currentDb.then(db => {
+        const tx = db.transaction(PROJECTS_KEY, 'readwrite');
+        return tx.objectStore(PROJECTS_KEY).put(project, 'temp-project');
+    });
+}
+
+export function idbLoadTemporaryProject () {
+    return currentDb.then(db => {
+        const tx = db.transaction(PROJECTS_KEY, 'readonly');
+        return tx.objectStore(PROJECTS_KEY).get('temp-project');
+    });
+}
+
+export function idbDeleteTemporaryProject () {
+    return currentDb.then(db => {
+        const tx = db.transaction(PROJECTS_KEY, 'readwrite');
+        return tx.objectStore(PROJECTS_KEY).delete('temp-project');
+    });
+}
+
 /* DOM/window updates */
 export function updateProjectQueryString(name) {
     const searchParams = new URLSearchParams(location.search);
