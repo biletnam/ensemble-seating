@@ -81,6 +81,7 @@ function createFreshState(user) {
         editMemberDialogOpen: false,
         projectOptionsDialogOpen: false,
         newProjectDialogOpen: false,
+        confirmNewProjectDialogOpen: false,
         drawerOpen: false,
         rosterOpen: true,
         editorId: null,
@@ -732,8 +733,25 @@ class App extends Component {
         window.print();
     }
 
-    handleRequestNewProject() {
-        this.setState({ newProjectDialogOpen: true });
+    handleRequestNewProject(event) {
+        if (this.state.confirmNewProjectDialogOpen) {
+            if (event && event.detail.action == 'accept') {
+                this.setState({
+                    confirmNewProjectDialogOpen: false,
+                    newProjectDialogOpen: true
+                });
+            }
+            else
+                this.setState({ confirmNewProjectDialogOpen: false });
+        }
+        else {
+            
+            if (this.state.user)
+                this.setState({ newProjectDialogOpen: true });
+            else
+                this.setState({ confirmNewProjectDialogOpen: true });
+        }
+        
     }
 
     handleRequestImportProject(project, name) {
@@ -1139,6 +1157,15 @@ class App extends Component {
                 body={`This will remove them from the ${this.state.deleteSectionName} section.`}
                 open={this.state.deleteMemberDialogOpen}
                 onClose={this.handleDeleteMemberDialogClosed} />
+
+            <SimpleDialog title='Abandon current seating chart?'
+                body={<>
+                    <p>If you create a new seating chart, the contents of the current seating chart will be lost. This can't be undone.</p>
+                    <p>Are you sure you want to continue?</p>
+                </>}
+                acceptLabel='Continue'
+                open={this.state.confirmNewProjectDialogOpen}
+                onClose={this.handleRequestNewProject} />
 
             <EditDialog open={this.state.editRegionDialogOpen}
                 title='Edit region'
