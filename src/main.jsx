@@ -835,7 +835,7 @@ class App extends Component {
                 extension = 'svg';
             }
             else {
-                result = renderImage(regions, sections, members, options);
+                result = renderImage(regions, sections, members, settings);
                 if (options.format == 'jpeg') {
                     mime = 'image/jpeg';
                     extension = 'jpg';
@@ -1100,7 +1100,8 @@ class App extends Component {
 
     render() {
         const [layoutWidth, layoutHeight] = getLayoutDimensions(
-            calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members)
+            calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings),
+            this.state.project.settings
         );
         return <React.Fragment>
             <MenuDrawer drawerOpen={this.state.drawerOpen}

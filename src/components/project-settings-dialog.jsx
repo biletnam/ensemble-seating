@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import LabeledSlider from './labeled-slider.jsx';
+
 import { SimpleDialog } from '@rmwc/dialog';
 import { Select } from '@rmwc/select';
 import { Switch } from '@rmwc/switch';
@@ -26,6 +28,9 @@ class ProjectSettingsDialog extends PureComponent {
                 // Toggle
                 newSetting[event.target.name] = event.target.checked;
             }
+            else if (event.target.name === 'seatGap') {
+                newSetting[event.target.name] = event.target.value;
+            }
             else
                 newSetting[event.target.name] = event.target.value;
             
@@ -36,10 +41,15 @@ class ProjectSettingsDialog extends PureComponent {
     render() {
         return <SimpleDialog open={this.props.isOpen}
         onClose={this.props.onClose}
+        onStateChange={state => {
+            if (state === 'opened')
+                window.dispatchEvent(new Event('resize'));
+        }}
         title='Display options'
         acceptLabel='Done'
         cancelLabel={null}
         body={<div>
+                <h3>Labels</h3>
                 <div className='text-input-wrapper'>
                     <Select value={this.props.seatNameLabels}
                         onChange={this.onChange}
@@ -56,10 +66,35 @@ class ProjectSettingsDialog extends PureComponent {
                         name='seatNameLabels' />
                 </div>
                 
+                <h3>Auto-generated seats</h3>
                 <div className='text-input-wrapper'>
                     <Switch checked={this.props.implicitSeatsVisible}
                         onChange={this.onChange}
                         name='implicitSeatsVisible'>Show auto-generated seats</Switch>
+                </div>
+
+                <h3>Seat size</h3>
+                <div className='text-input-wrapper'>
+                    <LabeledSlider value={this.props.seatSize}
+                        onChange={newValue => this.onChange({
+                            target: {
+                                name: 'seatSize',
+                                value: newValue
+                            }
+                        })}
+                        min={4} max={128} step={4} label='px' />
+                </div>
+
+                <h3>Seat spacing</h3>
+                <div className='text-input-wrapper'>
+                    <LabeledSlider value={this.props.seatGap}
+                        onChange={newValue => this.onChange({
+                            target: {
+                                name: 'seatGap',
+                                value: newValue
+                            }
+                        })}
+                        min={0} max={8} step={.5} label=' × seat size' />
                 </div>
         </div>}
         acceptLabel='Close'

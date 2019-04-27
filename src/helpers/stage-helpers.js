@@ -1,5 +1,5 @@
 export const seatSize = 32;
-export const seatGap = .5 * seatSize;
+export const seatGap = 1;
 export const regionGap = 2 * seatSize;
 
 export function sumRows(rows) {
@@ -168,11 +168,12 @@ export function getPositionOnCurve (seatNum, rowLength, angle) {
     return position;
 }
 
-export function curveRows(rowData, angle) {
+export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
     const rows = JSON.parse(JSON.stringify(rowData));
+    const increasePerRow = options.seatSize * (options.seatGap + 1);
 
     if (Array.isArray(rows) && rows.length > 0) {
-        const firstRowWidth = rows[0].length * seatGap;
+        const firstRowWidth = rows[0].length * options.seatSize * .5;
 
         for (let i=0; i<rows.length; i++) {
             const count = rows[i].length - 1;
@@ -183,15 +184,15 @@ export function curveRows(rowData, angle) {
 
                 // Multiply by the on-screen dimensions of each row to get pixel values
                 // Start at a fixed size for the first row, then increase radius for each row
-                rows[i][k].x = position.x * (firstRowWidth + (i * seatSize * 2));
-                rows[i][k].y = position.y * (firstRowWidth + (i * seatSize * 2));
+                rows[i][k].x = position.x * (firstRowWidth + (i * increasePerRow));
+                rows[i][k].y = position.y * (firstRowWidth + (i * increasePerRow));
 
-                rows[i][k].x -= (.5 * seatSize);
+                rows[i][k].x -= (.5 * options.seatSize);
             }
         }
 
         // Normalize dimensions (shift values to the right so they don't arc around 0,0)
-        const [regionWidth, regionHeight] = getLayoutDimensions(rows.flat());
+        const [regionWidth, regionHeight] = getLayoutDimensions(rows.flat(), options);
         const offset = .5 * regionWidth;
         for (let i=0; i<rows.length; i++) {
             for (const seat of rows[i])
@@ -202,7 +203,7 @@ export function curveRows(rowData, angle) {
     return rows;
 }
 
-export function straightenRows(rowData) {
+export function straightenRows(rowData, options = {seatSize, seatGap}) {
     const rows = JSON.parse(JSON.stringify(rowData));
 
     if (Array.isArray(rows) && rows.length > 0) {
@@ -211,8 +212,8 @@ export function straightenRows(rowData) {
         for (let i=0; i<rows.length; i++) {
             for (let k=0; k<rows[i].length; k++) {
                 // Temporary: use 1/2 seat of space between all seats
-                const xVal = (k * seatSize) + (k * seatGap);
-                const yVal = (i * seatSize) + (i * seatGap);
+                const xVal = (k * options.seatSize) + (k * (options.seatSize * options.seatGap));
+                const yVal = (i * options.seatSize) + (i * (options.seatSize * options.seatGap));
                 rows[i][k].x = xVal;
                 rows[i][k].y = yVal;
 
@@ -224,9 +225,9 @@ export function straightenRows(rowData) {
         }
 
         // Center rows
-        const maxRowWidth = (xMax - xMin) + seatSize;
+        const maxRowWidth = (xMax - xMin) + options.seatSize;
         for (let i=0; i<rows.length; i++) {
-            const [width, height] = getLayoutDimensions(rows[i]);
+            const [width, height] = getLayoutDimensions(rows[i], options);
             const diff = maxRowWidth - width;
             const offset = diff * .5;
             for (const seat of rows[i]) {
@@ -291,7 +292,7 @@ export function seatMembers (membersBySection, rows) {
     return seatedRows;
 }
 
-export function getLayoutDimensions (positionedSeats) {
+export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
     let minX = 0, maxX = 0, minY = 0, maxY = 0;
     for (let i=0; i<positionedSeats.length; i++) {
         const currentX = positionedSeats[i].x,
@@ -303,10 +304,10 @@ export function getLayoutDimensions (positionedSeats) {
         if (currentY > maxY) maxY = currentY;
     }
 
-    return [(maxX - minX) + seatSize, (maxY - minY) + seatSize];
+    return [(maxX - minX) + options.seatSize, (maxY - minY) + options.seatSize];
 }
 
-export function calculateSeatPositions(regions, sections, members) {
+export function calculateSeatPositions(regions, sections, members, options) {
     const seatsByRegion = [];
 
     for (let i=0; i<regions.length; i++) {
@@ -326,9 +327,9 @@ export function calculateSeatPositions(regions, sections, members) {
 
         // Curve rows if necessary, and set container dimensions for scrolling
         if (region.curvedLayout)
-            seatedRows = curveRows(seatedRows, region.angle);
+            seatedRows = curveRows(seatedRows, region.angle, options);
         else
-            seatedRows = straightenRows(seatedRows);
+            seatedRows = straightenRows(seatedRows, options);
 
         // Flatten seatedRows
         const flattenedSeats = trimOuterSpacing(seatedRows.flat());
@@ -337,7 +338,7 @@ export function calculateSeatPositions(regions, sections, members) {
         let regionOffset = 0;
         if (i > 0) {
             // Get the maximum y coordinate of the last region
-            const [previousRegionWidth, previousRegionHeight] = getLayoutDimensions(seatsByRegion[i - 1]);
+            const [previousRegionWidth, previousRegionHeight] = getLayoutDimensions(seatsByRegion[i - 1], options);
             regionOffset = previousRegionHeight + regionGap;
         }
         
@@ -362,11 +363,11 @@ export function calculateSeatPositions(regions, sections, members) {
         });
     });
 
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seatsByRegion.flat());
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seatsByRegion.flat(), options);
 
     for (const region of seatsByRegion) {
         // Get the width of the current region
-        const [regionWidth, regionHeight] = getLayoutDimensions(region);
+        const [regionWidth, regionHeight] = getLayoutDimensions(region, options);
 
         const diff = layoutWidth - regionWidth;
         const offset = diff * .5;
@@ -379,9 +380,9 @@ export function calculateSeatPositions(regions, sections, members) {
     return seatsByRegion.flat();
 }
 
-function flipStageDirection(positionedSeats) {
+function flipStageDirection(positionedSeats, options) {
     const seats = JSON.parse(JSON.stringify(positionedSeats));
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
     for (const seat of seats) {
         seat.x = (seat.x * -1) + layoutWidth;
         seat.y = (seat.y * -1) + layoutHeight;
@@ -390,11 +391,11 @@ function flipStageDirection(positionedSeats) {
 }
 
 export function renderSVG (regions, sections, members, settings) {
-    let seats = calculateSeatPositions(regions, sections, members);
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+    let seats = calculateSeatPositions(regions, sections, members, settings);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, settings);
 
     if (!settings.downstageTop)
-        seats = flipStageDirection(seats);
+        seats = flipStageDirection(seats, settings);
 
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg');
@@ -406,8 +407,8 @@ export function renderSVG (regions, sections, members, settings) {
 
     seats.filter(seat => !(seat.implicit && !settings.implicitSeatsVisible && !seat.member)).forEach((seat, index) => {
         const rect = document.createElementNS(ns, 'rect');
-        rect.setAttribute('width', seatSize);
-        rect.setAttribute('height', seatSize);
+        rect.setAttribute('width', settings.seatSize || seatSize);
+        rect.setAttribute('height', settings.seatSize || seatSize);
         rect.setAttributeNS(ns, 'stroke', 'black');
         rect.setAttributeNS(ns, 'strokeWidth', '1');
         rect.setAttributeNS(ns, 'fill', seat.color);
@@ -420,11 +421,11 @@ export function renderSVG (regions, sections, members, settings) {
 }
 
 export function renderImage (regions, sections, members, options) {
-    let seats = calculateSeatPositions(regions, sections, members);
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+    let seats = calculateSeatPositions(regions, sections, members, options);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
 
     if (!options.downstageTop)
-        seats = flipStageDirection(seats);
+        seats = flipStageDirection(seats, options);
 
     const exportWidth = options.width || layoutWidth;
     const exportHeight = options.height || layoutHeight;
@@ -448,8 +449,8 @@ export function renderImage (regions, sections, members, options) {
         ctx.fillStyle = seat.color;
         const x = Math.floor(seat.x * scale) + .5;
         const y = Math.floor(seat.y * scale) + .5;
-        const width = Math.floor(seatSize * scale);
-        const height = Math.floor(seatSize * scale);
+        const width = Math.floor(options.seatSize * scale);
+        const height = Math.floor(options.seatSize * scale);
         ctx.fillRect(x, y, width, height);
         ctx.strokeRect(x, y, width, height);
     });

@@ -213,8 +213,8 @@ body {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 2em;
-    height: 2em;
+    width: var(--seat-size);
+    height: var(--seat-size);
     border: 1px solid #aaa;
     vertical-align: top;
     cursor: default;

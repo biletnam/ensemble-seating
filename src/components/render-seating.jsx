@@ -28,6 +28,7 @@ class SeatingRenderer extends PureComponent {
                     region={currentRegion}
                     curvedLayout={currentRegion.curvedLayout}
                     downstageTop={this.props.settings.downstageTop}
+                    projectSettings={this.props.settings}
                     editorId={this.props.editorId}
                     implicitSeatsVisible={this.props.settings.implicitSeatsVisible}
                     seatNameLabels={this.props.settings.seatNameLabels}
@@ -43,7 +44,7 @@ class SeatingRenderer extends PureComponent {
         if (this.props.expanded)
             className = `${this.props.id}--expanded`
 
-        return <div id={this.props.id} className={className}>{regionsToRender}</div>;
+        return <div id={this.props.id} className={className} style={{'--seat-size': `${this.props.settings.seatSize}px`}}>{regionsToRender}</div>;
     }
 }
 

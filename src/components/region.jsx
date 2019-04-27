@@ -38,8 +38,8 @@ class Region extends PureComponent {
                 </div>
         }
         else {
-            const positionedSeats = calculateSeatPositions([this.props.region], this.props.sections, this.props.members);
-            const [layoutWidth, layoutHeight] = getLayoutDimensions(positionedSeats);
+            const positionedSeats = calculateSeatPositions([this.props.region], this.props.sections, this.props.members, this.props.projectSettings);
+            const [layoutWidth, layoutHeight] = getLayoutDimensions(positionedSeats, this.props.projectSettings);
 
             return <div className='rendering-area__stage' style={{ width: `${layoutWidth}px`, height: `${layoutHeight}px` }}>
                 {positionedSeats.map((currentSeat, seatIndex) => {

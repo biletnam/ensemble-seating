@@ -233,6 +233,8 @@
     "settings": {
       "seatNameLabels": "initials",
       "downstageTop": false,
-      "implicitSeatsVisible": false
+      "implicitSeatsVisible": false,
+      "seatGap": 1.0,
+      "seatSize": 32
     }
   }

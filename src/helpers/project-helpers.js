@@ -9,7 +9,7 @@ const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
 const DB_VER = 2;
 const APP_NAME = APP_INFO.NAME;
-const PROJECT_FORMAT_VER = '0.8.0';
+const PROJECT_FORMAT_VER = '0.10.0';
 
 const currentDb = openDB(DB_NAME, DB_VER, {
     upgrade(db, oldVersion, newVersion, transaction) {
@@ -321,6 +321,11 @@ export function upgradeProject(project) {
                 angle: 180
             });
         });
+    }
+    if (semver.lt(finalProject.appVersion, '0.10.0')) {
+        finalProject.appVersion = '0.10.0';
+        finalProject.settings.seatGap = 1.0;
+        finalProject.settings.seatSize = 32;
     }
 
     return finalProject;
