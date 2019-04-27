@@ -15,6 +15,8 @@ import '@material/line-ripple/dist/mdc.line-ripple.css';
 import '@material/switch/dist/mdc.switch.css';
 import '@material/form-field/dist/mdc.form-field.css';
 
+const fontSizes = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
+
 class ProjectSettingsDialog extends PureComponent {
     constructor(props) {
         super(props);
@@ -52,6 +54,7 @@ class ProjectSettingsDialog extends PureComponent {
                 <h3>Labels</h3>
                 <div className='text-input-wrapper'>
                     <Select value={this.props.seatNameLabels}
+                        label='Label type'
                         onChange={this.onChange}
                         options={[
                             {
@@ -64,6 +67,13 @@ class ProjectSettingsDialog extends PureComponent {
                             }
                         ]}
                         name='seatNameLabels' />
+                </div>
+                <div className='text-input-wrapper'>
+                        <Select value={this.props.seatLabelFontSize}
+                            label='Font size'
+                            onChange={this.onChange}
+                            options={fontSizes}
+                            name='seatLabelFontSize' />
                 </div>
                 
                 <h3>Auto-generated seats</h3>

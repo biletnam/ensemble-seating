@@ -1,3 +1,8 @@
+:root {
+    --seat-label-font-size: 16px;
+    --seat-size: 32px;
+}
+
 html {
     font-size: 16px;
     color: #333;
@@ -223,6 +228,7 @@ body {
     overflow: visible;
     box-sizing: border-box;
     position: absolute;
+    font-size: var(--seat-label-font-size);
 }
 
 .seat--implicit {

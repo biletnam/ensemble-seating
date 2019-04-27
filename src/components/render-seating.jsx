@@ -44,7 +44,10 @@ class SeatingRenderer extends PureComponent {
         if (this.props.expanded)
             className = `${this.props.id}--expanded`
 
-        return <div id={this.props.id} className={className} style={{'--seat-size': `${this.props.settings.seatSize}px`}}>{regionsToRender}</div>;
+        return <div id={this.props.id} className={className} style={{
+            '--seat-size': `${this.props.settings.seatSize}px`,
+            '--seat-label-font-size': `${this.props.settings.seatLabelFontSize}px`
+        }}>{regionsToRender}</div>;
     }
 }
 

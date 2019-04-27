@@ -117,6 +117,7 @@
       "downstageTop": false,
       "implicitSeatsVisible": false,
       "seatGap": 1.0,
-      "seatSize": 32
+      "seatSize": 32,
+      "seatLabelFontSize": 16
     }
   }
