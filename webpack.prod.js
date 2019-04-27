@@ -32,11 +32,11 @@ module.exports = merge(common, {
                     attributes: externalAttributes
                 },
                 {
-                    path: 'https://unpkg.com/react-beautiful-dnd@10.1.1/dist/react-beautiful-dnd.min.js',
+                    path: 'https://unpkg.com/react-beautiful-dnd@11.0.1/dist/react-beautiful-dnd.min.js',
                     attributes: externalAttributes
                 },
                 {
-                    path: 'https://unpkg.com/workbox-window@4.1.1/build/workbox-window.prod.umd.js',
+                    path: 'https://unpkg.com/workbox-window@4.3.0/build/workbox-window.prod.umd.js',
                     attributes: externalAttributes
                 }
             ],
