@@ -82,6 +82,14 @@ body {
         transform: translateX(100%);
     }
 
+    .sections-list--empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 1em;
+    }
+
     .sections-list__scrollable-container {
         position: absolute;
         top: 0;
@@ -122,12 +130,9 @@ body {
     }
 }
 
-.sections-list--empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 1em;
+.sections-list__no-sections-message {
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .sections-list__droppable-section-area:not(:last-child) {

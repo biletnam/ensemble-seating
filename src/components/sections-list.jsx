@@ -17,7 +17,6 @@ class SectionsList extends PureComponent {
         const label = this.props.expanded ? 'Hide sections' : 'Show sections';
 
         return <aside id={this.props.id} className={className}>
-            {this.props.sections.length === 0 && this.props.regions.length === 1 && <p>No sections to display</p>}
             <button type='button' className='sections-list__toggle-button' onClick={this.props.onToggleVisibility}
                 aria-label={label} title={label}>
                 <LeftChevronIcon style={{transform: this.props.expanded ? 'rotateZ(180deg)' : ''}} />
@@ -49,6 +48,7 @@ class SectionsList extends PureComponent {
                     )}
                 </DragDropContext>
             </div>
+            {this.props.sections.length === 0 && this.props.regions.length === 1 && <p className='sections-list__no-sections-message'>No sections to display</p>}
         </aside>
     }
 };
