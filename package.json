@@ -2,7 +2,7 @@
   "name": "ensemble-seating",
   "appName": "Ensemble Seating",
   "appCodename": "Debut",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Generate seating charts for musical ensembles",
   "homepage": "https://seatingch.art",
   "repository": {
@@ -52,7 +52,6 @@
     "css-loader": "^2.1.1",
     "cssnano": "^4.1.10",
     "firebase": "^5.10.1",
-    "html-webpack-include-assets-plugin": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
     "idb": "^4.0.3",
     "mini-css-extract-plugin": "^0.6.0",
