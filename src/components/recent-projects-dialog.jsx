@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import ProjectList from './project-list.jsx';
 
 import { SimpleDialog } from '@rmwc/dialog';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 class RecentProjectsDialog extends PureComponent {
     constructor (props) {

@@ -6,14 +6,14 @@ import { SimpleDialog } from '@rmwc/dialog';
 import { Select } from '@rmwc/select';
 import { Switch } from '@rmwc/switch';
 
-import '@material/dialog/dist/mdc.dialog.css';
-import '@material/typography/dist/mdc.typography.css';
-import '@material/select/dist/mdc.select.css';
-import '@material/floating-label/dist/mdc.floating-label.css';
-import '@material/notched-outline/dist/mdc.notched-outline.css';
-import '@material/line-ripple/dist/mdc.line-ripple.css';
-import '@material/switch/dist/mdc.switch.css';
-import '@material/form-field/dist/mdc.form-field.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
+import '@material/typography/dist/mdc.typography.min.css';
+import '@material/select/dist/mdc.select.min.css';
+import '@material/floating-label/dist/mdc.floating-label.min.css';
+import '@material/notched-outline/dist/mdc.notched-outline.min.css';
+import '@material/line-ripple/dist/mdc.line-ripple.min.css';
+import '@material/switch/dist/mdc.switch.min.css';
+import '@material/form-field/dist/mdc.form-field.min.css';
 
 const fontSizes = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 

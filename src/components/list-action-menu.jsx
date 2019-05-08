@@ -4,9 +4,9 @@ import './list-action-menu.css';
 
 import { Menu, MenuItem, MenuSurfaceAnchor } from '@rmwc/menu';
 import { ListDivider } from '@rmwc/list';
-import '@material/menu/dist/mdc.menu.css';
-import '@material/menu-surface/dist/mdc.menu-surface.css';
-import '@material/list/dist/mdc.list.css';
+import '@material/menu/dist/mdc.menu.min.css';
+import '@material/menu-surface/dist/mdc.menu-surface.min.css';
+import '@material/list/dist/mdc.list.min.css';
 
 
 class ListActionMenu extends PureComponent {

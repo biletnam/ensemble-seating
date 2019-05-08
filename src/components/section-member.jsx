@@ -3,8 +3,8 @@ import React, { PureComponent } from 'react';
 import { IconButton } from '@rmwc/icon-button';
 import { List, ListItem, ListItemPrimaryText, ListItemMeta } from '@rmwc/list';
 
-import '@material/icon-button/dist/mdc.icon-button.css';
-import '@material/list/dist/mdc.list.css';
+import '@material/icon-button/dist/mdc.icon-button.min.css';
+import '@material/list/dist/mdc.list.min.css';
 
 import { Draggable } from 'react-beautiful-dnd';
 

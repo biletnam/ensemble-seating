@@ -4,7 +4,7 @@ import './new-project-dialog.css';
 import {templates} from '../templates/index.js';
 
 import {SimpleDialog} from '@rmwc/dialog';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 import ProjectTile from './project-tile.jsx';
 

@@ -106,6 +106,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
+                sideEffects: true,
                 use: [
                     { loader: MiniCssExtractPlugin.loader },
                     { loader: 'css-loader' },

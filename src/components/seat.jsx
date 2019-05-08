@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 
 import { Ripple } from '@rmwc/ripple';
 
-import '@material/ripple/dist/mdc.ripple.css';
+import '@material/ripple/dist/mdc.ripple.min.css';
 
 import {getInitials} from '../helpers/stage-helpers.js';
 

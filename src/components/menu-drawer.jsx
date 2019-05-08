@@ -5,10 +5,10 @@ import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroup
 import { Button } from '@rmwc/button';
 import { SimpleDialog } from '@rmwc/dialog';
 
-import '@material/drawer/dist/mdc.drawer.css';
-import '@material/list/dist/mdc.list.css';
-import '@material/button/dist/mdc.button.css';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/drawer/dist/mdc.drawer.min.css';
+import '@material/list/dist/mdc.list.min.css';
+import '@material/button/dist/mdc.button.min.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 import DeleteProjectDialog from './delete-project-dialog.jsx';
 import RecentProjectsDialog from './recent-projects-dialog.jsx';

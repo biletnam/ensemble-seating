@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
 import { SimpleDialog } from '@rmwc/dialog';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 class DeleteProjectDialog extends PureComponent {
     constructor(props) {

@@ -7,10 +7,10 @@ import { Elevation } from '@rmwc/elevation';
 import SectionMember from './section-member.jsx';
 import ColorSquare from './color-square.jsx';
 
-import '@material/textfield/dist/mdc.textfield.css';
-import '@material/list/dist/mdc.list.css';
-import '@material/icon-button/dist/mdc.icon-button.css';
-import '@material/elevation/dist/mdc.elevation.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
+import '@material/list/dist/mdc.list.min.css';
+import '@material/icon-button/dist/mdc.icon-button.min.css';
+import '@material/elevation/dist/mdc.elevation.min.css';
 
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 

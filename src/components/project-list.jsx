@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 
 import { ListItem, ListGroup } from '@rmwc/list';
-import '@material/list/dist/mdc.list.css';
+import '@material/list/dist/mdc.list.min.css';
 
 import { listProjects } from '../helpers/project-helpers.js';
 

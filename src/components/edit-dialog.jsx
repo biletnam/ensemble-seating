@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {SimpleDialog} from '@rmwc/dialog';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 class EditDialog extends Component {
     constructor(props) {

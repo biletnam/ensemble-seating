@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
 import { SimpleDialog } from '@rmwc/dialog';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 import { Select } from '@rmwc/select';
-import '@material/select/dist/mdc.select.css';
-import '@material/floating-label/dist/mdc.floating-label.css';
-import '@material/notched-outline/dist/mdc.notched-outline.css';
-import '@material/line-ripple/dist/mdc.line-ripple.css';
+import '@material/select/dist/mdc.select.min.css';
+import '@material/floating-label/dist/mdc.floating-label.min.css';
+import '@material/notched-outline/dist/mdc.notched-outline.min.css';
+import '@material/line-ripple/dist/mdc.line-ripple.min.css';
 
 import { TextField } from '@rmwc/textfield';
-import '@material/textfield/dist/mdc.textfield.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
 
 import { Slider } from '@rmwc/slider';
-import '@material/slider/dist/mdc.slider.css';
+import '@material/slider/dist/mdc.slider.min.css';
 
 function ExportImageDialog (props) {
     const [format, setFormat] = useState('jpeg');

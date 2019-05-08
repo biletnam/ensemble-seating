@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 
 import { Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, ToolbarMenuIcon, ToolbarIcon } from '@rmwc/toolbar';
 
-import '@material/toolbar/dist/mdc.toolbar.css';
-import '@material/textfield/dist/mdc.textfield.css';
-import '@material/floating-label/dist/mdc.floating-label.css';
-import '@material/notched-outline/dist/mdc.notched-outline.css';
-import '@material/line-ripple/dist/mdc.line-ripple.css';
+import '@material/toolbar/dist/mdc.toolbar.min.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
+import '@material/floating-label/dist/mdc.floating-label.min.css';
+import '@material/notched-outline/dist/mdc.notched-outline.min.css';
+import '@material/line-ripple/dist/mdc.line-ripple.min.css';
 
 import InlineInput from './inline-input.jsx';
 

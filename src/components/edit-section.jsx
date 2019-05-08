@@ -9,11 +9,11 @@ import { Button } from '@rmwc/button';
 import { IconButton } from '@rmwc/icon-button';
 import { Radio } from '@rmwc/radio';
 
-import '@material/textfield/dist/mdc.textfield.css';
-import '@material/button/dist/mdc.button.css';
-import '@material/icon-button/dist/mdc.icon-button.css';
-import '@material/radio/dist/mdc.radio.css';
-import '@material/form-field/dist/mdc.form-field.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
+import '@material/button/dist/mdc.button.min.css';
+import '@material/icon-button/dist/mdc.icon-button.min.css';
+import '@material/radio/dist/mdc.radio.min.css';
+import '@material/form-field/dist/mdc.form-field.min.css';
 
 import ClearIcon from '../icons/baseline-clear-24px.jsx';
 

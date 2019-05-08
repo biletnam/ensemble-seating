@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react';
 
 import { TextField } from '@rmwc/textfield';
 
-import '@material/typography/dist/mdc.typography.css';
-import '@material/textfield/dist/mdc.textfield.css';
-import '@material/icon-button/dist/mdc.icon-button.css';
+import '@material/typography/dist/mdc.typography.min.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
+import '@material/icon-button/dist/mdc.icon-button.min.css';
 
 class MemberEditor extends PureComponent {
     constructor(props) {

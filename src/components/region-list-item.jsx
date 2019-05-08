@@ -4,9 +4,9 @@ import { IconButton } from '@rmwc/icon-button';
 import { Button, ButtonIcon } from '@rmwc/button';
 import { Elevation } from '@rmwc/elevation';
 
-import '@material/icon-button/dist/mdc.icon-button.css';
-import '@material/button/dist/mdc.button.css';
-import '@material/elevation/dist/mdc.elevation.css';
+import '@material/icon-button/dist/mdc.icon-button.min.css';
+import '@material/button/dist/mdc.button.min.css';
+import '@material/elevation/dist/mdc.elevation.min.css';
 
 import ListActionMenu from './list-action-menu.jsx';
 import SectionListItem from './section-list-item.jsx';

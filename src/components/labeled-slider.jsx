@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Slider } from '@rmwc/slider';
-import '@material/slider/dist/mdc.slider.css';
+import '@material/slider/dist/mdc.slider.min.css';
 
 const LabeledSlider = props => {
     const [liveValue, setLiveValue] = useState(null);

@@ -19,8 +19,8 @@ import firebase, { auth, provider } from './helpers/firebase-helpers.js';
 import { SimpleDialog } from '@rmwc/dialog';
 import { Snackbar, SnackbarAction } from '@rmwc/snackbar';
 
-import '@material/dialog/dist/mdc.dialog.css';
-import '@material/snackbar/dist/mdc.snackbar.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
+import '@material/snackbar/dist/mdc.snackbar.min.css';
 
 import {
     saveProject,

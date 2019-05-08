@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {SimpleDialog} from '@rmwc/dialog';
-import '@material/dialog/dist/mdc.dialog.css';
+import '@material/dialog/dist/mdc.dialog.min.css';
 
 const BODY_CONTENT = <div>
     <h3>

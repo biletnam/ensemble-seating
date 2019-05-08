@@ -4,9 +4,9 @@ import { Switch } from '@rmwc/switch';
 import { TextField } from '@rmwc/textfield';
 import { Slider } from '@rmwc/slider';
 
-import '@material/switch/dist/mdc.switch.css';
-import '@material/textfield/dist/mdc.textfield.css';
-import '@material/slider/dist/mdc.slider.css';
+import '@material/switch/dist/mdc.switch.min.css';
+import '@material/textfield/dist/mdc.textfield.min.css';
+import '@material/slider/dist/mdc.slider.min.css';
 
 class RegionEditor extends PureComponent {
     constructor(props) {
