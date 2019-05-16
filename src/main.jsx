@@ -142,6 +142,7 @@ class App extends Component {
         
         this.handleRequestPrint = this.handleRequestPrint.bind(this);
         this.handleRequestNewProject = this.handleRequestNewProject.bind(this);
+        this.handleRequestDuplicateProject = this.handleRequestDuplicateProject.bind(this);
         this.handleRequestImportProject = this.handleRequestImportProject.bind(this);
         this.handleRequestExportProject = this.handleRequestExportProject.bind(this);
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
@@ -793,6 +794,23 @@ class App extends Component {
         
     }
 
+    handleRequestDuplicateProject() {
+        getUnusedProjectName(this.state.user, this.state.projectName).then(name => {
+            const newProject = duplicateProject(this.state.project);
+            const newState = Object.assign({},
+                createFreshState(this.state.user),
+                {
+                    project: newProject,
+                    projectName: name,
+                    user: this.state.user,
+                    message: 'Copied chart contents into a new seating chart.'
+                }
+            );
+
+            this.setState(newState, this.saveSession);
+        });
+    }
+
     handleRequestImportProject(project, name) {
         if (validateProject(project)) {
             const newProject = duplicateProject(project);
@@ -1125,6 +1143,7 @@ class App extends Component {
                 onClose={this.handleRequestCloseMenuDrawer}
                 onRequestPrintProject={this.handleRequestPrint}
                 onRequestNewProject={this.handleRequestNewProject}
+                onRequestDuplicateProject={this.handleRequestDuplicateProject}
                 onRequestImportProject={this.handleRequestImportProject}
                 onRequestExportProject={this.handleRequestExportProject}
                 onRequestShowOpenProjectDialog={() => this.setState({openProjectDialogOpen: true})}

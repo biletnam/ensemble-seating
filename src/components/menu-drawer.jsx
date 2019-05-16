@@ -19,6 +19,7 @@ import ExportImageDialog from './export-image-dialog.jsx';
 import PrintIcon from '../icons/baseline-print-24px.jsx';
 import DeleteForeverIcon from '../icons/baseline-delete_forever-24px.jsx';
 import NoteAddIcon from '../icons/baseline-note_add-24px.jsx';
+import CopyIcon from '../icons/baseline-file_copy-24px.jsx';
 import FolderOpenIcon from '../icons/baseline-folder_open-24px.jsx';
 import SaveAltIcon from '../icons/baseline-save_alt-24px.jsx';
 import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
@@ -62,6 +63,9 @@ class MenuDrawer extends PureComponent {
             case 'new-project':
                 if (typeof this.props.onRequestNewProject === 'function')
                     this.props.onRequestNewProject();
+                break;
+            case 'duplicate-project':
+                this.props.onRequestDuplicateProject && this.props.onRequestDuplicateProject();
                 break;
             case 'recent-projects':
                 if (this.props.user)
@@ -130,6 +134,9 @@ class MenuDrawer extends PureComponent {
             <DrawerContent>
                 <List>
                     <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New&hellip;</ListItem>
+                    {this.props.user && <>
+                        <ListItem data-name='duplicate-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<CopyIcon />} />Duplicate&hellip;</ListItem>
+                    </>}
                     <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
 
                     <ListDivider />
