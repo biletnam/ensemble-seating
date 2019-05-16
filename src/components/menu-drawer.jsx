@@ -11,7 +11,6 @@ import '@material/button/dist/mdc.button.min.css';
 import '@material/dialog/dist/mdc.dialog.min.css';
 
 import DeleteProjectDialog from './delete-project-dialog.jsx';
-import RecentProjectsDialog from './recent-projects-dialog.jsx';
 import AboutDialog from './about-dialog.jsx';
 import UserWidget from './user-widget.jsx';
 import ExportActionMenu from './export-action-menu.jsx';
@@ -43,7 +42,6 @@ class MenuDrawer extends PureComponent {
         this.triggerFileImportDialog = this.triggerFileImportDialog.bind(this);
         this.handleSelectFileForImport = this.handleSelectFileForImport.bind(this);
         this.handleFileReaderLoaded = this.handleFileReaderLoaded.bind(this);
-        this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
         this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
         this.handleSelectExportOption = this.handleSelectExportOption.bind(this);
 
@@ -67,9 +65,7 @@ class MenuDrawer extends PureComponent {
                     this.props.onRequestNewProject();
                 break;
             case 'recent-projects':
-                this.setState({
-                    recentProjectsDialogVisible: true
-                });
+                this.props.onRequestShowOpenProjectDialog && this.props.onRequestShowOpenProjectDialog();
                 break;
             case 'import':
                 if (this.props.user)
@@ -125,12 +121,6 @@ class MenuDrawer extends PureComponent {
         catch(e) {
             console.error('Unable to load project - file is corrupt.');
         }
-    }
-
-    handleRequestOpenProject(project) {
-        this.setState({recentProjectsDialogVisible: false}, () => {
-            this.props.onRequestOpenProject(project);
-        })
     }
 
     handleAcceptDeleteProject() {
@@ -214,11 +204,6 @@ class MenuDrawer extends PureComponent {
         <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={this.handleRequestCancelDeleteProject}
             onAccept={this.handleAcceptDeleteProject}
             title={`Delete "${this.props.projectName}?"`} />
-
-        <RecentProjectsDialog open={this.state.recentProjectsDialogVisible} 
-            onClose={this.handleRequestCancelRecentProjects}
-            onRequestOpenProject={this.handleRequestOpenProject}
-            user={this.props.user} />
 
         <AboutDialog open={this.state.aboutDialogVisible} onClose={this.handleRequestCancelAbout} />
 

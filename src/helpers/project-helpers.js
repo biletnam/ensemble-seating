@@ -451,6 +451,22 @@ export function createEmptyProject (templateId = 'blank') {
     return project;
 }
 
+export function isEmptyProject(project) {
+    const empty = createEmptyProject();
+    const emptyRegion = empty.regions.length > 0 ? JSON.parse(JSON.stringify(empty.regions[0])) : '';
+    const projectRegion = project.regions.length > 0 ? JSON.parse(JSON.stringify(project.regions[0])) : '';
+
+    delete emptyRegion.id;
+    delete projectRegion.id;
+    return  (
+        project.appVersion === empty.appVersion &&
+        JSON.stringify(emptyRegion) === JSON.stringify(projectRegion) && project.regions.length === 1 && empty.regions.length === 1 &&
+        JSON.stringify(project.sections) === JSON.stringify(empty.sections) &&
+        JSON.stringify(project.members) === JSON.stringify(empty.members) &&
+        JSON.stringify(project.settings) === JSON.stringify(empty.settings)
+    )
+}
+
 
 export function createSectionRow () {
     return {

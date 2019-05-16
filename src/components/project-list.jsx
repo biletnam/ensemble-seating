@@ -5,6 +5,8 @@ import '@material/list/dist/mdc.list.min.css';
 
 import { listProjects } from '../helpers/project-helpers.js';
 
+const LIST_ITEM_HEIGHT = 48;
+
 class ProjectList extends PureComponent {
     constructor(props) {
         super(props);
@@ -40,8 +42,8 @@ class ProjectList extends PureComponent {
     }
 
     render() {
-        return <ListGroup>
-            {this.state.projects.map(project => (
+        return <ListGroup style={{minHeight: this.props.max ? `${this.props.max * LIST_ITEM_HEIGHT}px` : null}}>
+            {this.state.projects.slice(0, this.props.max || Infinity).map(project => (
                 <ListItem key={project}
                     data-project={project}
                     onClick={this.handleListItemClick}>

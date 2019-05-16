@@ -14,6 +14,7 @@ import SectionEditor from './components/edit-section.jsx';
 import MemberEditor from './components/edit-member.jsx';
 import BatchAddMembersDialog from './components/batch-add-members.jsx';
 import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
+import RecentProjectsDialog from './components/recent-projects-dialog.jsx';
 import firebase, { auth, provider } from './helpers/firebase-helpers.js';
 
 import { SimpleDialog } from '@rmwc/dialog';
@@ -58,7 +59,8 @@ import {
     idbSetLastAppVersion,
     idbSaveTemporaryProject,
     idbLoadTemporaryProject,
-    idbDeleteTemporaryProject
+    idbDeleteTemporaryProject,
+    isEmptyProject
 } from './helpers/project-helpers.js';
 
 import './main.css';
@@ -84,6 +86,8 @@ function createFreshState(user) {
         editMemberDialogOpen: false,
         projectOptionsDialogOpen: false,
         newProjectDialogOpen: false,
+        showFirstLaunch: false,
+        openProjectDialogOpen: false,
         confirmNewProjectDialogOpen: false,
         drawerOpen: false,
         rosterOpen: true,
@@ -232,13 +236,15 @@ class App extends Component {
                     });
                 }
 
-                // Otherwise, create fresh project and schedule save for next interaction
+                // Otherwise, show first launch UI and create fresh project, schedule save for next interaction
                 else {
                     getUnusedProjectName(user).then(projectName => {
                         this.setState({
                             projectName,
                             user,
-                            needFullSave: true
+                            needFullSave: true,
+                            showFirstLaunch: true,
+                            newProjectDialogOpen: true
                         }, () => {
                             resetProjectQueryString();
                             hideLoadingScreen();
@@ -260,6 +266,10 @@ class App extends Component {
                     });
                 }
                 else {
+                    this.setState({
+                        showFirstLaunch: true,
+                        newProjectDialogOpen: true
+                    });
                     resetProjectQueryString();
                     hideLoadingScreen();
                 }
@@ -291,7 +301,7 @@ class App extends Component {
             this.setState({user}, () => {
                 if (user) {
                     // User logs in; has a "fresh" (unmodified, just started) project
-                    if (JSON.stringify(this.state.project) === JSON.stringify(createEmptyProject())) {
+                    if (isEmptyProject(this.state.project)) {
                         listProjects(user).then(cloudProjects => {
                             // Load project if it already exists
                             if (cloudProjects.indexOf(this.state.projectName) !== -1) {
@@ -300,7 +310,12 @@ class App extends Component {
                             
                             // Schedule save for the next interaction
                             else {
-                                this.setState({needFullSave: true});
+                                getUnusedProjectName(user).then(name => {
+                                    this.setState({
+                                        needFullSave: true,
+                                        projectName: name
+                                    });
+                                });
                             }
                         });
                     }
@@ -891,7 +906,7 @@ class App extends Component {
 
     /* DIALOG EVENTS */
     handleNewProjectDialogClosed() {
-        this.setState({newProjectDialogOpen: false});
+        this.setState({newProjectDialogOpen: false, showFirstLaunch: false});
     }
 
     handleSelectNewProjectTemplate(template) {
@@ -1110,7 +1125,7 @@ class App extends Component {
                 onRequestNewProject={this.handleRequestNewProject}
                 onRequestImportProject={this.handleRequestImportProject}
                 onRequestExportProject={this.handleRequestExportProject}
-                onRequestOpenProject={this.handleRequestOpenProject}
+                onRequestShowOpenProjectDialog={() => this.setState({openProjectDialogOpen: true})}
                 onRequestDeleteProject={this.handleAcceptDeleteProject}
                 onRequestLogin={this.handleRequestLogin}
                 onRequestLogout={this.handleRequestLogout}
@@ -1160,7 +1175,12 @@ class App extends Component {
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
                 onSelectTemplate={this.handleSelectNewProjectTemplate}
-                onClose={this.handleNewProjectDialogClosed} />
+                onClose={this.handleNewProjectDialogClosed}
+                onRequestOpenProject={this.handleRequestOpenProject}
+                onRequestShowOpenProjectDialog={() => this.setState({openProjectDialogOpen: true})}
+                onRequestLogin={this.handleRequestLogin}
+                showFirstLaunch={this.state.showFirstLaunch}
+                user={this.state.user} />
 
             <SimpleDialog title={`Delete "${this.state.deleteRegionName}" region?`}
                 body={<React.Fragment>
@@ -1224,6 +1244,12 @@ class App extends Component {
                 onClose={this.handleRequestCloseProjectSettingsDialog}
                 onChange={this.handleChangeProjectSetting}
                 {...this.state.project.settings} />
+
+            <RecentProjectsDialog open={this.state.openProjectDialogOpen}
+                onClose={() => this.setState({openProjectDialogOpen: false})}
+                onRequestOpenProject={this.handleRequestOpenProject}
+                showFirstLaunch={this.state.showFirstLaunch}
+                user={this.state.user} />
 
             <Snackbar open={this.state.message} onClose={() => {this.setState({message: null})}}
                 message={this.state.message} />
