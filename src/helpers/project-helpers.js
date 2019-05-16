@@ -551,3 +551,35 @@ export function validateProject(project) {
 
     return valid;
 }
+
+export function browseForFile () {
+    return new Promise((resolve, reject) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.addEventListener('change', inputEvent => {
+            if (inputEvent.target.files.length > 0) {
+                const reader = new FileReader();
+                reader.addEventListener('load', fileReaderEvent => {
+                    let parsedProject, projectName;
+                    try {
+                        parsedProject = JSON.parse(fileReaderEvent.target.result);
+                        projectName = fileReaderEvent.target.file.name.split('.');
+                        if (projectName.length > 1)
+                            projectName = projectName.slice(0, projectName.length - 1);
+                        projectName = projectName.join('.');
+            
+                        resolve({project: parsedProject, projectName});
+                    }
+                    catch(e) {
+                        console.error('Unable to load project - file is corrupt.');
+                        reject();
+                    }
+                });
+                reader.file = inputEvent.target.files[0];
+                reader.readAsText(inputEvent.target.files[0]);
+            }
+        });
+        input.click();
+    });
+}

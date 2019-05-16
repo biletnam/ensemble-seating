@@ -19,11 +19,12 @@ import ExportImageDialog from './export-image-dialog.jsx';
 import PrintIcon from '../icons/baseline-print-24px.jsx';
 import DeleteForeverIcon from '../icons/baseline-delete_forever-24px.jsx';
 import NoteAddIcon from '../icons/baseline-note_add-24px.jsx';
-import HistoryIcon from '../icons/baseline-history-24px.jsx';
 import FolderOpenIcon from '../icons/baseline-folder_open-24px.jsx';
 import SaveAltIcon from '../icons/baseline-save_alt-24px.jsx';
 import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
 import InfoIcon from '../icons/baseline-info-24px.jsx';
+
+import { browseForFile } from '../helpers/project-helpers.js';
 
 class MenuDrawer extends PureComponent {
     constructor(props) {
@@ -40,8 +41,6 @@ class MenuDrawer extends PureComponent {
 
         this.handleMenuButtonClick = this.handleMenuButtonClick.bind(this);
         this.triggerFileImportDialog = this.triggerFileImportDialog.bind(this);
-        this.handleSelectFileForImport = this.handleSelectFileForImport.bind(this);
-        this.handleFileReaderLoaded = this.handleFileReaderLoaded.bind(this);
         this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
         this.handleSelectExportOption = this.handleSelectExportOption.bind(this);
 
@@ -65,11 +64,8 @@ class MenuDrawer extends PureComponent {
                     this.props.onRequestNewProject();
                 break;
             case 'recent-projects':
-                this.props.onRequestShowOpenProjectDialog && this.props.onRequestShowOpenProjectDialog();
-                break;
-            case 'import':
                 if (this.props.user)
-                    this.triggerFileImportDialog();
+                    this.props.onRequestShowOpenProjectDialog && this.props.onRequestShowOpenProjectDialog();
                 else
                     this.setState({ confirmImportDialogVisible: true });
                 break;
@@ -86,41 +82,14 @@ class MenuDrawer extends PureComponent {
 
     triggerFileImportDialog (event) {
         if ((event && event.detail.action == 'accept') || !event) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.addEventListener('change', this.handleSelectFileForImport);
-            input.click();
+            browseForFile().then(result => {
+                const {project, projectName} = result;
+                this.props.onRequestImportProject(project, projectName);
+            }).catch(error => {
+                // To do: recover from error and/or display a message
+            });;
         }
         this.setState({ confirmImportDialogVisible: false });
-    }
-
-    handleSelectFileForImport(event) {
-        event.target.removeEventListener('change', this.handleSelectFileForImport);
-        if (event.target.files.length > 0) {
-            const reader = new FileReader();
-            reader.addEventListener('load', this.handleFileReaderLoaded);
-            reader.file = event.target.files[0];
-            reader.readAsText(event.target.files[0]);
-        }
-    }
-
-    handleFileReaderLoaded(event) {
-        event.target.removeEventListener('load', this.handleFileReaderLoaded);
-        let parsedProject, projectName;
-        try {
-            parsedProject = JSON.parse(event.target.result);
-            projectName = event.target.file.name.split('.');
-            if (projectName.length > 1)
-                projectName = projectName.slice(0, projectName.length - 1);
-            projectName = projectName.join('.');
-
-            if (typeof this.props.onRequestImportProject === 'function')
-            this.props.onRequestImportProject(parsedProject, projectName);
-        }
-        catch(e) {
-            console.error('Unable to load project - file is corrupt.');
-        }
     }
 
     handleAcceptDeleteProject() {
@@ -160,13 +129,12 @@ class MenuDrawer extends PureComponent {
             </DrawerHeader>
             <DrawerContent>
                 <List>
-                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New seating chart&hellip;</ListItem>
+                    <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New&hellip;</ListItem>
                     <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
 
                     <ListDivider />
 
-                    {this.props.user && <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<HistoryIcon />} />Open project</ListItem>}
-                    <ListItem data-name='import' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Import</ListItem>
+                    <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Open&hellip;</ListItem>
                     <ExportActionMenu open={this.state.exportMenuVisible} anchorCorner='topRight' fixed
                         onClose={() => this.setState({exportMenuVisible: false})}
                         onSelectAction={this.handleSelectExportOption}>

@@ -1248,6 +1248,7 @@ class App extends Component {
             <RecentProjectsDialog open={this.state.openProjectDialogOpen}
                 onClose={() => this.setState({openProjectDialogOpen: false})}
                 onRequestOpenProject={this.handleRequestOpenProject}
+                onRequestImportProject={this.handleRequestImportProject}
                 showFirstLaunch={this.state.showFirstLaunch}
                 user={this.state.user} />
 
