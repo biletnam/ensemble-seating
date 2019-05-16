@@ -48,7 +48,7 @@ import {
     createRegion,
     createSection,
     createPerson,
-    createEmptyProject,
+    createProjectFromTemplate,
     renameProject,
     validateProject,
     listProjects,
@@ -60,7 +60,8 @@ import {
     idbSaveTemporaryProject,
     idbLoadTemporaryProject,
     idbDeleteTemporaryProject,
-    isEmptyProject
+    isBlankProject,
+    duplicateProject
 } from './helpers/project-helpers.js';
 
 import './main.css';
@@ -114,7 +115,7 @@ class App extends Component {
         this.firstLaunch = true;
 
         this.state = createFreshState();
-        this.state.project = createEmptyProject();
+        this.state.project = createProjectFromTemplate();
 
         this.handleUserTriggeredUpdate = this.handleUserTriggeredUpdate.bind(this);
         this.saveSession = this.saveSession.bind(this);
@@ -301,7 +302,7 @@ class App extends Component {
             this.setState({user}, () => {
                 if (user) {
                     // User logs in; has a "fresh" (unmodified, just started) project
-                    if (isEmptyProject(this.state.project)) {
+                    if (isBlankProject(this.state.project)) {
                         listProjects(user).then(cloudProjects => {
                             // Load project if it already exists
                             if (cloudProjects.indexOf(this.state.projectName) !== -1) {
@@ -553,7 +554,7 @@ class App extends Component {
         deleteProject(this.state.user, this.state.projectName).then(() => {
             getUnusedProjectName(this.state.user).then(name => {
                 const newState = Object.assign({}, createFreshState(this.state.user), {
-                    project: createEmptyProject(),
+                    project: createProjectFromTemplate(),
                     projectName: name,
                     needFullSave: true
                 })
@@ -794,10 +795,11 @@ class App extends Component {
 
     handleRequestImportProject(project, name) {
         if (validateProject(project)) {
+            const newProject = duplicateProject(project);
             const newState = Object.assign({},
                 createFreshState(this.state.user),
                 {
-                    project: Object.assign({}, project),
+                    project: newProject,
                     projectName: name,
                     user: this.state.user
                 }
@@ -910,7 +912,7 @@ class App extends Component {
     }
 
     handleSelectNewProjectTemplate(template) {
-        const project = createEmptyProject(template);
+        const project = createProjectFromTemplate(template);
         if (this.state.user) {
             getUnusedProjectName(this.state.user).then(name => {
                 this.setState(Object.assign({},
