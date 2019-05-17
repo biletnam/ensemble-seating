@@ -119,7 +119,7 @@ class App extends Component {
 
         this.handleUserTriggeredUpdate = this.handleUserTriggeredUpdate.bind(this);
         this.saveSession = this.saveSession.bind(this);
-        this.fullSaveIfNeeded = this.fullSaveIfNeeded.bind(this);
+        this.cleanUpAfterEdit = this.cleanUpAfterEdit.bind(this);
         this.deleteSection = this.deleteSection.bind(this);
         this.deleteMember = this.deleteMember.bind(this);
         this.batchAddMembers = this.batchAddMembers.bind(this);
@@ -349,11 +349,13 @@ class App extends Component {
             saveProject(this.state.user, this.state.project, this.state.projectName)
     }
 
-    fullSaveIfNeeded() {
-        if (this.state.user && this.state.needFullSave) {
-            this.setState({needFullSave: false}, () =>{
+    cleanUpAfterEdit() {
+        if (this.state.user) {
+            if (this.state.needFullSave)
                 this.saveSession();
-            });
+
+            else
+                saveMetadata(this.state.user, this.state.projectName, { modified: Date.now() });
         }
     }
 
@@ -386,7 +388,7 @@ class App extends Component {
                     deleteMemberData(this.state.user, membersToRemove[i].id);
                 }
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -412,7 +414,7 @@ class App extends Component {
                     deleteMemberData(this.state.user, membersToRemove[i].id);
                 }
 
-                this.fullSaveIfNeeded()
+                this.cleanUpAfterEdit()
             }
         });
     }
@@ -432,7 +434,7 @@ class App extends Component {
                 saveMemberOrder(this.state.user, this.state.projectName, members.map(current => current.id));
                 deleteMemberData(this.state.user, memberId);
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -454,7 +456,7 @@ class App extends Component {
                     saveNewMember(this.state.user, this.state.projectName, newMembers[i]);
                 }
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -481,7 +483,7 @@ class App extends Component {
                 saveMemberOrder(this.state.user, this.state.projectName, this.state.project.members.map(current => current.id));
                 saveMemberEdits(this.state.user, this.state.projectName, {section: sectionId});
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -499,7 +501,7 @@ class App extends Component {
             if (this.state.user) {
                 saveRegionOrder(this.state.user, this.state.projectName, this.state.project.regions.map(current => current.id));
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -529,7 +531,7 @@ class App extends Component {
                 saveSectionOrder(this.state.user, this.state.projectName, this.state.project.sections.map(current => current.id));
                 saveSectionEdits(this.state.user, this.state.projectName, {region: destinationId});
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -546,7 +548,7 @@ class App extends Component {
                 saveRegionOrder(this.state.user, this.state.projectName, this.state.project.regions.map(current => current.id));
                 saveNewRegion(this.state.user, this.state.projectName, newRegion);
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -592,7 +594,10 @@ class App extends Component {
             if (this.state.user && saveNeeded) {
                 saveMetadata(this.state.user, this.state.projectName, Object.assign({},
                     this.state.project.settings,
-                    {appVersion: this.state.project.appVersion}
+                    {
+                        appVersion: this.state.project.appVersion,
+                        modified: Date.now()
+                    }
                 ));
             }
         });
@@ -627,7 +632,7 @@ class App extends Component {
                 if (newRegion)
                     saveNewRegion(this.state.user, this.state.projectName, newRegion);
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -661,7 +666,7 @@ class App extends Component {
                     {appVersion: this.state.project.appVersion}
                 ));
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -996,7 +1001,7 @@ class App extends Component {
             if (this.state.user) {
                 saveRegionEdits(this.state.user, this.state.projectName, updatedRegion);
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -1019,7 +1024,7 @@ class App extends Component {
             if (this.state.user) {
                 saveSectionEdits(this.state.user, this.state.projectName, updatedSection);
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -1042,7 +1047,7 @@ class App extends Component {
             if (this.state.user) {
                 saveMemberEdits(this.state.user, this.state.projectName, updatedMember);
 
-                this.fullSaveIfNeeded();
+                this.cleanUpAfterEdit();
             }
         });
     }
@@ -1066,7 +1071,7 @@ class App extends Component {
                         projectName: newName,
                         needFullSave: true
                     }, () => {
-                        this.fullSaveIfNeeded();
+                        this.cleanUpAfterEdit();
                     });
                 }
                 else if (err.name == 'NameCollisionError') {

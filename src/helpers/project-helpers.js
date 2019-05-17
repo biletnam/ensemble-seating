@@ -9,7 +9,7 @@ const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
 const DB_VER = 2;
 const APP_NAME = APP_INFO.NAME;
-const PROJECT_FORMAT_VER = '0.10.0';
+const PROJECT_FORMAT_VER = '0.11.0';
 
 const currentDb = openDB(DB_NAME, DB_VER, {
     upgrade(db, oldVersion, newVersion, transaction) {
@@ -89,46 +89,39 @@ export function saveProject(user, project, name) {
             // Needs:
             // 1.) Project metadata & settings
             const settings = project.settings;
-            settings.appVersion = project.appVersion;          
+            settings.appVersion = project.appVersion;
+            settings.created = project.created;
+            settings.modified = Date.now();
 
             // 2.) regions/$user/$project: ordered list of region IDs in this project
             // 2a.) regionData/$user/$regionId: for each region ID, an object containing its data
             const regions = [];
-            for (let i=0; i<project.regions.length; i++) {
-                const {id, ...rest} = project.regions[i];
-                regions.push(id);
-
-                const result = firebase.database().ref(`regionData/${user.uid}/${id}`).set(Object.assign({projectName: name}, rest));
-                promises.push(result);
+            for (const region of project.regions) {
+                regions.push(region.id);
+                promises.push(saveRegionEdits(user, name, region));
             }
 
             // 3.) sections/$user/$project: ordered list of section IDs in this project
             // 3a.) sectionData/$user/$sectionId: for each section ID, an object containing its data
             const sections = [];
-            for (let i=0; i<project.sections.length; i++) {
-                const {id, ...rest} = project.sections[i];
-                sections.push(id);
-
-                const result = firebase.database().ref(`sectionData/${user.uid}/${id}`).set(Object.assign({projectName: name}, rest));
-                promises.push(result);
+            for (const section of project.sections) {
+                sections.push(section.id);
+                promises.push(saveSectionEdits(user, name, section));
             }
 
             // 4.) members/$user/$project: ordered list of member IDs in this project
             // 4a.) memberData/$user/$memberId: for each member ID, an object containing its data
             const members = [];
-            for (let i=0; i<project.members.length; i++) {
-                const {id, ...rest} = project.members[i];
-                members.push(id);
-
-                const result = firebase.database().ref(`memberData/${user.uid}/${id}`).set(Object.assign({projectName: name}, rest));
-                promises.push(result);
+            for (const member of project.members) {
+                members.push(member.id);
+                promises.push(saveMemberEdits(user, project, member));
             }
 
             promises.push(
-                firebase.database().ref(`projects/${user.uid}/${name}`).set(settings),
-                firebase.database().ref(`regions/${user.uid}/${name}`).set(regions),
-                firebase.database().ref(`sections/${user.uid}/${name}`).set(sections),
-                firebase.database().ref(`members/${user.uid}/${name}`).set(members)
+                saveMetadata(user, name, settings),
+                saveRegionOrder(user, name, regions),
+                saveSectionOrder(user, name, sections),
+                saveMemberOrder(user, name, members)
             );
 
             // Now, wait for all operations to complete and resolve the promise
@@ -145,7 +138,7 @@ export function saveProject(user, project, name) {
 }
 
 export function saveMetadata(user, name, metadata) {
-    return firebase.database().ref(`projects/${user.uid}/${name}`).set(metadata);
+    return firebase.database().ref(`projects/${user.uid}/${name}`).update(metadata);
 }
 
 export function saveRegionOrder(user, projectName, regions) {
@@ -327,6 +320,11 @@ export function upgradeProject(project) {
         finalProject.settings.seatGap = 1.0;
         finalProject.settings.seatSize = 32;
     }
+    if (semver.lt(finalProject.appVersion, '0.11.0')) {
+        finalProject.appVersion = '0.11.0';
+        finalProject.created = 0;
+        finalProject.modified = Date.now();
+    }
 
     return finalProject;
 }
@@ -473,7 +471,10 @@ export function duplicateProject(oldProject) {
     }
 
     // Update any other metadata
+    const currentTime = Date.now();
     project.appVersion = PROJECT_FORMAT_VER;
+    project.created = currentTime;
+    project.modified = currentTime;
     
     return project;
 }
@@ -557,6 +558,10 @@ export function validateProject(project) {
     if (typeof project.settings !== 'object')
         valid = false;
     if (typeof project.appVersion !== 'string')
+        valid = false;
+    if (typeof project.created !== 'number')
+        valid = false;
+    if (typeof project.modified !== 'number')
         valid = false;
 
     return valid;

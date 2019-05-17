@@ -17,5 +17,7 @@
       "seatSize": 32,
       "seatLabelFontSize": 16
     },
-    "appVersion": null
+    "appVersion": null,
+    "created": null,
+    "modified": null
   }
