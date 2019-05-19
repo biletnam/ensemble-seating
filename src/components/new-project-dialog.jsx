@@ -22,13 +22,13 @@ const NewProjectDialog = props => {
     const [recentProjects, setRecentProjects] = useState([]);
 
     useEffect(() => {
-        if (props.user) {
+        if (props.open && props.user) {
             listProjects(props.user).then(projects => {
                 const sortedProjects = sortProjects(mapProjects(projects), 'modified', 1);
                 setRecentProjects(sortedProjects.slice(0, 3));
             });
         }
-    }, [props.open]);
+    }, [props.open, props.user]);
 
     function handleClick (event) {
         if (typeof props.onSelectTemplate === 'function')
