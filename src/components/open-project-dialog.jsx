@@ -6,7 +6,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, DialogButton } from 
 import '@material/dialog/dist/mdc.dialog.min.css';
 import { browseForFile } from '../helpers/project-helpers.js';
 
-class RecentProjectsDialog extends PureComponent {
+class OpenProjectDialog extends PureComponent {
     constructor (props) {
         super(props);
         this.state = {
@@ -49,4 +49,4 @@ class RecentProjectsDialog extends PureComponent {
     
 };
 
-export default RecentProjectsDialog;
+export default OpenProjectDialog;

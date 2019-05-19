@@ -14,7 +14,7 @@ import SectionEditor from './components/edit-section.jsx';
 import MemberEditor from './components/edit-member.jsx';
 import BatchAddMembersDialog from './components/batch-add-members.jsx';
 import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
-import RecentProjectsDialog from './components/recent-projects-dialog.jsx';
+import OpenProjectDialog from './components/open-project-dialog.jsx';
 import firebase, { auth, provider } from './helpers/firebase-helpers.js';
 
 import { SimpleDialog } from '@rmwc/dialog';
@@ -1271,7 +1271,7 @@ class App extends Component {
                 onChange={this.handleChangeProjectSetting}
                 {...this.state.project.settings} />
 
-            <RecentProjectsDialog open={this.state.openProjectDialogOpen}
+            <OpenProjectDialog open={this.state.openProjectDialogOpen}
                 onClose={() => this.setState({openProjectDialogOpen: false})}
                 onRequestOpenProject={this.handleRequestOpenProject}
                 onRequestImportProject={this.handleRequestImportProject}
