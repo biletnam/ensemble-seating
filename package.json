@@ -31,6 +31,7 @@
     "@babel/preset-env": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
     "@rmwc/button": "^5.5.1",
+    "@rmwc/data-table": "^5.5.1",
     "@rmwc/dialog": "^5.5.1",
     "@rmwc/drawer": "^5.5.1",
     "@rmwc/elevation": "^5.5.1",

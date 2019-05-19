@@ -335,7 +335,7 @@ export function getUnusedProjectName(user, name = DEFAULT_NAME) {
         let num = 1, found = false;
         if (projects) {
             while (!found) {
-                if (projects.indexOf(`${name} ${num}`) !== -1)
+                if (Object.keys(projects).indexOf(`${name} ${num}`) !== -1)
                     num++;
                 else
                     found = true;
@@ -410,7 +410,7 @@ export function listProjects(user) {
     return new Promise((resolve, reject) => {
         if (user) {
             firebase.database().ref(`projects/${user.uid}`).once('value').then(snapshot => {
-                resolve(Object.keys(snapshot.val() || {}));
+                resolve(snapshot.val() || {});
             });
         }
         else

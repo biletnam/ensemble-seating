@@ -1,57 +1,102 @@
-import React, { PureComponent } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { ListItem, ListGroup } from '@rmwc/list';
-import '@material/list/dist/mdc.list.min.css';
+import { DataTable, DataTableContent, DataTableHead, DataTableHeadCell, DataTableBody, DataTableRow, DataTableCell } from '@rmwc/data-table';
+import '@rmwc/data-table/data-table.css';
 
 import { listProjects } from '../helpers/project-helpers.js';
+import './project-list.css';
 
-const LIST_ITEM_HEIGHT = 48;
+function convertToDate (time) {
+    if (typeof time === 'number' && time > 0)
+        return new Date(time).toLocaleDateString();
+    else
+        return '-';
+}
 
-class ProjectList extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            projects: []
+function numberOrZero (num) {
+    if (typeof num === 'number')
+        return num;
+    else
+        return 0;
+}
+
+export function mapProjects (projects) {
+    return Object.entries(projects).map(project => (
+        Object.assign({name: project[0]}, project[1])
+    ));
+}
+
+export function sortProjects (projects, sort, direction) {
+    return projects.slice().sort((a, b) => {
+        let aVal = a[sort], bVal = b[sort];
+        if (sort != 'name') {
+            aVal = numberOrZero(aVal);
+            bVal = numberOrZero(bVal);
         }
-        this.handleListItemClick = this.handleListItemClick.bind(this);
-    }
 
-    componentDidMount() {
-        this.updateProjectList();
-    }
+        if (aVal === bVal)
+            return 0;
+        else if (aVal < bVal)
+            return direction;
+        else return -1 * direction;
+    });
+}
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.props.lastUpdated !== prevProps.lastUpdated) {
-            console.log("Updating project list...");
-            this.updateProjectList();
-        }
-            
-    }
+const ProjectList = props => {
+    const [projects, setProjects] = useState([]);
+    const [sort, setSort] = useState(null);
+    const [direction, setDirection] = useState(1);
 
-    updateProjectList() {
-        if (this.props.user) {
-            listProjects(this.props.user).then(projects => {
-                if (projects)
-                    this.setState({projects});
+    useEffect(() => {
+        console.log("Updating project list...");
+        if (props.user) {
+            listProjects(props.user).then(newProjects => {
+                if (newProjects) {
+                    setProjects(mapProjects(newProjects));
+                }
             });
         }
+    }, [props.lastUpdated]);
+
+    function updateSort(name) {
+        let newDirection;
+        if (name != sort)
+            newDirection = -1;
+        else {
+            newDirection = direction == 1 ? -1 : 1;
+        }
+        
+        setSort(name);
+        setDirection(newDirection);
     }
 
-    handleListItemClick (event) {
-        this.props.onProjectItemClick(event.target.dataset.project);
-    }
+    const sortedProjects = sortProjects(projects, sort, direction);
 
-    render() {
-        return <ListGroup style={{minHeight: this.props.max ? `${this.props.max * LIST_ITEM_HEIGHT}px` : null}}>
-            {this.state.projects.slice(0, this.props.max || Infinity).map(project => (
-                <ListItem key={project}
-                    data-project={project}
-                    onClick={this.handleListItemClick}>
-                        {project}
-                    </ListItem>
-            ))}
-        </ListGroup>
-    }
+    return <DataTable>
+        <DataTableContent>
+            <DataTableHead>
+                <DataTableRow>
+                    <DataTableHeadCell onSortChange={() => updateSort('name')}
+                        sort={sort == 'name' && direction} alignStart>Name</DataTableHeadCell>
+                    <DataTableHeadCell onSortChange={() => updateSort('created')}
+                        sort={sort == 'created' && direction} alignEnd>Created</DataTableHeadCell>
+                    <DataTableHeadCell onSortChange={() => updateSort('modified')}
+                        sort={sort == 'modified' && direction} alignEnd>Modified</DataTableHeadCell>
+                </DataTableRow>
+            </DataTableHead>
+            <DataTableBody>
+                {sortedProjects.map(project => (
+                    <DataTableRow key={project.name}
+                        data-project={project.name}
+                        onClick={event => props.onProjectItemClick(event.currentTarget.dataset.project)}>
+                        <DataTableCell>{project.name}</DataTableCell>
+                        <DataTableCell alignEnd>{convertToDate(project.created)}</DataTableCell>
+                        <DataTableCell alignEnd>{convertToDate(project.modified)}</DataTableCell>
+                    </DataTableRow>
+                ))}
+            </DataTableBody>
+        </DataTableContent>
+    </DataTable>
 } 
 
 export default ProjectList;

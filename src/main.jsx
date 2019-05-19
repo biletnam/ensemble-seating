@@ -217,7 +217,7 @@ class App extends Component {
         if (user) {
             listProjects(user).then(projects => {
                 // If project exists, open it
-                if (projects.indexOf(initProject) !== -1) {
+                if (Object.keys(projects).indexOf(initProject) !== -1) {
                     loadProject(user, initProject).then(project => {
                         if (project) {
                             const newState = {
@@ -306,7 +306,7 @@ class App extends Component {
                     if (isBlankProject(this.state.project)) {
                         listProjects(user).then(cloudProjects => {
                             // Load project if it already exists
-                            if (cloudProjects.indexOf(this.state.projectName) !== -1) {
+                            if (Object.keys(cloudProjects).indexOf(this.state.projectName) !== -1) {
                                 this.handleRequestOpenProject(this.state.projectName);
                             }
                             
@@ -830,7 +830,7 @@ class App extends Component {
 
             if (this.state.user) {
                 listProjects(this.state.user).then(existingProjects => {
-                    if (existingProjects.indexOf(name) === -1) {
+                    if (Object.keys(existingProjects).indexOf(name) === -1) {
                         // No name conflict: go ahead with import.
                         this.setState(newState, this.saveSession);
                     }

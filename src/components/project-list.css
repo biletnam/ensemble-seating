@@ -1,0 +1,11 @@
+th, tr {
+    user-select: none;
+}
+
+.rmwc-data-table__head-cell--sortable.rmwc-data-table__cell--align-start:not(.rmwc-data-table__head-cell--sorted) svg {
+    display: none;
+}
+
+.rmwc-data-table__cell {
+    white-space: normal;
+}

@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, {PureComponent, useState, useEffect} from 'react';
 
 import './new-project-dialog.css';
 import {templates} from '../templates/index.js';
@@ -9,78 +9,81 @@ import '@material/dialog/dist/mdc.dialog.min.css';
 import { Button } from '@rmwc/button';
 import '@material/button/dist/mdc.button.css';
 
+import { ListItem, ListGroup } from '@rmwc/list';
+import '@material/list/dist/mdc.list.min.css';
+
 import ProjectTile from './project-tile.jsx';
-import ProjectList from './project-list.jsx';
+import { listProjects } from '../helpers/project-helpers.js';
+import { mapProjects, sortProjects } from './project-list.jsx';
 
-class NewProjectDialog extends PureComponent {
-    constructor(props) {
-        super(props);
+const LIST_ITEM_HEIGHT = 48;
 
-        this.state = {
-            lastUpdatedProjectList: Date.now()
-        };
+const NewProjectDialog = props => {
+    const [recentProjects, setRecentProjects] = useState([]);
 
-        this.handleClick = this.handleClick.bind(this);
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleBrowse = this.handleBrowse.bind(this);
+    useEffect(() => {
+        if (props.user) {
+            listProjects(props.user).then(projects => {
+                const sortedProjects = sortProjects(mapProjects(projects), 'modified', 1);
+                setRecentProjects(sortedProjects.slice(0, 3));
+            });
+        }
+    }, [props.open]);
+
+    function handleClick (event) {
+        if (typeof props.onSelectTemplate === 'function')
+            props.onSelectTemplate(event.target.name);
     }
 
-    handleClick(event) {
-        if (typeof this.props.onSelectTemplate === 'function')
-            this.props.onSelectTemplate(event.target.name);
-    }
-
-    handleOpen(event) {
-        this.setState({lastUpdatedProjectList: Date.now()});
-    }
-
-    handleBrowse() {
-        if (this.props.user) {
+    function handleBrowse () {
+        if (props.user) {
             // Switch to the "Open project" dialog to show all projects
-            this.props.onRequestShowOpenProjectDialog && this.props.onRequestShowOpenProjectDialog();
+            props.onRequestShowOpenProjectDialog && props.onRequestShowOpenProjectDialog();
         }        
     }
     
-    render() {
-        return <SimpleDialog open={this.props.open}
-            className='new-project-dialog'
-            title='New seating chart'
-            onClose={this.props.onClose}
-            onOpen={this.onOpen}
-            acceptLabel={null}
-            cancelLabel={this.props.showFirstLaunch ? null : undefined}
-            body={<>
-                <div className='project-template-grid'>
-                    {templates.map(template => (
-                        <ProjectTile key={template.id}
-                            name={template.id}
-                            onClick={this.handleClick}
-                            title={template.name}
-                            data={JSON.parse(JSON.stringify(template.data))} />
-                    ))}
-                </div>
+    return <SimpleDialog open={props.open}
+        className='new-project-dialog'
+        title='New seating chart'
+        onClose={props.onClose}
+        acceptLabel={null}
+        cancelLabel={props.showFirstLaunch ? null : undefined}
+        body={<>
+            <div className='project-template-grid'>
+                {templates.map(template => (
+                    <ProjectTile key={template.id}
+                        name={template.id}
+                        onClick={evt => handleClick(evt)}
+                        title={template.name}
+                        data={JSON.parse(JSON.stringify(template.data))} />
+                ))}
+            </div>
 
-                {this.props.showFirstLaunch && <>
-                    <h3>Recent</h3>
+            {props.showFirstLaunch && <>
+                <h3>Recent</h3>
 
-                    {this.props.user && <>
-                        <ProjectList user={this.props.user}
-                            max={3}
-                            onProjectItemClick={this.props.onRequestOpenProject}
-                            lastUpdated={this.state.lastUpdatedProjectList} />
-                        
-                        <p className='text-input-wrapper'>
-                            <Button onClick={this.handleBrowse} raised>More projects&hellip;</Button>
-                        </p>
-                    </>}
-
-                    {!this.props.user && <p>
-                        <Button raised onClick={this.props.onRequestLogin}>Sign in with Google</Button>
-                    </p>}
+                {props.user && <>
+                    <ListGroup style={{minHeight: `${recentProjects.length * LIST_ITEM_HEIGHT}px`}}>
+                        {recentProjects.map(project => (
+                            <ListItem key={project.name}
+                                data-project={project.name}
+                                onClick={event => props.onRequestOpenProject(event.target.dataset.project)}>
+                                    {project.name}
+                                </ListItem>
+                        ))}
+                    </ListGroup>
+                    
+                    <p className='text-input-wrapper'>
+                        <Button onClick={() => handleBrowse()} raised>More projects&hellip;</Button>
+                    </p>
                 </>}
+
+                {!props.user && <p>
+                    <Button raised onClick={props.onRequestLogin}>Sign in with Google</Button>
+                </p>}
             </>}
-        />
-    }
+        </>}
+    />
 }
 
 export default NewProjectDialog;
