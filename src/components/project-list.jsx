@@ -44,8 +44,8 @@ export function sortProjects (projects, sort, direction) {
 
 const ProjectList = props => {
     const [projects, setProjects] = useState([]);
-    const [sort, setSort] = useState(null);
-    const [direction, setDirection] = useState(1);
+    const [sort, setSort] = useState('name');
+    const [direction, setDirection] = useState(-1);
 
     useEffect(() => {
         console.log("Updating project list...");
