@@ -135,7 +135,7 @@ class MenuDrawer extends PureComponent {
                 <List>
                     <ListItem data-name='new-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<NoteAddIcon />} />New&hellip;</ListItem>
                     {this.props.user && <>
-                        <ListItem data-name='duplicate-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<CopyIcon />} />Duplicate&hellip;</ListItem>
+                        <ListItem data-name='duplicate-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<CopyIcon />} />Duplicate this chart</ListItem>
                     </>}
                     <ListItem data-name='print-project' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<PrintIcon />} />Print&hellip;</ListItem>
 
