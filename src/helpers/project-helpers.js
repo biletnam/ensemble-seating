@@ -125,12 +125,7 @@ export function saveProject(user, project, name) {
             );
 
             // Now, wait for all operations to complete and resolve the promise
-            resolve(
-                Promise.all(promises).then(() => {
-                    updateProjectQueryString(name, user);
-                    return;
-                })
-            );
+            resolve(Promise.all(promises));
         }
         else
             reject(new Error('Unable to save project: user is not authenticated'));
@@ -200,7 +195,6 @@ export function renameProject(user, oldName, newName) {
                         projectToSave = upgradeProject(projectToSave);
 
                     saveProject(user, projectToSave, newName).then(() => {
-                        updateProjectQueryString(newName, user);
                         deleteProject(user, oldName).then(() => {
                             resolve();
                         });

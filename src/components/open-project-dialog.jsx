@@ -38,7 +38,8 @@ class OpenProjectDialog extends PureComponent {
         return <Dialog open={this.props.open} onClose={this.handleClose}>
                 <DialogTitle>Open seating chart</DialogTitle>
                 <DialogContent>
-                    <ProjectList user={this.props.user} onProjectItemClick={this.props.onRequestOpenProject} lastUpdated={this.state.lastShown} />
+                    <ProjectList user={this.props.user} currentProject={this.props.currentProject}
+                        onProjectItemClick={this.props.onRequestOpenProject} lastUpdated={this.state.lastShown} />
                 </DialogContent>
                 <DialogActions>
                     <DialogButton action='cancel'>Cancel</DialogButton>

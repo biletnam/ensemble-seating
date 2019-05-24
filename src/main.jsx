@@ -15,10 +15,12 @@ import MemberEditor from './components/edit-member.jsx';
 import BatchAddMembersDialog from './components/batch-add-members.jsx';
 import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
 import OpenProjectDialog from './components/open-project-dialog.jsx';
+import { queue as dialogQueue } from './components/dialog-queue.jsx';
+import { queue as snackbarQueue } from './components/snackbar-queue.jsx';
 import firebase, { auth, provider } from './helpers/firebase-helpers.js';
 
-import { SimpleDialog } from '@rmwc/dialog';
-import { Snackbar, SnackbarAction } from '@rmwc/snackbar';
+import { SimpleDialog, DialogQueue } from '@rmwc/dialog';
+import { Snackbar, SnackbarAction, SnackbarQueue } from '@rmwc/snackbar';
 
 import '@material/dialog/dist/mdc.dialog.min.css';
 import '@material/snackbar/dist/mdc.snackbar.min.css';
@@ -346,7 +348,9 @@ class App extends Component {
 
     saveSession() {
         if (this.state.user)
-            saveProject(this.state.user, this.state.project, this.state.projectName)
+            saveProject(this.state.user, this.state.project, this.state.projectName).then(() => {
+                updateProjectQueryString(this.state.projectName);
+            });
     }
 
     cleanUpAfterEdit() {
@@ -1057,6 +1061,7 @@ class App extends Component {
             const oldName = this.state.projectName;
             renameProject(this.state.user, oldName, newName).then(() => {
                 this.setState({projectName: newName});
+                updateProjectQueryString(newName);
             }).catch((err) => {
                 if (err.name === 'NotAuthenticatedError') {
                     // User is not authenticated. Swallow the error and keep the new name locally.
@@ -1276,7 +1281,11 @@ class App extends Component {
                 onRequestOpenProject={this.handleRequestOpenProject}
                 onRequestImportProject={this.handleRequestImportProject}
                 showFirstLaunch={this.state.showFirstLaunch}
+                currentProject={this.state.projectName}
                 user={this.state.user} />
+                
+            <DialogQueue dialogs={dialogQueue.dialogs} />
+            <SnackbarQueue messages={snackbarQueue.messages} />
 
             <Snackbar open={this.state.message} onClose={() => {this.setState({message: null})}}
                 message={this.state.message} />
