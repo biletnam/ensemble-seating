@@ -195,11 +195,16 @@ export function renameProject(user, oldName, newName) {
             .then(result => {
                 const [existingProject, newLocation] = result;
                 if (existingProject && !newLocation) {
-                    deleteProject(user, oldName).then(() => {
-                        saveProject(user, existingProject, newName).then(() => {
-                            updateProjectQueryString(newName, user);
+                    let projectToSave = existingProject;
+                    if (projectNeedsUpgrade(projectToSave))
+                        projectToSave = upgradeProject(projectToSave);
+
+                    saveProject(user, projectToSave, newName).then(() => {
+                        updateProjectQueryString(newName, user);
+                        deleteProject(user, oldName).then(() => {
                             resolve();
                         });
+                        
                     });
                 }
                 else {
@@ -361,7 +366,11 @@ export function loadProject(user, name) {
                 const settings = result[0].val();
                 if (settings) {
                     const appVersion = settings.appVersion;
+                    const created = settings.created;
+                    const modified = settings.modified;
                     delete settings.appVersion;
+                    delete settings.created;
+                    delete settings.modified;
     
                     const regions = result[1].val() || [];
                     const sections = result[2].val() || [];
@@ -394,7 +403,9 @@ export function loadProject(user, name) {
                         regions: unpackedRegions,
                         sections: unpackedSections,
                         members: unpackedMembers,
-                        appVersion
+                        appVersion,
+                        created,
+                        modified
                     });
                 }
                 else
