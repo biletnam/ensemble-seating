@@ -304,7 +304,7 @@ export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
         if (currentY > maxY) maxY = currentY;
     }
 
-    return [(maxX - minX) + options.seatSize, (maxY - minY) + options.seatSize];
+    return [(maxX - minX) + options.seatSize + 1, (maxY - minY) + options.seatSize + 1];
 }
 
 export function calculateSeatPositions(regions, sections, members, options) {
