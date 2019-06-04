@@ -304,15 +304,30 @@ export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
         if (currentY > maxY) maxY = currentY;
     }
 
-    return [(maxX - minX) + options.seatSize + 1, (maxY - minY) + options.seatSize + 1];
+    return adjustDimensionsForSeatSize(maxX - minX, maxY - minY, options);
+}
+
+function adjustDimensionsForSeatSize (width, height, options = {seatSize}) {
+    return [width + options.seatSize + 1, height + options.seatSize + 1];
 }
 
 export function calculateSeatPositions(regions, sections, members, options) {
     const seatsByRegion = [];
+    const dimensionsByRegion = [];
 
+    let maxSeatX = 0,
+        maxSeatY = 0,
+        minSeatX = 0,
+        minSeatY = 0;
     for (let i=0; i<regions.length; i++) {
         const region = regions[i];
         const includedSections = sections.filter(section => section.region === region.id);
+        const regionOffset = i > 0 ? maxSeatY + regionGap : 0;
+
+        let maxRegionX = 0,
+            maxRegionY = 0,
+            minRegionX = 0,
+            minRegionY = 0;
 
         let rows = generateRows(includedSections);
 
@@ -331,50 +346,71 @@ export function calculateSeatPositions(regions, sections, members, options) {
         else
             seatedRows = straightenRows(seatedRows, options);
 
-        // Flatten seatedRows
-        const flattenedSeats = trimOuterSpacing(seatedRows.flat());
+        // Normalize coordinates
+        const trimmedSeats = trimOuterSpacing(seatedRows.flat());
+        for (const row of seatedRows) {
+            // Update each seat with the new positions from trimmedSeats
+            for (const seat of row) {
+                const trimmed = trimmedSeats.find(value => value.id === seat.id);
+                if (trimmed)
+                    Object.assign(seat, trimmed);
+                
+                // Update the y coordinate for the current region
+                seat.y += regionOffset;
 
-        // Find the max Y coordinate of seats in seatsToRender, and offset this region by that amount
-        let regionOffset = 0;
-        if (i > 0) {
-            // Get the maximum y coordinate of the last region
-            const [previousRegionWidth, previousRegionHeight] = getLayoutDimensions(seatsByRegion[i - 1], options);
-            regionOffset = previousRegionHeight + regionGap;
-        }
-        
-        for (let k=0; k<flattenedSeats.length; k++) {
-            flattenedSeats[k].y += regionOffset;
+                // Finally, check if this seat exceeds the current max
+                if (seat.x > maxRegionX)
+                    maxRegionX = seat.x;
+                if (seat.y > maxRegionY)
+                    maxRegionY = seat.y;
+                if (seat.x < minRegionX)
+                    minRegionX = seat.x;
+                if (seat.y < minRegionY)
+                    minRegionY = seat.y;
+            }
         }
 
-        seatsByRegion.push(flattenedSeats);
+        // Update the overall layout
+        if (maxRegionX > maxSeatX)
+            maxSeatX = maxRegionX;
+        if (maxRegionY > maxSeatY)
+            maxSeatY = maxRegionY;
+        if (minRegionX < minSeatX)
+            minSeatX = minRegionX;
+        if (minRegionY < minSeatY)
+            minSeatY = minRegionY;
+
+        // Store the info
+        seatsByRegion.push(seatedRows.flat());
+        dimensionsByRegion.push({
+            xMax: maxRegionX,
+            yMax: maxRegionY,
+            xMin: minRegionX,
+            yMin: minRegionY
+        });
     }
 
-    // Curved rows arc around 0,0
-    // Find the maximum x coordinate, and center everything based on that
-    let maxX = 0,
-        minX = 0;
-
-    seatsByRegion.forEach(region => {
-        region.forEach(seat => {
-            if (seat.x > maxX)
-                maxX = seat.x;
-            if (seat.x < minX)
-                minX = seat.x;
-        });
-    });
-
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seatsByRegion.flat(), options);
-
-    for (const region of seatsByRegion) {
-        // Get the width of the current region
-        const [regionWidth, regionHeight] = getLayoutDimensions(region, options);
-
-        const diff = layoutWidth - regionWidth;
-        const offset = diff * .5;
-
-        // Add the difference to the X value of every seat in the region
-        for (const seat of region)
-            seat.x += offset;
+    // Horizontally center all regions in the layout
+    if (seatsByRegion.length > 1) {
+        const [layoutWidth, layoutHeight] = adjustDimensionsForSeatSize(maxSeatX - minSeatX, maxSeatY - minSeatY, options);
+        for (let i=0; i<seatsByRegion.length; i++) {
+            const region = seatsByRegion[i];
+            const dimensions = dimensionsByRegion[i];
+    
+            // Get the width of the current region
+            const [regionWidth, regionHeight] = adjustDimensionsForSeatSize(
+                dimensions.xMax - dimensions.xMin,
+                dimensions.yMax - dimensions.yMin,
+                options
+            );
+    
+            const diff = layoutWidth - regionWidth;
+            const offset = diff * .5;
+    
+            // Add the difference to the X value of every seat in the region
+            for (const seat of region)
+                seat.x += offset;
+        }
     }
     
     return seatsByRegion.flat();
