@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 
-import { createSectionRow } from '../helpers/project-helpers.js';
+import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project-helpers.js';
 
 import { TwitterPicker } from 'react-color';
 
@@ -49,14 +49,10 @@ class SectionEditor extends PureComponent {
             this.props.onRequestEdit(this.props.data.id, {offsetValue: newValue});
     }
 
-    updateRowSetting(row, setting, value) {
+    updateRowSetting(row, value) {
         const saveData = {};
         saveData.rowSettings = this.props.data.rowSettings.slice();
-
-        const newSetting = Object.assign({}, this.props.data.rowSettings[row]);
-        newSetting[setting] = value;
-
-        saveData.rowSettings.splice(row, 1, newSetting);
+        saveData.rowSettings[row] = value;
 
         if (this.props.onRequestEdit)
             this.props.onRequestEdit(this.props.data.id, saveData);
@@ -70,7 +66,7 @@ class SectionEditor extends PureComponent {
 
         else if (settingType === 'rowSettings') {
             const rowIndex = parseInt(event.target.getAttribute('data-row'), 10);
-            this.updateRowSetting(rowIndex, event.target.name, event.target.value);
+            this.updateRowSetting(rowIndex, event.target.value);
         }
 
         else if (settingType === 'offsetType') {
@@ -108,7 +104,7 @@ class SectionEditor extends PureComponent {
     handleClickedAddRow(event) {
         const saveData = {};
         saveData['rowSettings'] = this.props.data['rowSettings'].slice();
-        saveData['rowSettings'].push(createSectionRow())
+        saveData['rowSettings'].push(DEFAULT_SECTION_ROW_LENGTH)
 
         if (this.props.onRequestEdit)
             this.props.onRequestEdit(this.props.data.id, saveData);
@@ -143,7 +139,7 @@ class SectionEditor extends PureComponent {
                     <h2>Performers per row</h2>
                     <p>Pick how many performers may be seated within each row of this section.</p>
                 {this.props.data.rowSettings.map((current, index) => <div key={index + '-rowSettings'} className='text-input-wrapper'>
-                    <TextField label={`Row ${index + 1}`} data-row={index} data-setting-type='rowSettings' name='min' value={current.min} onChange={this.handleChange} onBlur={this.handleRowBlur} />
+                    <TextField label={`Row ${index + 1}`} data-row={index} data-setting-type='rowSettings' value={current} onChange={this.handleChange} onBlur={this.handleRowBlur} />
                     <IconButton icon={<ClearIcon />} label='Remove row' onClick={this.handleClickedRemoveRow} data-row={index} />
                 </div>)}
                 <br />

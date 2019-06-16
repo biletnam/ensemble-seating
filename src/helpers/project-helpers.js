@@ -9,7 +9,7 @@ const DEFAULT_NAME = 'Untitled';
 const DB_NAME = 'ensemble-db';
 const DB_VER = 2;
 const APP_NAME = APP_INFO.NAME;
-const PROJECT_FORMAT_VER = '0.11.0';
+const PROJECT_FORMAT_VER = '0.13.0';
 
 const currentDb = openDB(DB_NAME, DB_VER, {
     upgrade(db, oldVersion, newVersion, transaction) {
@@ -324,6 +324,12 @@ export function upgradeProject(project) {
         finalProject.created = 0;
         finalProject.modified = Date.now();
     }
+    if (semver.lt(finalProject.appVersion, '0.13.0')) {
+        finalProject.appVersion = '0.13.0';
+        for (const section of finalProject.sections) {
+            section.rowSettings = section.rowSettings.map(row => row.min);
+        }
+    }
 
     return finalProject;
 }
@@ -484,12 +490,7 @@ export function duplicateProject(oldProject) {
     return project;
 }
 
-export function createSectionRow () {
-    return {
-        min: 2,
-        max: 2
-    }
-}
+export const DEFAULT_SECTION_ROW_LENGTH = 2;
 
 export function createRegion (name = 'Untitled region') {
     return {
@@ -508,19 +509,7 @@ export function createSection (name = 'Untitled', regionId = null) {
         region: regionId,
         offsetType: 'first-row',
         offsetValue: 0,
-        rowSettings: [
-            {
-                min: 2,
-                max: 2
-            },
-            {
-                min: 4,
-                max: 6
-            },
-            {
-                min: 4,
-                max: 8
-            }]
+        rowSettings: [2, 4, 4]
     };
 }
 
@@ -541,9 +530,7 @@ export function cloneRegion (region) {
 
 export function cloneSection (section) {
     const newSection = Object.assign({}, section);
-    newSection.rowSettings = section.rowSettings.map(current => {
-        return Object.assign({}, current);
-    });
+    newSection.rowSettings = section.rowSettings.slice();
     return newSection;
 }
 

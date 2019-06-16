@@ -15,20 +15,7 @@
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-              "min": 4,
-              "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Violin 2",
@@ -37,20 +24,7 @@
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-              "min": 4,
-              "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Viola",
@@ -59,20 +33,7 @@
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-              "min": 4,
-              "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Cello",
@@ -81,20 +42,7 @@
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-              "min": 4,
-              "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Bass",
@@ -103,12 +51,7 @@
         "region": "region-1",
         "offsetType": "last-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 3,
-            "max": 3
-          }
-        ]
+        "rowSettings": [3]
       }
     ],
     "members": [],

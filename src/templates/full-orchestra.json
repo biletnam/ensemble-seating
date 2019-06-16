@@ -21,20 +21,7 @@
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-            "min": 4,
-            "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Violin 2",
@@ -43,20 +30,7 @@
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-            "min": 4,
-            "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Viola",
@@ -65,20 +39,7 @@
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-            "min": 4,
-            "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Cello",
@@ -87,20 +48,7 @@
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          },
-          {
-            "min": 4,
-            "max": 6
-          },
-          {
-            "min": 4,
-            "max": 6
-          }
-        ]
+        "rowSettings": [2, 4, 4]
       },
       {
         "name": "Bass",
@@ -109,12 +57,7 @@
         "region": "region-2",
         "offsetType": "last-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 3,
-            "max": 3
-          }
-        ]
+        "rowSettings": [3]
       },
       {
         "name": "Flute",
@@ -123,12 +66,7 @@
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          }
-        ]
+        "rowSettings": [2]
       },
       {
         "name": "Oboe",
@@ -137,12 +75,7 @@
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          }
-        ]
+        "rowSettings": [2]
       },
       {
         "name": "Clarinet",
@@ -151,12 +84,7 @@
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 2,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          }
-        ]
+        "rowSettings": [2]
       },
       {
         "name": "Bassoon",
@@ -165,12 +93,7 @@
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 2,
-        "rowSettings": [
-          {
-            "min": 2,
-            "max": 2
-          }
-        ]
+        "rowSettings": [2]
       },
       {
         "name": "Percussion",
@@ -179,12 +102,7 @@
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [
-          {
-            "min": 3,
-            "max": 6
-          }
-        ]
+        "rowSettings": [3]
       },
       {
         "name": "French Horn",
@@ -193,12 +111,7 @@
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [
-          {
-            "min": 4,
-            "max": 6
-          }
-        ]
+        "rowSettings": [4]
       },
       {
         "name": "Trumpet",
@@ -207,12 +120,7 @@
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [
-          {
-            "min": 3,
-            "max": 2
-          }
-        ]
+        "rowSettings": [3]
       },
       {
         "name": "Trombone",
@@ -221,12 +129,7 @@
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [
-          {
-            "min": 3,
-            "max": 2
-          }
-        ]
+        "rowSettings": [3]
       }
     ],
     "members": [],

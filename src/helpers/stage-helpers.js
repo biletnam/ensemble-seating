@@ -5,7 +5,7 @@ export const regionGap = 2 * seatSize;
 export function sumRows(rows) {
     let sum = 0;
     for (let i=0; i<rows.length; i++) {
-        sum = sum + parseInt(rows[i].min, 10);
+        sum = sum + parseInt(rows[i], 10);
     }
     return sum;
 }
@@ -35,7 +35,8 @@ export function generateRows(sectionData) {
             const offsetValue = currentSection.offsetType === 'last-row' ? numOfRows + 1 : parseInt(currentSection.offsetValue, 10);
             if (!isNaN(offsetValue)) {
                 for (let i=1; i<offsetValue; i++) {
-                    result.rowSettings.unshift({min: 0, max: 0});
+                    // Add an empty row
+                    result.rowSettings.unshift(0);
                 }
             }
             
@@ -56,13 +57,13 @@ export function generateRows(sectionData) {
         for (const currentSection of sections) {
             // If it has seats in the current row, add them to the current row.
             // Otherwise, reuse the settings from the last available row.
-            let currentRowSettings = currentSection.rowSettings[i],
+            let currentRowLength = currentSection.rowSettings[i],
                 implicit = false;
-            if (typeof currentRowSettings === 'undefined') {
+            if (typeof currentRowLength === 'undefined') {
                 implicit = true;
-                currentRowSettings = currentSection.rowSettings[currentSection.rowSettings.length - 1];
+                currentRowLength = currentSection.rowSettings[currentSection.rowSettings.length - 1];
             }
-            for (let k=0; k<currentRowSettings.min; k++) {
+            for (let k=0; k<currentRowLength; k++) {
                 // Create a seat and add it to the current row
                 currentRow.push({
                     id: `${currentSection.id}-[${i},${k}]`,
