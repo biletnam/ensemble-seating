@@ -19,60 +19,98 @@ export function getInitials(name) {
     return initials;
 }
 
+/**
+ * Gets the section's absolute offset from the front of the ensemble
+ * @param {object} currentSection 
+ * @param {number} numOfRows 
+ * @returns {number}
+ */
+function getRowOffset(currentSection, numOfRows) {
+    let rowOffset = 0;
+    if (currentSection.offsetType === 'custom-row')
+        rowOffset = parseInt(currentSection.offsetValue, 10) - 1;
+    else if (currentSection.offsetType === 'last-row')
+        rowOffset = numOfRows;
+
+    return rowOffset;
+}
+
 export function generateRows(sectionData) {
-    let numOfRows = Math.max(...sectionData.map(section => {
+    // 1.) find how many rows there are, ignoring 'last-row' offsets
+    // 2.) then, find the 'last-row' section with the most number of rows
+    //     and add it to the total
+    let lastRowMax = 0;
+    let origNumOfRows = Math.max(...sectionData.map(section => {
         let returnValue = 0;
-        if (section.offsetType === 'first-row' || (section.offsetType === 'custom-row' && parseInt(section.offsetValue, 10) === 0))
+
+        if (section.offsetType === 'first-row')
             returnValue = section.rowSettings.length;
+        else if (section.offsetType === 'custom-row') {
+            const rowOffset = parseInt(section.offsetValue, 10);
+            returnValue = section.rowSettings.length + rowOffset;
+        }
+        else if (section.rowSettings.length > lastRowMax)
+            lastRowMax = section.rowSettings.length;
+
         return returnValue;        
     }));
 
-    // Check offset settings, and pad the start of its rows if necessary
-    const sections = sectionData.map(currentSection => {
-        if (currentSection.offsetType === 'custom-row' || currentSection.offsetType === 'last-row') {
-            const result = JSON.parse(JSON.stringify(currentSection));
-
-            const offsetValue = currentSection.offsetType === 'last-row' ? numOfRows + 1 : parseInt(currentSection.offsetValue, 10);
-            if (!isNaN(offsetValue)) {
-                for (let i=1; i<offsetValue; i++) {
-                    // Add an empty row
-                    result.rowSettings.unshift(0);
-                }
-            }
-            
-            return result;
-        }
-        else
-            return currentSection;
-    });
-
-    // Update row count, in case it was changed while calculating offsets
-    numOfRows = Math.max(...sections.map(section => section.rowSettings.length));
+    const numOfRows = origNumOfRows + lastRowMax;
 
     const rows = [];
     
     for (let i=0; i<numOfRows; i++) {
         const currentRow = [];
-
-        for (const currentSection of sections) {
-            // If it has seats in the current row, add them to the current row.
-            // Otherwise, reuse the settings from the last available row.
-            let currentRowLength = currentSection.rowSettings[i],
-                implicit = false;
-            if (typeof currentRowLength === 'undefined') {
-                implicit = true;
-                currentRowLength = currentSection.rowSettings[currentSection.rowSettings.length - 1];
+        
+        // Determine if implicit seats would be needed to maintain section alignment
+        // Conditions (any or all):
+        // 1.) A section has an offsetType of 'last-row'
+        // 2.) A section has an offsetType of 'custom-row' and we're not to that row yet
+        // 3.) No sections have seats in the current row
+        let implicitNeeded = sectionData.some(currentSection => {
+            if (currentSection.offsetType === 'last-row')
+                return true;
+            else {
+                const rowOffset = getRowOffset(currentSection, origNumOfRows);
+                const hasCurrent = typeof currentSection.rowSettings[i - rowOffset] === 'number',
+                    hasPrevious = typeof currentSection.rowSettings[(i - rowOffset) - 1] === 'number';
+    
+                return hasCurrent && hasPrevious;
             }
-            for (let k=0; k<currentRowLength; k++) {
-                // Create a seat and add it to the current row
-                currentRow.push({
-                    id: `${currentSection.id}-[${i},${k}]`,
-                    section: currentSection.id,
-                    seat: sumRows(currentSection.rowSettings.slice(0, i)) + k,
-                    member: null,
-                    implicit,
-                    color: currentSection.color
-                });
+        });
+
+        for (const currentSection of sectionData) {
+            // If it has seats in the current row, add them to the current row.
+            // Otherwise, reuse the settings from the last available row if
+            // at least one other section had seats in the previous row.
+
+            // This helps sections with multiple rows keep their shape as
+            // as they go to the back of the ensemble and help seats stay
+            // aligned with others in their section from row to row.
+            const rowOffset = getRowOffset(currentSection, origNumOfRows);
+            
+            let currentRowLength,
+                implicit = false;
+
+            currentRowLength = currentSection.rowSettings[i - rowOffset];
+            if (typeof currentRowLength === 'undefined' && implicitNeeded && currentSection.offsetType !== 'last-row') {
+                implicit = true;
+                if (!(currentSection.offsetType === 'custom-row' && rowOffset > i))
+                    currentRowLength = currentSection.rowSettings[currentSection.rowSettings.length - 1];
+            }
+
+            if (typeof currentRowLength === 'number' && (!implicit || (implicit && implicitNeeded))) {
+                for (let k=0; k<currentRowLength; k++) {
+                    // Create a seat and add it to the current row
+                    currentRow.push({
+                        id: `${currentSection.id}-[${i},${k}]`,
+                        section: currentSection.id,
+                        seat: sumRows(currentSection.rowSettings.slice(0, i - rowOffset)) + k,
+                        member: null,
+                        implicit,
+                        color: currentSection.color
+                    });
+                }
             }
         }
 
@@ -80,7 +118,7 @@ export function generateRows(sectionData) {
     }
 
     // Determine which sections need to be rendered mirror image
-    const sectionDirectionTotals = sections.reduce((acc, currentSection) => {
+    const sectionDirectionTotals = sectionData.reduce((acc, currentSection) => {
         acc[currentSection.id] = {
             firstHalf: 0,
             secondHalf: 0,
@@ -212,7 +250,6 @@ export function straightenRows(rowData, options = {seatSize, seatGap}) {
             xMin = 0;
         for (let i=0; i<rows.length; i++) {
             for (let k=0; k<rows[i].length; k++) {
-                // Temporary: use 1/2 seat of space between all seats
                 const xVal = (k * options.seatSize) + (k * (options.seatSize * options.seatGap));
                 const yVal = (i * options.seatSize) + (i * (options.seatSize * options.seatGap));
                 rows[i][k].x = xVal;
@@ -258,37 +295,6 @@ export function seatMembers (membersBySection, rows) {
         const member = membersBySection[currentSeat.section][currentSeat.seat];
         return Object.assign({}, currentSeat, {member: member ? member : null});
     }));
-
-    // Collapse implicit, unoccupied seats that are adjacent to explicit seats
-    for (let i=0; i<seatedRows.length; i++) {
-        let explicitCount = seatedRows[i].filter(current => !(current.implicit && current.member === null)).length;
-        while (explicitCount > 0) {
-            // Find an implicit, unoccupied seat adjacent to a seat that is explicit, occupied, or both
-            let indexToRemove = seatedRows[i].findIndex((current, index) => {
-                let found = false;
-                if (current.implicit && current.member === null) {
-                    const previousSeat = seatedRows[i][index - 1];
-                    const nextSeat = seatedRows[i][index + 1];
-
-                    if ((previousSeat && !(previousSeat.implicit && previousSeat.member === null)) || (nextSeat && !(nextSeat.implicit && nextSeat.member === null)))
-                        found = true;
-                }
-                return found;
-            });
-
-            // If no implicit, unoccupied seats are adjacent to an explict seat, select the first implicit, unoccupied seat
-            if (indexToRemove === -1)
-                indexToRemove = seatedRows[i].findIndex(current => current.implicit && current.member === null);
-                
-            if (indexToRemove > -1) {
-                seatedRows[i].splice(indexToRemove, 1);
-                explicitCount--;
-            }
-            else {
-                explicitCount = 0;
-            }
-        }
-    }
 
     return seatedRows;
 }
