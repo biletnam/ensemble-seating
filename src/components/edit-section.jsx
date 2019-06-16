@@ -88,7 +88,7 @@ class SectionEditor extends PureComponent {
         const valueAsInt = parseInt(event.target.value, 10);
         if (settingType === 'rowSettings') {
             const rowIndex = parseInt(event.target.getAttribute('data-row'), 10);
-            this.updateRowSetting(rowIndex, event.target.name, isNaN(valueAsInt) ? 0 : valueAsInt);
+            this.updateRowSetting(rowIndex, isNaN(valueAsInt) ? 0 : valueAsInt);
         }
 
         else if (settingType === 'offsetValue') {
