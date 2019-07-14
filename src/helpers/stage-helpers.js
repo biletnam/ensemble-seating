@@ -277,7 +277,7 @@ export function straightenRows(rowData, options = {seatSize, seatGap}) {
     return rows;
 }
 
-function trimOuterSpacing (seats) {
+export function trimOuterSpacing (seats) {
     const result = JSON.parse(JSON.stringify(seats));
     const minX = Math.min(...result.map(seat => seat.x));
     const minY = Math.min(...result.map(seat => seat.y));

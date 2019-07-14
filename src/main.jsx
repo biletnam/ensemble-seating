@@ -1144,8 +1144,9 @@ class App extends Component {
     }
 
     render() {
+        const seats = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
         const [layoutWidth, layoutHeight] = getLayoutDimensions(
-            calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings),
+            seats,
             this.state.project.settings
         );
         return <React.Fragment>
@@ -1173,10 +1174,10 @@ class App extends Component {
                 onToolbarButtonClick={this.handleClickedToolbarButton} />
 
             <SeatingRenderer id='rendering-area'
+                seats={seats}
                 project={this.state.project}
                 regions={this.state.project.regions}
                 sections={this.state.project.sections}
-                members={this.state.project.members}
                 settings={this.state.project.settings}
                 editorId={this.state.editorId}
                 expanded={!this.state.rosterOpen}

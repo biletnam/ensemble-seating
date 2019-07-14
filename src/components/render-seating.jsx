@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import Region from './region.jsx';
+import { trimOuterSpacing } from '../helpers/stage-helpers.js';
 
 class SeatingRenderer extends PureComponent {
     constructor(props) {
@@ -19,19 +20,15 @@ class SeatingRenderer extends PureComponent {
         for (let i=0; i< this.props.regions.length; i++) {
             const currentRegion =  this.props.regions[i];
             const currentSections = this.props.sections.filter(section => section.region === currentRegion.id);
-            const currentMembers = this.props.members.filter(member => currentSections.some(section => member.section === section.id));
+            const currentSeats = this.props.seats.filter(seat => currentSections.some(section => section.id === seat.section));
+            const trimmedSeats = trimOuterSpacing(currentSeats);
 
             regionsToRender.push(
                 <Region key={currentRegion.id}
-                    sections={currentSections} 
-                    members={currentMembers}
-                    region={currentRegion}
-                    curvedLayout={currentRegion.curvedLayout}
-                    downstageTop={this.props.settings.downstageTop}
-                    projectSettings={this.props.settings}
+                    seats={trimmedSeats}
+                    {...currentRegion}
+                    settings={this.props.settings}
                     editorId={this.props.editorId}
-                    implicitSeatsVisible={this.props.settings.implicitSeatsVisible}
-                    seatNameLabels={this.props.settings.seatNameLabels}
                     onRequestSelectMember={this.props.onRequestSelectMember}
                     onRequestNewSection={this.props.onRequestNewSection} />
             );
