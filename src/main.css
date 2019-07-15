@@ -219,6 +219,19 @@ body {
     position: relative;
 }
 
+.section-backdrop {
+    fill: none;
+    stroke: transparent;
+    --backdrop-transform: calc(var(--seat-size) / 2);
+    transform: translate(var(--backdrop-transform), var(--backdrop-transform));
+    stroke-width: calc(2 * var(--seat-size) + 2px);
+    stroke-linecap: square;
+}
+
+.section-backdrop:hover {
+    stroke: #eeeeee;
+}
+
 .seat {
     display: inline-flex;
     justify-content: center;

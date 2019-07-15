@@ -22,10 +22,15 @@ class SeatingRenderer extends PureComponent {
             const currentSections = this.props.sections.filter(section => section.region === currentRegion.id);
             const currentSeats = this.props.seats.filter(seat => currentSections.some(section => section.id === seat.section));
             const trimmedSeats = trimOuterSpacing(currentSeats);
+            const currentBackdrops = currentSections.reduce((acc, cur) => {
+                acc[cur.id] = this.props.sectionBackdrops[cur.id];
+                return acc;
+            }, {});
 
             regionsToRender.push(
                 <Region key={currentRegion.id}
                     seats={trimmedSeats}
+                    backdrops={currentBackdrops}
                     {...currentRegion}
                     settings={this.props.settings}
                     editorId={this.props.editorId}

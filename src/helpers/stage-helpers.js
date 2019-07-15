@@ -319,8 +319,9 @@ function adjustDimensionsForSeatSize (width, height, options = {seatSize}) {
 }
 
 export function calculateSeatPositions(regions, sections, members, options) {
-    const seatsByRegion = [];
+    const rowsByRegion = [];
     const dimensionsByRegion = [];
+    const backdropsBySection = {};
 
     let maxSeatX = 0,
         maxSeatY = 0,
@@ -388,7 +389,7 @@ export function calculateSeatPositions(regions, sections, members, options) {
             minSeatY = minRegionY;
 
         // Store the info
-        seatsByRegion.push(seatedRows.flat());
+        rowsByRegion.push(seatedRows);
         dimensionsByRegion.push({
             xMax: maxRegionX,
             yMax: maxRegionY,
@@ -398,29 +399,39 @@ export function calculateSeatPositions(regions, sections, members, options) {
     }
 
     // Horizontally center all regions in the layout
-    if (seatsByRegion.length > 1) {
-        const [layoutWidth, layoutHeight] = adjustDimensionsForSeatSize(maxSeatX - minSeatX, maxSeatY - minSeatY, options);
-        for (let i=0; i<seatsByRegion.length; i++) {
-            const region = seatsByRegion[i];
-            const dimensions = dimensionsByRegion[i];
-    
-            // Get the width of the current region
-            const [regionWidth, regionHeight] = adjustDimensionsForSeatSize(
-                dimensions.xMax - dimensions.xMin,
-                dimensions.yMax - dimensions.yMin,
-                options
-            );
-    
-            const diff = layoutWidth - regionWidth;
-            const offset = diff * .5;
-    
-            // Add the difference to the X value of every seat in the region
-            for (const seat of region)
+    const [layoutWidth, layoutHeight] = adjustDimensionsForSeatSize(maxSeatX - minSeatX, maxSeatY - minSeatY, options);
+    for (let i=0; i<rowsByRegion.length; i++) {
+        const dimensions = dimensionsByRegion[i];
+
+        // Get the width of the current region
+        const [regionWidth, regionHeight] = adjustDimensionsForSeatSize(
+            dimensions.xMax - dimensions.xMin,
+            dimensions.yMax - dimensions.yMin,
+            options
+        );
+
+        const diff = layoutWidth - regionWidth;
+        const offset = diff * .5;
+
+        const region = rowsByRegion[i];
+        for (let k=0; k<region.length; k++) {
+            const row = region[k];
+
+            for (const seat of row) {
                 seat.x += offset;
+    
+                if (!backdropsBySection.hasOwnProperty(seat.section))
+                    backdropsBySection[seat.section] = [];
+    
+                if (!backdropsBySection[seat.section][k])
+                    backdropsBySection[seat.section][k] = [];
+    
+                backdropsBySection[seat.section][k].push(seat.id);
+            }
         }
     }
     
-    return seatsByRegion.flat();
+    return [rowsByRegion.flat(2), backdropsBySection];
 }
 
 function flipStageDirection(positionedSeats, options) {
@@ -434,7 +445,7 @@ function flipStageDirection(positionedSeats, options) {
 }
 
 export function renderSVG (regions, sections, members, settings) {
-    let seats = calculateSeatPositions(regions, sections, members, settings);
+    let [seats] = calculateSeatPositions(regions, sections, members, settings);
     const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, settings);
 
     if (!settings.downstageTop)
@@ -464,7 +475,7 @@ export function renderSVG (regions, sections, members, settings) {
 }
 
 export function renderImage (regions, sections, members, options) {
-    let seats = calculateSeatPositions(regions, sections, members, options);
+    let [seats] = calculateSeatPositions(regions, sections, members, options);
     const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
 
     if (!options.downstageTop)

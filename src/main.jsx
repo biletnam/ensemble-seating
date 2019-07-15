@@ -1144,7 +1144,7 @@ class App extends Component {
     }
 
     render() {
-        const seats = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
+        const [seats, sectionBackdrops] = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
         const [layoutWidth, layoutHeight] = getLayoutDimensions(
             seats,
             this.state.project.settings
@@ -1175,6 +1175,7 @@ class App extends Component {
 
             <SeatingRenderer id='rendering-area'
                 seats={seats}
+                sectionBackdrops={sectionBackdrops}
                 project={this.state.project}
                 regions={this.state.project.regions}
                 sections={this.state.project.sections}

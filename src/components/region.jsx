@@ -35,11 +35,22 @@ class Region extends PureComponent {
                 </div>
         }
         else {
-            const positionedSeats = this.props.seats;
-            const [layoutWidth, layoutHeight] = getLayoutDimensions(positionedSeats, this.props.settings);
+            const [layoutWidth, layoutHeight] = getLayoutDimensions(this.props.seats, this.props.settings);
 
             return <div className='rendering-area__stage' style={{ width: `${layoutWidth}px`, height: `${layoutHeight}px` }}>
-                {positionedSeats.map((currentSeat, seatIndex) => {
+                {/* SVG backdrops */}
+                <svg width={layoutWidth} height={layoutHeight} viewBox={`0 0 ${layoutWidth} ${layoutHeight}`}>
+                    {Object.keys(this.props.backdrops).map(sectionId => <g key={sectionId} className='section-backdrop'>
+                        {this.props.backdrops[sectionId].map((backdropRow, currentIndex) => <polyline key={`${sectionId}-${currentIndex}`}
+                            points={backdropRow.reduce((acc, seatId) => {
+                                const seat = this.props.seats.find(seat => seat.id === seatId);
+                                return acc + `${acc.length > 0 ? ' ' : ''}${seat.x},${seat.y}`;
+                            }, '')} />)}
+                    </g>)}
+                </svg>
+
+                {/* Seats */}
+                {this.props.seats.map((currentSeat, seatIndex) => {
                     const member = currentSeat.member;
                     return <Seat key={currentSeat.id}
                         member={member}
