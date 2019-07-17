@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 
+import './toolbar.css';
+
 import { Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, ToolbarMenuIcon, ToolbarIcon } from '@rmwc/toolbar';
 
 import '@material/toolbar/dist/mdc.toolbar.min.css';

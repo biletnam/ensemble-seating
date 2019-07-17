@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import './seat.css';
+
 import { Ripple } from '@rmwc/ripple';
 
 import '@material/ripple/dist/mdc.ripple.min.css';

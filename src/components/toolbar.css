@@ -1,0 +1,9 @@
+#toolbar {
+    grid-area: toolbar;
+}
+
+@media print {
+    #toolbar {
+        display: none !important;
+    }
+}

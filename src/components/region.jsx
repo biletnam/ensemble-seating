@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import './region.css';
+
 import Seat from './seat.jsx';
 
 import { Button } from '@rmwc/button';
@@ -38,7 +40,7 @@ class Region extends PureComponent {
             const positionedSeats = this.props.seats;
             const [layoutWidth, layoutHeight] = getLayoutDimensions(positionedSeats, this.props.settings);
 
-            return <div className='rendering-area__stage' style={{ width: `${layoutWidth}px`, height: `${layoutHeight}px` }}>
+            return <div className='stage__region' style={{ width: `${layoutWidth}px`, height: `${layoutHeight}px` }}>
                 {positionedSeats.map((currentSeat, seatIndex) => {
                     const member = currentSeat.member;
                     return <Seat key={currentSeat.id}

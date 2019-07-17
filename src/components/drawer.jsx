@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react';
 
+import './drawer.css';
+
 import { Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle } from '@rmwc/drawer';
 import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroupSubheader, ListDivider, ListItemGraphic } from '@rmwc/list';
 import { Button } from '@rmwc/button';

@@ -68,7 +68,7 @@ class SectionListItem extends PureComponent {
             type='section'>
                 {(provided, snapshot) => (
                     <div ref={provided.innerRef}
-                        className='sections-list__section-container'
+                        className='roster__section-container'
                         {...provided.draggableProps}>
                         <Elevation z={1}>
                             <ListGroup>

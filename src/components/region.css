@@ -1,0 +1,13 @@
+.stage__region {
+    margin: auto;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.stage__region:not(:only-child):not(:last-child) {
+    margin-bottom: 1em;
+}
+
+.stage__region:not(:only-child):not(:first-child) {
+    margin-top: 1em;
+}

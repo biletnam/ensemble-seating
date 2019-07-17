@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
 import semver from 'semver';
 
-import SeatingRenderer from './components/render-seating.jsx';
-import MenuDrawer from './components/menu-drawer.jsx';
-import MainToolbar from './components/toolbar.jsx';
-import SectionsList from './components/sections-list.jsx';
+import Stage from './components/stage.jsx';
+import Drawer from './components/drawer.jsx';
+import Toolbar from './components/toolbar.jsx';
+import Roster from './components/roster.jsx';
 import NewProjectDialog from './components/new-project-dialog.jsx';
 import EditDialog from './components/edit-dialog.jsx';
 import RegionEditor from './components/edit-region.jsx';
@@ -1150,7 +1150,7 @@ class App extends Component {
             this.state.project.settings
         );
         return <React.Fragment>
-            <MenuDrawer drawerOpen={this.state.drawerOpen}
+            <Drawer drawerOpen={this.state.drawerOpen}
                 onClose={this.handleRequestCloseMenuDrawer}
                 onRequestPrintProject={this.handleRequestPrint}
                 onRequestNewProject={this.handleRequestNewProject}
@@ -1166,14 +1166,14 @@ class App extends Component {
                 layoutHeight={layoutHeight}
                 user={this.state.user} />
 
-            <MainToolbar id='rendering-toolbar'
+            <Toolbar id='toolbar'
                 implicitSeatsVisible={this.state.project.settings.implicitSeatsVisible}
                 downstageTop={this.state.project.settings.downstageTop}
                 onRequestRenameProject={this.handleAcceptRenameProject}
                 projectName={this.state.projectName}
                 onToolbarButtonClick={this.handleClickedToolbarButton} />
 
-            <SeatingRenderer id='rendering-area'
+            <Stage id='stage'
                 seats={seats}
                 project={this.state.project}
                 regions={this.state.project.regions}
@@ -1184,7 +1184,7 @@ class App extends Component {
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestNewSection={this.handleClickedNewSectionButton} />
 
-            <SectionsList id='sections-list'
+            <Roster id='roster'
                 editorId={this.state.editorId}
                 sections={this.state.project.sections}
                 members={this.state.project.members}
@@ -1298,4 +1298,4 @@ class App extends Component {
     }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('app'));

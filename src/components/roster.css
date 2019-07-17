@@ -1,0 +1,119 @@
+#roster {
+    grid-area: roster;
+    overflow: visible;
+    border-top: 1px solid #aaa
+}
+
+.roster__toggle-button {
+    display: none;
+}
+
+@media screen and (min-width: 800px) {
+    #roster {
+        border-top: none;
+        border-left: 1px solid #aaa;
+        position: relative;
+        transition: transform .15s ease-in-out;
+    }
+
+    .roster--collapsed {
+        transform: translateX(100%);
+    }
+
+    .roster--empty {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 1em;
+    }
+
+    .roster__scrollable-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .roster__toggle-button {
+        display: inline-flex;
+        position: absolute;
+        top: 1em;
+        right: 100%;
+        width: 3em;
+        height: 3em;
+        align-items: center;
+        justify-content: center;
+        -webkit-appearance: none;
+        background-color: transparent;
+        border: 1px solid #aaa;
+        border-top-left-radius: .25em;
+        border-bottom-left-radius: .25em;
+        transition: background-color .1s ease;
+    }
+
+    .roster__toggle-button:hover {
+        background-color: rgba(0, 0, 0, .05);
+    }
+
+    .roster__toggle-button:active {
+        background-color: rgba(0, 0, 0, .1);
+    }
+
+    .roster__toggle-button:focus {
+        outline: 0;
+    }
+}
+
+.roster__no-sections-message {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.roster__droppable-section-area:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+}
+
+.roster__region-heading-container {
+    padding-left: 1em;
+    padding-right: 1em;
+    background-color: #efefef;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.roster__region-heading-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.roster__section-container {
+    background-color: #fff;
+    margin: 1em 1em 0 1em;
+}
+
+.roster__section-container  .mdc-list-group {
+    border: 1px solid #ddd;
+}
+
+*:not(.roster__section-container) + .roster__section-container {
+    margin-top: 2em;
+}
+
+.roster__section-container:last-child {
+    margin-bottom: 2em;
+}
+
+@media print {
+    #roster {
+        display: none !important;
+    }
+}

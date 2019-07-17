@@ -1,11 +1,13 @@
 import React, { PureComponent } from 'react';
 
+import './roster.css';
+
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import RegionListItem from './region-list-item.jsx';
 import LeftChevronIcon from '../icons/baseline-chevron_left-24px.jsx';
 
-class SectionsList extends PureComponent {
+class Roster extends PureComponent {
     render() {
         let className = '';
         if (this.props.sections.length === 0 && this.props.regions.length === 1)
@@ -17,11 +19,11 @@ class SectionsList extends PureComponent {
         const label = this.props.expanded ? 'Hide sections' : 'Show sections';
 
         return <aside id={this.props.id} className={className}>
-            <button type='button' className='sections-list__toggle-button' onClick={this.props.onToggleVisibility}
+            <button type='button' className='roster__toggle-button' onClick={this.props.onToggleVisibility}
                 aria-label={label} title={label}>
                 <LeftChevronIcon style={{transform: this.props.expanded ? 'rotateZ(180deg)' : ''}} />
             </button>
-            <div className='sections-list__scrollable-container'>
+            <div className='roster__scrollable-container'>
                 <DragDropContext onDragEnd={this.props.onDragEnd}>
                     {this.props.regions.map(currentRegion => <RegionListItem
                         key={currentRegion.id}
@@ -48,9 +50,9 @@ class SectionsList extends PureComponent {
                     )}
                 </DragDropContext>
             </div>
-            {this.props.sections.length === 0 && this.props.regions.length === 1 && <p className='sections-list__no-sections-message'>No sections to display</p>}
+            {this.props.sections.length === 0 && this.props.regions.length === 1 && <p className='roster__no-sections-message'>No sections to display</p>}
         </aside>
     }
 };
 
-export default SectionsList;
+export default Roster;

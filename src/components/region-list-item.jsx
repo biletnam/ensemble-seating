@@ -56,12 +56,12 @@ class RegionListItem extends PureComponent {
     render() {
         return <Droppable droppableId={this.props.region.id} type='section'>
             {(provided, snapshot) => (
-                <div ref={provided.innerRef} {...provided.droppableProps} className='sections-list__droppable-section-area'>
+                <div ref={provided.innerRef} {...provided.droppableProps} className='roster__droppable-section-area'>
                     {/* Iterate over sections here */}
                     <Elevation z='1'
                         style={{zIndex: this.state.actionMenuOpen ? '2' : ''}}
-                        className='sections-list__region-heading-container'>
-                        <span className='sections-list__region-heading-text'>{this.props.region.name}</span>
+                        className='roster__region-heading-container'>
+                        <span className='roster__region-heading-text'>{this.props.region.name}</span>
                         <ListActionMenu
                             onSelectAction={this.handleActionMenuClick}
                             open={this.state.actionMenuOpen}
@@ -91,7 +91,7 @@ class RegionListItem extends PureComponent {
                     
                     {provided.placeholder}
 
-                    {this.props.forceNewSectionButton && <div className='sections-list__section-container'>
+                    {this.props.forceNewSectionButton && <div className='roster__section-container'>
                         <Button onClick={this.handleClickedNewSection} raised><ButtonIcon icon={<AddIcon />} /> New section</Button>
                     </div>}
                 </div>

@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react';
+
+import './stage.css';
+
 import Region from './region.jsx';
 import { trimOuterSpacing } from '../helpers/stage-helpers.js';
 
-class SeatingRenderer extends PureComponent {
+class Stage extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -48,4 +51,4 @@ class SeatingRenderer extends PureComponent {
     }
 }
 
-export default SeatingRenderer;
+export default Stage;
