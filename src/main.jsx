@@ -71,9 +71,6 @@ import { renderSVG, renderImage, getLayoutDimensions, calculateSeatPositions } f
 
 function createFreshState(user) {
     return {
-        deleteSectionId: null,
-        deleteSectionName: null,
-        deleteSectionDialogOpen: false,
         batchAddSectionId: null,
         batchAddSectionName: null,
         batchAddDialogOpen: false,
@@ -149,7 +146,6 @@ class App extends Component {
         // Dialogs
         this.handleNewProjectDialogClosed = this.handleNewProjectDialogClosed.bind(this);
         this.handleSelectNewProjectTemplate = this.handleSelectNewProjectTemplate.bind(this);
-        this.handleDeleteSectionDialogClosed = this.handleDeleteSectionDialogClosed.bind(this);
         this.handleAcceptRegionEdits = this.handleAcceptRegionEdits.bind(this);
         this.handleAcceptSectionEdits = this.handleAcceptSectionEdits.bind(this);
         this.handleAcceptMemberEdits = this.handleAcceptMemberEdits.bind(this);
@@ -382,17 +378,13 @@ class App extends Component {
         });
     }
 
-    deleteSection() {
-        const sectionId = this.state.deleteSectionId;
+    deleteSection(sectionId) {
         const sections = this.state.project.sections.filter(currentSection => currentSection.id !== sectionId);
         const members = this.state.project.members.filter(currentMember => currentMember.section !== sectionId);
         const membersToRemove = this.state.project.members.filter(currentMember => currentMember.section === sectionId);
         this.setState({
             project: Object.assign({}, this.state.project, {sections, members}),
-            editorId: null,
-            deleteSectionName: null,
-            deleteSectionId: null,
-            deleteSectionDialogOpen: false
+            editorId: null
         }, () => {
             if (this.state.user) {
                 saveSectionOrder(this.state.user, this.state.projectName, sections.map(current => current.id));
@@ -675,12 +667,14 @@ class App extends Component {
 
     handleRequestedDeleteSection(sectionId) {
         const requestedSection = this.state.project.sections.find(current => current.id === sectionId);
-        this.setState({
-            editorId: sectionId,
-            deleteSectionId: sectionId,
-            deleteSectionName: requestedSection.name,
-            deleteSectionDialogOpen: true
-        });
+
+        dialogQueue.confirm({
+            title: `Delete "${requestedSection.name}" section?`,
+            body: 'This will also delete all section members.'
+        }).then(confirmed => {
+            if (confirmed)
+                this.deleteSection(sectionId);
+        })
     }
 
     handleRequestedDeleteMember(memberId) {
@@ -952,14 +946,6 @@ class App extends Component {
         }
     }
 
-    handleDeleteSectionDialogClosed(event) {
-        console.log(event.detail.action);
-        if (event.detail.action === 'accept')
-            this.deleteSection();
-        else
-            this.setState({deleteSectionDialogOpen: false})
-    }
-
     handleAcceptRegionEdits(regionId, data) {
         const newRegions = this.state.project.regions.slice();
 
@@ -1185,11 +1171,6 @@ class App extends Component {
                 onRequestLogin={this.handleRequestLogin}
                 showFirstLaunch={this.state.showFirstLaunch}
                 user={this.state.user} />
-
-            <SimpleDialog title={`Delete "${this.state.deleteSectionName}" section?`}
-                body='This will also delete all section members.'
-                open={this.state.deleteSectionDialogOpen}
-                onClose={this.handleDeleteSectionDialogClosed} />
 
             <SimpleDialog title='Abandon current seating chart?'
                 body={<>
