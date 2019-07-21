@@ -74,9 +74,6 @@ function createFreshState(user) {
         deleteSectionId: null,
         deleteSectionName: null,
         deleteSectionDialogOpen: false,
-        deleteMemberId: null,
-        deleteMemberName: null,
-        deleteMemberDialogOpen: false,
         batchAddSectionId: null,
         batchAddSectionName: null,
         batchAddDialogOpen: false,
@@ -153,7 +150,6 @@ class App extends Component {
         this.handleNewProjectDialogClosed = this.handleNewProjectDialogClosed.bind(this);
         this.handleSelectNewProjectTemplate = this.handleSelectNewProjectTemplate.bind(this);
         this.handleDeleteSectionDialogClosed = this.handleDeleteSectionDialogClosed.bind(this);
-        this.handleDeleteMemberDialogClosed = this.handleDeleteMemberDialogClosed.bind(this);
         this.handleAcceptRegionEdits = this.handleAcceptRegionEdits.bind(this);
         this.handleAcceptSectionEdits = this.handleAcceptSectionEdits.bind(this);
         this.handleAcceptMemberEdits = this.handleAcceptMemberEdits.bind(this);
@@ -412,16 +408,11 @@ class App extends Component {
         });
     }
 
-    deleteMember() {
-        const memberId = this.state.deleteMemberId;
+    deleteMember(memberId) {
         const members = this.state.project.members.filter(current => current.id !== memberId);
         this.setState({
             project: Object.assign({}, this.state.project, {members}),
-            editorId: null,
-            deleteSectionName: null,
-            deleteMemberName: null,
-            deleteMemberId: null,
-            deleteMemberDialogOpen: false
+            editorId: null
         }, () => {
             if (this.state.user) {
                 saveMemberOrder(this.state.user, this.state.projectName, members.map(current => current.id));
@@ -695,12 +686,13 @@ class App extends Component {
     handleRequestedDeleteMember(memberId) {
         const requestedMember = this.state.project.members.find(current => current.id === memberId);
         const memberSection = this.state.project.sections.find(current => current.id === requestedMember.section);
-        this.setState({
-            editorId: memberId,
-            deleteMemberId: memberId,
-            deleteMemberName: requestedMember.name,
-            deleteMemberDialogOpen: true,
-            deleteSectionName: memberSection.name
+
+        dialogQueue.confirm({
+            title: `Delete ${requestedMember.name}?`,
+            body: `This will delete them from the ${memberSection.name} section.`
+        }).then(confirmed => {
+            if (confirmed)
+                this.deleteMember(memberId);
         })
     }
 
@@ -968,14 +960,6 @@ class App extends Component {
             this.setState({deleteSectionDialogOpen: false})
     }
 
-    handleDeleteMemberDialogClosed(event) {
-        console.log(event.detail.action);
-        if (event.detail.action === 'accept')
-            this.deleteMember();
-        else
-            this.setState({deleteMemberDialogOpen: false})
-    }
-
     handleAcceptRegionEdits(regionId, data) {
         const newRegions = this.state.project.regions.slice();
 
@@ -1206,11 +1190,6 @@ class App extends Component {
                 body='This will also delete all section members.'
                 open={this.state.deleteSectionDialogOpen}
                 onClose={this.handleDeleteSectionDialogClosed} />
-            
-            <SimpleDialog title={`Delete ${this.state.deleteMemberName}?`}
-                body={`This will remove them from the ${this.state.deleteSectionName} section.`}
-                open={this.state.deleteMemberDialogOpen}
-                onClose={this.handleDeleteMemberDialogClosed} />
 
             <SimpleDialog title='Abandon current seating chart?'
                 body={<>
