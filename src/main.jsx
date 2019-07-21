@@ -71,10 +71,6 @@ import { renderSVG, renderImage, getLayoutDimensions, calculateSeatPositions } f
 
 function createFreshState(user) {
     return {
-        deleteRegionId: null,
-        deleteRegionName: null,
-        deleteRegionAffectedSections: [],
-        deleteRegionDialogOpen: false,
         deleteSectionId: null,
         deleteSectionName: null,
         deleteSectionDialogOpen: false,
@@ -156,7 +152,6 @@ class App extends Component {
         // Dialogs
         this.handleNewProjectDialogClosed = this.handleNewProjectDialogClosed.bind(this);
         this.handleSelectNewProjectTemplate = this.handleSelectNewProjectTemplate.bind(this);
-        this.handleDeleteRegionDialogClosed = this.handleDeleteRegionDialogClosed.bind(this);
         this.handleDeleteSectionDialogClosed = this.handleDeleteSectionDialogClosed.bind(this);
         this.handleDeleteMemberDialogClosed = this.handleDeleteMemberDialogClosed.bind(this);
         this.handleAcceptRegionEdits = this.handleAcceptRegionEdits.bind(this);
@@ -363,9 +358,7 @@ class App extends Component {
         }
     }
 
-    deleteRegion() {
-        const regionId = this.state.deleteRegionId;
-        
+    deleteRegion(regionId) {        
         const regions = this.state.project.regions.filter(current => current.id !== regionId);
         const sections = this.state.project.sections.filter(current => current.region !== regionId);
         const sectionsToRemove = this.state.project.sections.filter(current => current.region === regionId);
@@ -373,11 +366,7 @@ class App extends Component {
         const membersToRemove = this.state.project.members.filter(current => sectionsToRemove.some(currentSection => currentSection.id === current.section));
         this.setState({
             project: Object.assign({}, this.state.project, {regions, sections, members}),
-            editorId: null,
-            deleteRegionName: null,
-            deleteRegionId: null,
-            deleteRegionAffectedSections: [],
-            deleteRegionDialogOpen: false
+            editorId: null
         }, () => {
             if (this.state.user) {
                 saveRegionOrder(this.state.user, this.state.projectName, regions.map(current => current.id));
@@ -678,12 +667,18 @@ class App extends Component {
     handleRequestedDeleteRegion(regionId) {
         const requestedRegion = this.state.project.regions.find(current => current.id === regionId);
         const affectedSections = this.state.project.sections.filter(current => current.region === regionId);
-        this.setState({
-            editorId: regionId,
-            deleteRegionId: regionId,
-            deleteRegionName: requestedRegion.name,
-            deleteRegionAffectedSections: affectedSections.slice(),
-            deleteRegionDialogOpen: true
+
+        dialogQueue.confirm({
+            title: `Delete "${requestedRegion.name}" region?`,
+            body: <>
+                <p>This will also delete the following sections and all their section members:</p>
+                <ul>
+                    {affectedSections.map(current => <li key={current.id}>{current.name}</li>)}
+                </ul>
+            </>
+        }).then(confirmed => {
+            if (confirmed)
+                this.deleteRegion(regionId);
         });
     }
 
@@ -965,13 +960,6 @@ class App extends Component {
         }
     }
 
-    handleDeleteRegionDialogClosed(event) {
-        if (event.detail.action === 'accept')
-            this.deleteRegion();
-        else
-            this.setState({deleteRegionDialogOpen: false});
-    }
-
     handleDeleteSectionDialogClosed(event) {
         console.log(event.detail.action);
         if (event.detail.action === 'accept')
@@ -1213,16 +1201,6 @@ class App extends Component {
                 onRequestLogin={this.handleRequestLogin}
                 showFirstLaunch={this.state.showFirstLaunch}
                 user={this.state.user} />
-
-            <SimpleDialog title={`Delete "${this.state.deleteRegionName}" region?`}
-                body={<React.Fragment>
-                    <p>This will also delete the following sections and all their section members:</p>
-                    <ul>
-                        {this.state.deleteRegionAffectedSections.map(current => <li key={current.id}>{current.name}</li>)}
-                    </ul>
-                </React.Fragment>}
-                open={this.state.deleteRegionDialogOpen}
-                onClose={this.handleDeleteRegionDialogClosed} />
 
             <SimpleDialog title={`Delete "${this.state.deleteSectionName}" section?`}
                 body='This will also delete all section members.'
