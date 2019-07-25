@@ -3,16 +3,14 @@ import React, { PureComponent } from 'react';
 import './drawer.css';
 
 import { Drawer, DrawerHeader, DrawerContent, DrawerTitle, DrawerSubtitle } from '@rmwc/drawer';
-import { List, ListItem, ListItemPrimaryText, ListItemMeta, ListGroup, ListGroupSubheader, ListDivider, ListItemGraphic } from '@rmwc/list';
+import { List, ListItem, ListDivider, ListItemGraphic } from '@rmwc/list';
 import { Button } from '@rmwc/button';
-import { SimpleDialog } from '@rmwc/dialog';
 
 import '@material/drawer/dist/mdc.drawer.min.css';
 import '@material/list/dist/mdc.list.min.css';
 import '@material/button/dist/mdc.button.min.css';
 import '@material/dialog/dist/mdc.dialog.min.css';
 
-import DeleteProjectDialog from './delete-project-dialog.jsx';
 import AboutDialog from './about-dialog.jsx';
 import UserWidget from './user-widget.jsx';
 import ExportActionMenu from './export-action-menu.jsx';
@@ -28,6 +26,7 @@ import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
 import InfoIcon from '../icons/baseline-info-24px.jsx';
 
 import { browseForFile } from '../helpers/project-helpers.js';
+import { queue as dialogQueue } from './dialog-queue.jsx';
 
 class MenuDrawer extends PureComponent {
     constructor(props) {
@@ -36,19 +35,14 @@ class MenuDrawer extends PureComponent {
         this.state = {
             aboutDialogVisible: false,
             recentProjectsDialogVisible: false,
-            deleteProjectDialogVisible: false,
             exportMenuVisible: false,
-            exportDialogVisible: false,
-            confirmImportDialogVisible: false
+            exportDialogVisible: false
         }
 
         this.handleMenuButtonClick = this.handleMenuButtonClick.bind(this);
-        this.triggerFileImportDialog = this.triggerFileImportDialog.bind(this);
-        this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
         this.handleSelectExportOption = this.handleSelectExportOption.bind(this);
 
         // Dialog cancel listeners
-        this.handleRequestCancelDeleteProject = this.handleRequestCancelDeleteProject.bind(this);
         this.handleRequestCancelRecentProjects = this.handleRequestCancelRecentProjects.bind(this);
         this.handleRequestCancelAbout = this.handleRequestCancelAbout.bind(this);
     }
@@ -60,7 +54,14 @@ class MenuDrawer extends PureComponent {
                     this.props.onRequestPrintProject();
                 break;
             case 'delete-project':
-                this.setState({deleteProjectDialogVisible: true});
+                dialogQueue.confirm({
+                    title: `Delete "${this.props.projectName}?"`,
+                    body: 'This can\'t be undone.',
+                    acceptLabel: 'Delete project'
+                }).then(confirmed => {
+                    if (confirmed && typeof this.props.onRequestDeleteProject === 'function')
+                        this.props.onRequestDeleteProject();
+                });
                 break;
             case 'new-project':
                 if (typeof this.props.onRequestNewProject === 'function')
@@ -73,7 +74,21 @@ class MenuDrawer extends PureComponent {
                 if (this.props.user)
                     this.props.onRequestShowOpenProjectDialog && this.props.onRequestShowOpenProjectDialog();
                 else
-                    this.setState({ confirmImportDialogVisible: true });
+                    dialogQueue.confirm({
+                        title: 'Abandon current seating chart?',
+                        body: <>
+                            <p>If you import a seating chart, the contents of the current seating chart will be lost. This can't be undone.</p>
+                            <p>Are you sure you want to continue?</p>
+                        </>,
+                        acceptLabel: 'Continue'
+                    }).then(confirmed => {
+                        confirmed && browseForFile().then(result => {
+                            const {project, projectName} = result;
+                            this.props.onRequestImportProject(project, projectName);
+                        }).catch(error => {
+                            // To do: recover from error and/or display a message
+                        });
+                    });
                 break;
             case 'export':
                 this.setState({ exportMenuVisible: true });
@@ -86,25 +101,6 @@ class MenuDrawer extends PureComponent {
         }
     }
 
-    triggerFileImportDialog (event) {
-        if ((event && event.detail.action == 'accept') || !event) {
-            browseForFile().then(result => {
-                const {project, projectName} = result;
-                this.props.onRequestImportProject(project, projectName);
-            }).catch(error => {
-                // To do: recover from error and/or display a message
-            });;
-        }
-        this.setState({ confirmImportDialogVisible: false });
-    }
-
-    handleAcceptDeleteProject() {
-        this.setState({deleteProjectDialogVisible: false}, () => {
-            if (typeof this.props.onRequestDeleteProject === 'function')
-                this.props.onRequestDeleteProject();
-        })
-    }
-
     handleSelectExportOption(action) {
         if (action === 'project' && typeof this.props.onRequestExportProject === 'function')
             this.props.onRequestExportProject({format: action});
@@ -114,10 +110,6 @@ class MenuDrawer extends PureComponent {
     }
 
     // Dialog cancel listeners
-    handleRequestCancelDeleteProject() {
-        this.setState({deleteProjectDialogVisible: false});
-    }
-
     handleRequestCancelRecentProjects() {
         this.setState({recentProjectsDialogVisible: false});
     }
@@ -178,24 +170,11 @@ class MenuDrawer extends PureComponent {
             </DrawerHeader>
         </Drawer>
 
-        <DeleteProjectDialog open={this.state.deleteProjectDialogVisible} onCancel={this.handleRequestCancelDeleteProject}
-            onAccept={this.handleAcceptDeleteProject}
-            title={`Delete "${this.props.projectName}?"`} />
-
         <AboutDialog open={this.state.aboutDialogVisible} onClose={this.handleRequestCancelAbout} />
 
         <ExportImageDialog open={this.state.exportDialogVisible} onCancel={() => this.setState({exportDialogVisible: false})}
             onAccept={options => { this.setState({ exportDialogVisible: false }); this.props.onRequestExportProject(options) }}
             imageWidth={this.props.layoutWidth} imageHeight={this.props.layoutHeight} />
-
-        <SimpleDialog title='Abandon current seating chart?'
-            open={this.state.confirmImportDialogVisible}
-            acceptLabel='Continue'
-            body={<>
-                <p>If you import a seating chart, the contents of the current seating chart will be lost. This can't be undone.</p>
-                <p>Are you sure you want to continue?</p>
-            </>}
-            onClose={this.triggerFileImportDialog} />
     </React.Fragment>
     }
 }
