@@ -81,7 +81,6 @@ function createFreshState(user) {
         newProjectDialogOpen: false,
         showFirstLaunch: false,
         openProjectDialogOpen: false,
-        confirmNewProjectDialogOpen: false,
         drawerOpen: false,
         rosterOpen: true,
         editorId: null,
@@ -764,24 +763,16 @@ class App extends Component {
     }
 
     handleRequestNewProject(event) {
-        if (this.state.confirmNewProjectDialogOpen) {
-            if (event && event.detail.action == 'accept') {
-                this.setState({
-                    confirmNewProjectDialogOpen: false,
-                    newProjectDialogOpen: true
-                });
-            }
-            else
-                this.setState({ confirmNewProjectDialogOpen: false });
-        }
-        else {
-            
-            if (this.state.user)
-                this.setState({ newProjectDialogOpen: true });
-            else
-                this.setState({ confirmNewProjectDialogOpen: true });
-        }
-        
+        if (this.state.user)
+            this.setState({ newProjectDialogOpen: true });
+        else
+            dialogQueue.confirm({
+                title: 'Abandon current seating chart?',
+                body: <>
+                    <p>If you create a new seating chart, the contents of the current seating chart will be lost. This can't be undone.</p>
+                    <p>Are you sure you want to continue?</p>
+                </>
+            }).then(confirmed => confirmed && this.setState({ newProjectDialogOpen: true }));
     }
 
     handleRequestDuplicateProject() {
@@ -1171,15 +1162,6 @@ class App extends Component {
                 onRequestLogin={this.handleRequestLogin}
                 showFirstLaunch={this.state.showFirstLaunch}
                 user={this.state.user} />
-
-            <SimpleDialog title='Abandon current seating chart?'
-                body={<>
-                    <p>If you create a new seating chart, the contents of the current seating chart will be lost. This can't be undone.</p>
-                    <p>Are you sure you want to continue?</p>
-                </>}
-                acceptLabel='Continue'
-                open={this.state.confirmNewProjectDialogOpen}
-                onClose={this.handleRequestNewProject} />
 
             <EditDialog open={this.state.editRegionDialogOpen}
                 title='Edit region'
