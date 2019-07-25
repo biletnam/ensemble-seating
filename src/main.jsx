@@ -131,19 +131,14 @@ class App extends Component {
         this.handleChangeProjectSetting = this.handleChangeProjectSetting.bind(this);
         this.handleSectionsListDragEnd = this.handleSectionsListDragEnd.bind(this);
         
-        this.handleRequestPrint = this.handleRequestPrint.bind(this);
         this.handleRequestNewProject = this.handleRequestNewProject.bind(this);
         this.handleRequestDuplicateProject = this.handleRequestDuplicateProject.bind(this);
         this.handleRequestImportProject = this.handleRequestImportProject.bind(this);
         this.handleRequestExportProject = this.handleRequestExportProject.bind(this);
         this.handleRequestOpenProject = this.handleRequestOpenProject.bind(this);
         this.handleAcceptRenameProject = this.handleAcceptRenameProject.bind(this);
-        this.handleAcceptDeleteProject = this.handleAcceptDeleteProject.bind(this);
-
-        this.handleToggleRoster = this.handleToggleRoster.bind(this);
-
+        
         // Dialogs
-        this.handleNewProjectDialogClosed = this.handleNewProjectDialogClosed.bind(this);
         this.handleSelectNewProjectTemplate = this.handleSelectNewProjectTemplate.bind(this);
         this.handleAcceptRegionEdits = this.handleAcceptRegionEdits.bind(this);
         this.handleAcceptSectionEdits = this.handleAcceptSectionEdits.bind(this);
@@ -750,10 +745,6 @@ class App extends Component {
 
     /* MAIN MENU */
 
-    handleRequestPrint() {
-        window.print();
-    }
-
     handleRequestNewProject(event) {
         if (this.state.user)
             this.setState({ newProjectDialogOpen: true });
@@ -893,15 +884,7 @@ class App extends Component {
         })        
     }
 
-    handleToggleRoster(event) {
-        this.setState({rosterOpen: !this.state.rosterOpen});
-    }
-
     /* DIALOG EVENTS */
-    handleNewProjectDialogClosed() {
-        this.setState({newProjectDialogOpen: false, showFirstLaunch: false});
-    }
-
     handleSelectNewProjectTemplate(template) {
         const project = createProjectFromTemplate(template);
         if (this.state.user) {
@@ -1038,10 +1021,6 @@ class App extends Component {
             this.setState({projectName: newName});
     }
 
-    handleAcceptDeleteProject () {
-        this.deleteProject();
-    }
-
     // AUTH
 
     handleRequestLogin() {
@@ -1068,13 +1047,13 @@ class App extends Component {
         return <React.Fragment>
             <Drawer drawerOpen={this.state.drawerOpen}
                 onClose={() => this.setState({ drawerOpen: false })}
-                onRequestPrintProject={this.handleRequestPrint}
+                onRequestPrintProject={() => window.print()}
                 onRequestNewProject={this.handleRequestNewProject}
                 onRequestDuplicateProject={this.handleRequestDuplicateProject}
                 onRequestImportProject={this.handleRequestImportProject}
                 onRequestExportProject={this.handleRequestExportProject}
                 onRequestShowOpenProjectDialog={() => this.setState({openProjectDialogOpen: true})}
-                onRequestDeleteProject={this.handleAcceptDeleteProject}
+                onRequestDeleteProject={() => this.deleteProject()}
                 onRequestLogin={this.handleRequestLogin}
                 onRequestLogout={this.handleRequestLogout}
                 projectName={this.state.projectName}
@@ -1106,7 +1085,7 @@ class App extends Component {
                 members={this.state.project.members}
                 regions={this.state.project.regions}
                 expanded={this.state.rosterOpen}
-                onToggleVisibility={this.handleToggleRoster}
+                onToggleVisibility={() => this.setState({ rosterOpen: !this.state.rosterOpen })}
                 onRequestNewSection={this.handleClickedNewSectionButton}
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}
@@ -1123,7 +1102,7 @@ class App extends Component {
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
                 onSelectTemplate={this.handleSelectNewProjectTemplate}
-                onClose={this.handleNewProjectDialogClosed}
+                onClose={() => this.setState({ newProjectDialogOpen: false, showFirstLaunch: false })}
                 onRequestOpenProject={this.handleRequestOpenProject}
                 onRequestShowOpenProjectDialog={() => this.setState({openProjectDialogOpen: true})}
                 onRequestLogin={this.handleRequestLogin}
