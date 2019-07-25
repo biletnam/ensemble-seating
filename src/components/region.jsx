@@ -29,7 +29,7 @@ class Region extends PureComponent {
 
     render() {
         if (this.props.seats.length === 0) {
-            return <div className='rendering-area__stage'>
+            return <div className='stage__region'>
                     <p>No seats to display</p>
                     <div>
                         <Button raised onClick={this.handleClickedNewSectionButton}>Create a section</Button>
