@@ -57,23 +57,9 @@ Example:
   "region": "abcd1234",
   "offsetType": "first-row",
   "offsetValue": 0,
-  "rowSettings": [
-    {
-      "min": 2,
-      "max": 2
-    },
-    {
-      "min": 4,
-      "max": 6
-    },
-    {
-      "min": 4,
-      "max": 8
-    }
-  ]
+  "rowSettings": [2, 4, 4]
 }
 ```
-*Note: during initial prototyping, the `min` and `max` values were intended to allow sections to dynamically adjust their size depending on how many seats were filled, in an effort to "fill forward" empty seats. `max` is currently unused and will probably be removed in a future refactoring.*
 
 #### Members
 Ensemble members can be added to each section, and get seated in the layout in the order that they appear in the roster sidebar.
