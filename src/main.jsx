@@ -1,3 +1,4 @@
+import 'array-flat-polyfill';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
