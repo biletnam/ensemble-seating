@@ -318,6 +318,18 @@ function adjustDimensionsForSeatSize (width, height, options = {seatSize}) {
     return [width + options.seatSize + 1, height + options.seatSize + 1];
 }
 
+function sumArray(arr) {
+    return arr.length > 0 ? arr.reduce((a, b) => a + b) : 0;
+}
+
+function ensureEnoughSeats(rowLengths, numOfMembers) {
+        // Duplicate the last row until there are enough seats
+        const result = rowLengths.slice();
+        while (sumArray(result) < numOfMembers)
+            result.push(result[result.length - 1]);
+        return result;
+}
+
 export function calculateSeatPositions(regions, sections, members, options) {
     const seatsByRegion = [];
     const dimensionsByRegion = [];
@@ -336,13 +348,14 @@ export function calculateSeatPositions(regions, sections, members, options) {
             minRegionX = 0,
             minRegionY = 0;
 
-        let rows = generateRows(includedSections);
-
         const membersBySection = {};
-        for (let k = 0; k < sections.length; k++) {
-            const currentSection = sections[k];
+        for (const currentSection of includedSections) {
             membersBySection[currentSection.id] = members.filter(member => member.section === currentSection.id);
         }
+        
+        const rows = generateRows(includedSections.map(section => Object.assign({}, section, {
+            rowSettings: ensureEnoughSeats(section.rowSettings, membersBySection[section.id].length)
+        })));
 
         // Seat members if any are passed
         let seatedRows = seatMembers(membersBySection, rows);
