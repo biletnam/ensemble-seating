@@ -1,3 +1,5 @@
+import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project-helpers.js';
+
 export const seatSize = 32;
 export const seatGap = 1;
 export const regionGap = 2 * seatSize;
@@ -325,8 +327,9 @@ function sumArray(arr) {
 function ensureEnoughSeats(rowLengths, numOfMembers) {
         // Duplicate the last row until there are enough seats
         const result = rowLengths.slice();
+        const newRowLength = result.length > 1 && result[result.length - 1] > 0 ? result[result.length - 1] : DEFAULT_SECTION_ROW_LENGTH;
         while (sumArray(result) < numOfMembers)
-            result.push(result[result.length - 1]);
+            result.push(newRowLength);
         return result;
 }
 
