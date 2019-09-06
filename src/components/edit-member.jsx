@@ -29,14 +29,15 @@ class MemberEditor extends PureComponent {
     }
 
     render() {
-        return <div>
-            {this.props.data && <React.Fragment>
+        const {data, ...rest} = this.props;
+        return <div {...rest}>
+            {data && <React.Fragment>
                 <div>
-                    <TextField label='Name' name='name' value={this.props.data.name} onChange={this.handleChange} />
+                    <TextField label='Name' name='name' value={data.name} onChange={this.handleChange} />
                 </div>
                 <br />
                 <div>
-                    <TextField textarea label='Notes' name='notes' value={this.props.data.notes} onChange={this.handleChange} />
+                    <TextField textarea label='Notes' name='notes' value={data.notes} onChange={this.handleChange} />
                 </div>
             </React.Fragment>}
         </div>

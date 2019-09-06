@@ -25,16 +25,12 @@ class ListActionMenu extends PureComponent {
         const { onSelectAction, showEditAndDeleteControls, ...props } = this.props;
         return <MenuSurfaceAnchor>
             <Menu {...props}>
-                <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='edit'>Edit&hellip;</MenuItem>
-                {showEditAndDeleteControls && <>
-                    <ListDivider  />
-                    <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-top'>Move to top</MenuItem>
-                    <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-up'>Move up</MenuItem>
-                    <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-down'>Move down</MenuItem>
-                    <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-bottom'>Move to bottom</MenuItem>
-                    <ListDivider  />
-                    <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='delete'>Delete</MenuItem>
-                </>}
+                <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-top'>Move to top</MenuItem>
+                <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-up'>Move up</MenuItem>
+                <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-down'>Move down</MenuItem>
+                <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-bottom'>Move to bottom</MenuItem>
+                <ListDivider  />
+                <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='delete'>Delete</MenuItem>
             </Menu>
             {this.props.children}
         </MenuSurfaceAnchor>

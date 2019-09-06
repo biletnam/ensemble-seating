@@ -34,25 +34,26 @@ class RegionEditor extends PureComponent {
     }
 
     render() {
-        return <div>
-            {this.props.data && <React.Fragment>
+        const {data, ...rest} = this.props;
+        return <div {...rest}>
+            {data && <React.Fragment>
                 <div className='text-input-wrapper'>
-                    <TextField label='Name' name='name' value={this.props.data.name} onChange={this.handleChange} />
+                    <TextField label='Name' name='name' value={data.name} onChange={this.handleChange} />
                 </div>
 
                 <h2>Shape</h2>
                 <div className='text-input-wrapper'>
-                    <Switch checked={this.props.data.curvedLayout}
+                    <Switch checked={data.curvedLayout}
                         onChange={this.handleChange}
                         name='curvedLayout'>&nbsp;Curved layout</Switch>
                 </div>
 
                 <div className='text-input-wrapper'>
                     <Slider min={90} max={180} discrete
-                        disabled={!this.props.data.curvedLayout}
-                        value={this.props.data.angle}
+                        disabled={!data.curvedLayout}
+                        value={data.angle}
                         onInput={this.handleSliderInput} />
-                    <span>Angle: {this.props.data.angle}&deg;</span>
+                    <span>Angle: {data.angle}&deg;</span>
                 </div>
             </React.Fragment>}
         </div>

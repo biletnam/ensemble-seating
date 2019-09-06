@@ -5,7 +5,6 @@ import './roster.css';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import RegionListItem from './region-list-item.jsx';
-import LeftChevronIcon from '../icons/baseline-chevron_left-24px.jsx';
 
 class Roster extends PureComponent {
     render() {
@@ -16,13 +15,7 @@ class Roster extends PureComponent {
         if (!this.props.expanded)
             className += ` ${this.props.id}--collapsed`;
 
-        const label = this.props.expanded ? 'Hide sections' : 'Show sections';
-
         return <aside id={this.props.id} className={className}>
-            <button type='button' className='roster__toggle-button' onClick={this.props.onToggleVisibility}
-                aria-label={label} title={label}>
-                <LeftChevronIcon style={{transform: this.props.expanded ? 'rotateZ(180deg)' : ''}} />
-            </button>
             <div className='roster__scrollable-container'>
                 <DragDropContext onDragEnd={this.props.onDragEnd}>
                     {this.props.regions.map(currentRegion => <RegionListItem
@@ -39,10 +32,6 @@ class Roster extends PureComponent {
 
                         onRequestDeleteRegion={this.props.onRequestDeleteRegion}
                         onRequestMoveRegion={this.props.onRequestMoveRegion}
-                        onRequestEditRegion={this.props.onRequestEditRegion}
-                        onRequestEditSection={this.props.onRequestEditSection}
-                        onRequestEditMember={this.props.onRequestEditMember}
-
                         onRequestDeleteSection={this.props.onRequestDeleteSection}
                         onRequestDeleteMember={this.props.onRequestDeleteMember}
 

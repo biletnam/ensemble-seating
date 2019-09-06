@@ -15,6 +15,7 @@ import InlineInput from './inline-input.jsx';
 import MenuIcon from '../icons/baseline-menu-24px.jsx';
 import HorizontalSplitIcon from '../icons/baseline-horizontal_split-24px.jsx';
 import RotateIcon from '../icons/baseline-rotate_90_degrees_ccw-24px.jsx';
+import MenuOpenIcon from '../icons/baseline-menu_open-24px.jsx';
 import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
 
 const MainToolbar = props => (
@@ -44,6 +45,15 @@ const MainToolbar = props => (
                     icon={<RotateIcon />}
                     style={{transform: props.downstageTop ? 'rotate(90deg)' : 'rotateZ(-90deg)'}}
                     onClick={props.onToolbarButtonClick} />
+
+                <ToolbarIcon tag='button'
+                    name='roster'
+                    title={props.rosterOpen ? 'Close roster' : 'Open roster'}
+                    icon={<MenuOpenIcon />}
+                    style={{transform: props.rosterOpen ? 'rotateZ(180deg)' : ''}}
+                    id='toolbar__toggle-roster-button'
+                    onClick={props.onToolbarButtonClick}
+                     />
 
                 <ToolbarIcon tag='button'
                     name='project-settings'

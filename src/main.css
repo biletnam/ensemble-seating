@@ -45,10 +45,10 @@ body {
     
     #app {
         display: grid;
-        grid-template-columns: 1fr 400px;
+        grid-template-columns: 1fr 400px 400px;
         grid-template-rows: auto 1fr;
-        grid-template-areas: 'toolbar toolbar'
-                             'stage roster';
+        grid-template-areas: 'toolbar toolbar toolbar'
+                             'stage editor roster';
         position: absolute;
         width: 100%;
         height: 100%;

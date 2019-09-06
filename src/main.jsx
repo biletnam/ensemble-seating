@@ -7,12 +7,9 @@ import semver from 'semver';
 import Stage from './components/stage.jsx';
 import Drawer from './components/drawer.jsx';
 import Toolbar from './components/toolbar.jsx';
+import Editor from './components/editor.jsx'
 import Roster from './components/roster.jsx';
 import NewProjectDialog from './components/new-project-dialog.jsx';
-import EditDialog from './components/edit-dialog.jsx';
-import RegionEditor from './components/edit-region.jsx';
-import SectionEditor from './components/edit-section.jsx';
-import MemberEditor from './components/edit-member.jsx';
 import BatchAddMembersDialog from './components/batch-add-members.jsx';
 import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
 import OpenProjectDialog from './components/open-project-dialog.jsx';
@@ -55,9 +52,6 @@ import {
     renameProject,
     validateProject,
     listProjects,
-    cloneRegion,
-    cloneSection,
-    clonePerson,
     idbGetLastAppVersion,
     idbSetLastAppVersion,
     idbSaveTemporaryProject,
@@ -75,9 +69,6 @@ function createFreshState(user) {
         batchAddSectionId: null,
         batchAddSectionName: null,
         batchAddDialogOpen: false,
-        editRegionDialogOpen: false,
-        editSectionDialogOpen: false,
-        editMemberDialogOpen: false,
         projectOptionsDialogOpen: false,
         newProjectDialogOpen: false,
         showFirstLaunch: false,
@@ -123,10 +114,7 @@ class App extends Component {
         this.handleRequestedDeleteSection = this.handleRequestedDeleteSection.bind(this);
         this.handleRequestedDeleteMember = this.handleRequestedDeleteMember.bind(this);
         this.handleRequestedMoveRegion = this.handleRequestedMoveRegion.bind(this);
-        this.handleRequestedEditRegion = this.handleRequestedEditRegion.bind(this);
-        this.handleRequestedEditSection = this.handleRequestedEditSection.bind(this);
         this.handleRequestedSelectMember = this.handleRequestedSelectMember.bind(this);
-        this.handleRequestedEditMember = this.handleRequestedEditMember.bind(this);
         this.handleRequestedBatchAddMembers = this.handleRequestedBatchAddMembers.bind(this);
         this.handleAcceptedBatchAdd = this.handleAcceptedBatchAdd.bind(this);
         this.handleChangeProjectSetting = this.handleChangeProjectSetting.bind(this);
@@ -553,6 +541,11 @@ class App extends Component {
         if (event.target.name === 'project-settings') {
             newState.projectOptionsDialogOpen = true;
         }
+
+        if (event.target.name === 'roster') {
+            newState.rosterOpen = !this.state.rosterOpen;
+        }
+
         this.setState(newState, () => {
             if (this.state.user && saveNeeded) {
                 saveMetadata(this.state.user, this.state.projectName, Object.assign({},
@@ -677,13 +670,6 @@ class App extends Component {
         })
     }
 
-    handleRequestedEditRegion(regionId) {
-        this.setState({
-            editRegionDialogOpen: true,
-            editorId: regionId
-        })
-    }
-
     handleRequestedMoveRegion(regionId, direction) {
         const currentIndex = this.state.project.regions.findIndex(current => current.id === regionId);
         let destinationIndex = currentIndex;
@@ -708,24 +694,10 @@ class App extends Component {
         this.moveRegionToIndex(regionId, destinationIndex);
     }
 
-    handleRequestedEditSection(sectionId) {
-        this.setState({
-            editSectionDialogOpen: true,
-            editorId: sectionId
-        })
-    }
-
     handleRequestedSelectMember(memberId) {
         this.setState({
             editorId: memberId
         })
-    }
-
-    handleRequestedEditMember(memberId) {
-        this.setState({
-            editMemberDialogOpen: true,
-            editorId: memberId
-        });
     }
 
     /* DRAG AND DROP */
@@ -924,8 +896,7 @@ class App extends Component {
         this.setState({
             project: Object.assign({}, this.state.project, {
                 regions: newRegions
-            }),
-            editRegionDialogOpen: false
+            })
         }, () => {
             if (this.state.user) {
                 saveRegionEdits(this.state.user, this.state.projectName, updatedRegion);
@@ -947,8 +918,7 @@ class App extends Component {
         this.setState({
             project: Object.assign({}, this.state.project, {
                 sections: newSections
-            }),
-            editSectionDialogOpen: false
+            })
         }, () => {
             if (this.state.user) {
                 saveSectionEdits(this.state.user, this.state.projectName, updatedSection);
@@ -970,8 +940,7 @@ class App extends Component {
         this.setState({
             project: Object.assign({}, this.state.project, {
                 members: newMembers
-            }),
-            editMemberDialogOpen: false
+            })
         }, () => {
             if (this.state.user) {
                 saveMemberEdits(this.state.user, this.state.projectName, updatedMember);
@@ -1065,6 +1034,7 @@ class App extends Component {
             <Toolbar id='toolbar'
                 implicitSeatsVisible={this.state.project.settings.implicitSeatsVisible}
                 downstageTop={this.state.project.settings.downstageTop}
+                rosterOpen={this.state.rosterOpen}
                 onRequestRenameProject={this.handleAcceptRenameProject}
                 projectName={this.state.projectName}
                 onToolbarButtonClick={this.handleClickedToolbarButton} />
@@ -1080,25 +1050,27 @@ class App extends Component {
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestNewSection={this.handleClickedNewSectionButton} />
 
+            <Editor expanded={this.state.rosterOpen}
+                data={[...this.state.project.regions, ...this.state.project.sections, ...this.state.project.members].find(current => current.id === this.state.editorId)}
+                onEditRegion={this.handleAcceptRegionEdits}
+                onEditSection={this.handleAcceptSectionEdits}
+                onEditMember={this.handleAcceptMemberEdits} />
+
             <Roster id='roster'
                 editorId={this.state.editorId}
                 sections={this.state.project.sections}
                 members={this.state.project.members}
                 regions={this.state.project.regions}
                 expanded={this.state.rosterOpen}
-                onToggleVisibility={() => this.setState({ rosterOpen: !this.state.rosterOpen })}
                 onRequestNewSection={this.handleClickedNewSectionButton}
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}
                 onRequestBatchAdd={this.handleRequestedBatchAddMembers}
                 onRequestDeleteSection={this.handleRequestedDeleteSection}
-                onRequestEditSection={this.handleRequestedEditSection}
                 onRequestMoveRegion={this.handleRequestedMoveRegion}
-                onRequestEditRegion={this.handleRequestedEditRegion}
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
                 onRequestSelectMember={this.handleRequestedSelectMember}
-                onRequestEditMember={this.handleRequestedEditMember}
                 onRequestDeleteMember={this.handleRequestedDeleteMember} />
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
@@ -1109,30 +1081,6 @@ class App extends Component {
                 onRequestLogin={this.handleRequestLogin}
                 showFirstLaunch={this.state.showFirstLaunch}
                 user={this.state.user} />
-
-            <EditDialog open={this.state.editRegionDialogOpen}
-                title='Edit region'
-                editor={RegionEditor}
-                cloneFn={cloneRegion}
-                data={this.state.project.regions.find(current => current.id === this.state.editorId)}
-                onAccept={this.handleAcceptRegionEdits}
-                onCancel={() => this.setState({ editRegionDialogOpen: false })} />
-
-            <EditDialog open={this.state.editSectionDialogOpen}
-                title='Edit section'
-                editor={SectionEditor}
-                cloneFn={cloneSection}
-                data={this.state.project.sections.find(current => current.id === this.state.editorId)}
-                onAccept={this.handleAcceptSectionEdits}
-                onCancel={() => this.setState({ editSectionDialogOpen: false })} />
-
-            <EditDialog open={this.state.editMemberDialogOpen}
-                title='Edit section member'
-                editor={MemberEditor}
-                cloneFn={clonePerson}
-                data={this.state.project.members.find(current => current.id === this.state.editorId)}
-                onAccept={this.handleAcceptMemberEdits}
-                onCancel={() => this.setState({ editMemberDialogOpen: false })} />
 
             <BatchAddMembersDialog isOpen={this.state.batchAddDialogOpen}
                 onClose={() => this.setState({ batchAddDialogOpen: false })}

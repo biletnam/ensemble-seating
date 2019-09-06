@@ -2,6 +2,12 @@
     grid-area: toolbar;
 }
 
+@media screen and (max-width: 799px) {
+    #toolbar__toggle-roster-button {
+        display: none;
+    }
+}
+
 @media print {
     #toolbar {
         display: none !important;

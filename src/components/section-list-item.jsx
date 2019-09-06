@@ -17,7 +17,6 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 import PersonAddIcon from '../icons/baseline-person_add-24px.jsx';
 import GroupAddIcon from '../icons/baseline-group_add-24px.jsx';
 import DeleteIcon from '../icons/baseline-delete-24px.jsx';
-import EditIcon from '../icons/baseline-edit-24px.jsx';
 
 const editStyle = {marginLeft: 'auto'};
 
@@ -29,7 +28,6 @@ class SectionListItem extends PureComponent {
         this.handleClickedSectionMember = this.handleClickedSectionMember.bind(this);
         this.handleClickedSectionButton = this.handleClickedSectionButton.bind(this);
         this.handleClickedBatchAddMembers = this.handleClickedBatchAddMembers.bind(this);
-        this.handleClickedEditSection = this.handleClickedEditSection.bind(this);
         this.handleClickedDeleteSection = this.handleClickedDeleteSection.bind(this);
     }
 
@@ -53,10 +51,6 @@ class SectionListItem extends PureComponent {
             this.props.onRequestBatchAdd(this.props.data.id);
     }
 
-    handleClickedEditSection() {
-        this.props.onRequestEditSection(this.props.data.id);
-    }
-
     handleClickedDeleteSection() {
         this.props.onRequestDeleteSection(this.props.data.id);
     }
@@ -77,7 +71,6 @@ class SectionListItem extends PureComponent {
                                     <ColorSquare color={this.props.data.color} />
                                     {this.props.data.id === this.props.editorId && <React.Fragment>
                                         <IconButton onClick={this.handleClickedDeleteSection} icon={<DeleteIcon />} label='Delete section' style={editStyle} />
-                                        <IconButton onClick={this.handleClickedEditSection} icon={<EditIcon />} label='Edit section' />
                                     </React.Fragment>}
                                 </ListItem>
 

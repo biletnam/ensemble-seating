@@ -4,10 +4,6 @@
     border-top: 1px solid #aaa
 }
 
-.roster__toggle-button {
-    display: none;
-}
-
 @media screen and (min-width: 800px) {
     #roster {
         border-top: none;
@@ -37,35 +33,6 @@
         overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
     }
-
-    .roster__toggle-button {
-        display: inline-flex;
-        position: absolute;
-        top: 1em;
-        right: 100%;
-        width: 3em;
-        height: 3em;
-        align-items: center;
-        justify-content: center;
-        -webkit-appearance: none;
-        background-color: transparent;
-        border: 1px solid #aaa;
-        border-top-left-radius: .25em;
-        border-bottom-left-radius: .25em;
-        transition: background-color .1s ease;
-    }
-
-    .roster__toggle-button:hover {
-        background-color: rgba(0, 0, 0, .05);
-    }
-
-    .roster__toggle-button:active {
-        background-color: rgba(0, 0, 0, .1);
-    }
-
-    .roster__toggle-button:focus {
-        outline: 0;
-    }
 }
 
 .roster__no-sections-message {
@@ -87,6 +54,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 48px;
+}
+
+.roster__region-heading-container--selected {
+    background-color: lightblue;
 }
 
 .roster__region-heading-text {

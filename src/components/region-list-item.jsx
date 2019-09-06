@@ -35,9 +35,7 @@ class RegionListItem extends PureComponent {
     }
 
     handleActionMenuClick(action) {
-        if (action === 'edit' && typeof this.props.onRequestEditRegion === 'function')
-            this.props.onRequestEditRegion(this.props.region.id);
-        else if (action === 'delete' && typeof this.props.onRequestDeleteRegion === 'function')
+        if (action === 'delete' && typeof this.props.onRequestDeleteRegion === 'function')
             this.props.onRequestDeleteRegion(this.props.region.id);
         else if (typeof this.props.onRequestMoveRegion === 'function') {
             const splitAction = action.split('-');
@@ -60,15 +58,15 @@ class RegionListItem extends PureComponent {
                     {/* Iterate over sections here */}
                     <Elevation z='1'
                         style={{zIndex: this.state.actionMenuOpen ? '2' : ''}}
-                        className='roster__region-heading-container'>
+                        className={`roster__region-heading-container${this.props.editorId == this.props.region.id ? ' roster__region-heading-container--selected' : ''}`}
+                        onClick={() => this.props.onRequestSelectMember(this.props.region.id)}>
                         <span className='roster__region-heading-text'>{this.props.region.name}</span>
-                        <ListActionMenu
+                        {this.props.showEditAndDeleteControls && <ListActionMenu
                             onSelectAction={this.handleActionMenuClick}
                             open={this.state.actionMenuOpen}
-                            onClose={this.handleRequestCloseActionMenu}
-                            showEditAndDeleteControls={this.props.showEditAndDeleteControls}>
+                            onClose={this.handleRequestCloseActionMenu}>
                             <IconButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
-                        </ListActionMenu>
+                        </ListActionMenu>}
                     </Elevation>
                     {this.props.sections.map((currentSection, currentIndex) => {
                         return <SectionListItem key={currentSection.id}

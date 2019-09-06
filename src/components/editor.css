@@ -1,0 +1,54 @@
+#editor {
+    grid-area: editor;
+    display: flex;
+    flex-direction: column;
+}
+
+#editor__title, #editor__content {
+    padding: 1rem;
+    margin: 0;
+}
+
+#editor__title {
+    background-color: #efefef;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 48px;
+    font-weight: lighter;
+    z-index: 1;
+    position: sticky;
+    top: 0;
+}
+
+@media screen and (min-width: 800px) {
+    #editor {
+        margin: 1em 0 1em 1em;
+        border: 1px solid #ccc;
+        border-right: none;
+        transition: transform .15s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    #editor__title {
+        position: static;
+    }
+
+    #editor__content {
+        flex-grow: 1;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .editor--collapsed {
+        transform: translateX(calc(200% + 2em));
+    }
+}
+
+@media print {
+    #editor {
+        display: none !important;
+    }
+}

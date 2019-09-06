@@ -123,22 +123,22 @@ class SectionEditor extends PureComponent {
     }
 
     render() {
-        return <div>
-            {this.props.data && <React.Fragment>
+        const {data, ...rest} = this.props;
+        return <div {...rest}>
+            {data && <React.Fragment>
                 <div>
-                    <h2>Name</h2>
-                    <TextField name='name' data-setting-type='name' value={this.props.data.name} onChange={this.handleChange} />
+                    <TextField label='Name' name='name' data-setting-type='name' value={data.name} onChange={this.handleChange} />
                 </div>
                 
                 <div>
                     <h2>Color</h2>
-                    <TwitterPicker color={this.props.data.color} onChange={this.handleColorChange} />
+                    <TwitterPicker color={data.color} onChange={this.handleColorChange} />
                 </div>
                 
                 <div>
                     <h2>Performers per row</h2>
                     <p>Pick how many performers may be seated within each row of this section.</p>
-                {this.props.data.rowSettings.map((current, index) => <div key={index + '-rowSettings'} className='text-input-wrapper'>
+                {data.rowSettings.map((current, index) => <div key={index + '-rowSettings'} className='text-input-wrapper'>
                     <TextField label={`Row ${index + 1}`} data-row={index} data-setting-type='rowSettings' value={current} onChange={this.handleChange} onBlur={this.handleRowBlur} />
                     <IconButton icon={<ClearIcon />} label='Remove row' onClick={this.handleClickedRemoveRow} data-row={index} />
                 </div>)}
@@ -153,21 +153,21 @@ class SectionEditor extends PureComponent {
                         <Radio value='first-row' name='offsetType'
                             data-setting-type='offsetType'
                             onChange={this.handleChange}
-                            checked={this.props.data.offsetType === 'first-row'}>Front of ensemble</Radio><br />
+                            checked={data.offsetType === 'first-row'}>Front of ensemble</Radio><br />
                         <Radio value='custom-row' name='offsetType'
                             data-setting-type='offsetType'
                             onChange={this.handleChange}
-                            checked={this.props.data.offsetType === 'custom-row'}>Start on row:</Radio><br />
-                        <TextField pattern='\d+' disabled={this.props.data.offsetType !== 'custom-row'}
+                            checked={data.offsetType === 'custom-row'}>Start on row:</Radio><br />
+                        <TextField pattern='\d+' disabled={data.offsetType !== 'custom-row'}
                             data-setting-type='offsetValue'
                             onChange={this.handleChange}
                             onBlur={this.handleRowBlur}
-                            value={this.props.data.offsetValue} /><br />
+                            value={data.offsetValue} /><br />
 
                         <Radio value='last-row' name='offsetType'
                             data-setting-type='offsetType'
                             onChange={this.handleChange}
-                            checked={this.props.data.offsetType === 'last-row'}>Back of ensemble</Radio>
+                            checked={data.offsetType === 'last-row'}>Back of ensemble</Radio>
                     </div>
                 </div>
             </React.Fragment>}

@@ -522,6 +522,18 @@ export function createPerson (name = 'New person', sectionId = null) {
     }
 }
 
+export function isRegion (obj) {
+    return JSON.stringify(Object.keys(obj).sort()) == JSON.stringify(Object.keys(createRegion()).sort());
+}
+
+export function isSection (obj) {
+    return JSON.stringify(Object.keys(obj).sort()) == JSON.stringify(Object.keys(createSection()).sort());
+}
+
+export function isMember (obj) {
+    return JSON.stringify(Object.keys(obj).sort()) == JSON.stringify(Object.keys(createPerson()).sort());
+}
+
 /* Clone types */
 
 export function cloneRegion (region) {
