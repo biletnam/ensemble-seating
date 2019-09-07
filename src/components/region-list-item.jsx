@@ -43,7 +43,8 @@ class RegionListItem extends PureComponent {
         }
     }
 
-    handleRequestToggleActionMenu() {
+    handleRequestToggleActionMenu(event) {
+        event.stopPropagation();
         this.setState({actionMenuOpen: !this.state.actionMenuOpen})
     }
 
@@ -57,7 +58,6 @@ class RegionListItem extends PureComponent {
                 <div ref={provided.innerRef} {...provided.droppableProps} className='roster__droppable-section-area'>
                     {/* Iterate over sections here */}
                     <Elevation z='1'
-                        style={{zIndex: this.state.actionMenuOpen ? '2' : ''}}
                         className={`roster__region-heading-container${this.props.editorId == this.props.region.id ? ' roster__region-heading-container--selected' : ''}`}
                         onClick={() => this.props.onRequestSelectMember(this.props.region.id)}>
                         <span className='roster__region-heading-text'>{this.props.region.name}</span>

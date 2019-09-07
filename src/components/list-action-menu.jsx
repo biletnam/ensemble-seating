@@ -24,7 +24,7 @@ class ListActionMenu extends PureComponent {
     render() {
         const { onSelectAction, showEditAndDeleteControls, ...props } = this.props;
         return <MenuSurfaceAnchor>
-            <Menu {...props}>
+            <Menu {...props} hoistToBody>
                 <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-to-top'>Move to top</MenuItem>
                 <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-up'>Move up</MenuItem>
                 <MenuItem onClick={this.handleClick} className='list-action-menu__item' data-action-type='move-down'>Move down</MenuItem>
