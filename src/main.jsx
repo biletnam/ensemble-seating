@@ -397,7 +397,6 @@ class App extends Component {
             project: Object.assign({}, this.state.project, {
                 members: this.state.project.members.slice().concat(newMembers)
             }),
-            editorId: newMembers[newMembers.length - 1].id,
             batchAddDialogOpen: false
         }), () => {
             if (this.state.user) {
@@ -579,8 +578,7 @@ class App extends Component {
         }
 
         this.setState(Object.assign({}, {
-            project: Object.assign({}, this.state.project, {sections: sections, regions: regions}),
-            editorId: sections[sections.length - 1].id
+            project: Object.assign({}, this.state.project, {sections: sections, regions: regions})
         }), () => {
             if (this.state.user) {
                 saveSectionOrder(this.state.user, this.state.projectName, this.state.project.sections.map(current => current.id));
@@ -600,7 +598,6 @@ class App extends Component {
     handleRequestedBatchAddMembers(sectionId) {
         const requestedSection = this.state.project.sections.find(current => current.id === sectionId);
         this.setState({
-            editorId: sectionId,
             batchAddSectionId: sectionId,
             batchAddSectionName: requestedSection.name,
             batchAddDialogOpen: true
