@@ -23,13 +23,8 @@ class MemberEditor extends PureComponent {
             this.props.onRequestEdit(this.props.data.id, newData);
     }
 
-    handleClickedDelete() {
-        if (this.props.onRequestDelete)
-            this.props.onRequestDelete(this.props.data.id);
-    }
-
     render() {
-        const {data, ...rest} = this.props;
+        const {data, onRequestEdit, ...rest} = this.props;
         return <div {...rest}>
             {data && <React.Fragment>
                 <div>

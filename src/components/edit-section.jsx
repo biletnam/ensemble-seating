@@ -25,7 +25,6 @@ class SectionEditor extends PureComponent {
         this.handleColorChange = this.handleColorChange.bind(this);
         this.handleRowBlur = this.handleRowBlur.bind(this);
         this.handleClickedAddRow = this.handleClickedAddRow.bind(this);
-        this.handleRequestedDelete = this.handleRequestedDelete.bind(this);
         this.handleClickedRemoveRow = this.handleClickedRemoveRow.bind(this);
     }
 
@@ -96,11 +95,6 @@ class SectionEditor extends PureComponent {
         }
     }
 
-    handleRequestedDelete() {
-        if (this.props.onRequestDelete)
-            this.props.onRequestDelete(this.props.data.id);
-    }
-
     handleClickedAddRow(event) {
         const saveData = {};
         saveData['rowSettings'] = this.props.data['rowSettings'].slice();
@@ -123,7 +117,7 @@ class SectionEditor extends PureComponent {
     }
 
     render() {
-        const {data, ...rest} = this.props;
+        const {data, onRequestEdit, ...rest} = this.props;
         return <div {...rest}>
             {data && <React.Fragment>
                 <div>

@@ -1052,6 +1052,9 @@ class App extends Component {
                 onEditRegion={this.handleAcceptRegionEdits}
                 onEditSection={this.handleAcceptSectionEdits}
                 onEditMember={this.handleAcceptMemberEdits}
+                onRequestDeleteRegion={this.handleRequestedDeleteRegion}
+                onRequestDeleteSection={this.handleRequestedDeleteSection}
+                onRequestDeleteMember={this.handleRequestedDeleteMember}
                 onClickedBack={() => this.setState({editorId: null})} />}
             
             {!this.state.editorId && <Roster id='roster'

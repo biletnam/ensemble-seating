@@ -18,7 +18,16 @@ function getEditorType(data) {
 }
 
 const Editor = props => {
-    let { data, ...rest } = props;
+    let { 
+        data,
+        onEditRegion,
+        onEditSection,
+        onEditMember,
+        onRequestDeleteRegion,
+        onRequestDeleteSection,
+        onRequestDeleteMember,
+        ...rest 
+    } = props;
 
     const type = getEditorType(data);
 
@@ -32,14 +41,23 @@ const Editor = props => {
 
     function handleEdit(editorId, newData) {
         if (type == 'region')
-            props.onEditRegion(editorId, newData);
+            onEditRegion(editorId, newData);
         else if (type == 'section')
-            props.onEditSection(editorId, newData);
+            onEditSection(editorId, newData);
         else if (type == 'member')
-            props.onEditMember(editorId, newData);
+            onEditMember(editorId, newData);
     }
 
-    return <Sidebar {...rest} id='editor' title={type ? `Edit ${type}` : `Editor`}>
+    function handleDelete() {
+        if (type == 'region')
+            onRequestDeleteRegion(data.id);
+        else if (type == 'section')
+            onRequestDeleteSection(data.id);
+        else if (type == 'member')
+            onRequestDeleteMember(data.id);
+    }
+
+    return <Sidebar {...rest} id='editor' title={type ? `Edit ${type}` : `Editor`} onClickedDelete={handleDelete}>
         {Control && <Control onRequestEdit={handleEdit} data={data} id='editor__content' />}
         {!Control && <p id='editor__content'>Select a region, section, or section member to edit their details</p>}
     </Sidebar>

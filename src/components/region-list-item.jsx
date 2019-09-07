@@ -3,10 +3,12 @@ import React, { PureComponent } from 'react';
 import { IconButton } from '@rmwc/icon-button';
 import { Button, ButtonIcon } from '@rmwc/button';
 import { Elevation } from '@rmwc/elevation';
+import { Ripple } from '@rmwc/ripple';
 
 import '@material/icon-button/dist/mdc.icon-button.min.css';
 import '@material/button/dist/mdc.button.min.css';
 import '@material/elevation/dist/mdc.elevation.min.css';
+import '@material/ripple/dist/mdc.ripple.min.css';
 
 import ListActionMenu from './list-action-menu.jsx';
 import SectionListItem from './section-list-item.jsx';
@@ -57,6 +59,7 @@ class RegionListItem extends PureComponent {
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className='roster__droppable-section-area'>
                     {/* Iterate over sections here */}
+                    <Ripple>
                     <Elevation z='1'
                         className={`roster__region-heading-container${this.props.editorId == this.props.region.id ? ' roster__region-heading-container--selected' : ''}`}
                         onClick={() => this.props.onRequestSelectMember(this.props.region.id)}>
@@ -67,7 +70,7 @@ class RegionListItem extends PureComponent {
                             onClose={this.handleRequestCloseActionMenu}>
                             <IconButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
                         </ListActionMenu>}
-                    </Elevation>
+                    </Elevation></Ripple>
                     {this.props.sections.map((currentSection, currentIndex) => {
                         return <SectionListItem key={currentSection.id}
                             editorId={this.props.editorId}

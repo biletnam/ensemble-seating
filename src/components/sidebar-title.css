@@ -13,3 +13,7 @@
 .sidebar-title__back-button {
     margin-left: calc(-1 * var(--sidebar-padding));
 }
+
+.sidebar-title__delete-button {
+    margin-left: auto;
+}
