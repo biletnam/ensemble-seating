@@ -34,7 +34,7 @@ class RegionEditor extends PureComponent {
     }
 
     render() {
-        const {data, ...rest} = this.props;
+        const {data, onRequestEdit, ...rest} = this.props;
         return <div {...rest}>
             {data && <React.Fragment>
                 <div className='text-input-wrapper'>

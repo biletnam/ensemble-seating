@@ -5,10 +5,10 @@ import './sidebar.css';
 import SidebarTitle from './sidebar-title.jsx';
 
 const Sidebar = props => {
-    const { title, onClickedBack, children, ...rest } = props;
+    const { title, onClickedBack, expanded, children, ...rest } = props;
     let className = 'sidebar';
 
-    if (!props.expanded)
+    if (!expanded)
         className += ` sidebar--collapsed`;
 
     return <aside {...rest} className={className}>
