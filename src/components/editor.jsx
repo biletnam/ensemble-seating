@@ -1,11 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import './editor.css';
-
-import { Elevation } from '@rmwc/elevation';
+import React from 'react';
 
 import RegionEditor from './edit-region.jsx';
 import SectionEditor from './edit-section.jsx';
 import MemberEditor from './edit-member.jsx';
+import Sidebar from './sidebar.jsx';
 import { isRegion, isSection, isMember } from '../helpers/project-helpers';
 
 function getEditorType(data) {
@@ -20,7 +18,9 @@ function getEditorType(data) {
 }
 
 const Editor = props => {
-    const type = getEditorType(props.data);
+    let { data, ...rest } = props;
+
+    const type = getEditorType(data);
 
     let Control;
     if (type == 'region')
@@ -39,11 +39,10 @@ const Editor = props => {
             props.onEditMember(editorId, newData);
     }
 
-    return <div id='editor' className={`${props.expanded ? '' : ' editor--collapsed'}`}>
-        <Elevation z='1' tag='h2' id='editor__title'>{type ? `Edit ${type}` : `Editor`}</Elevation>
-        {Control && <Control onRequestEdit={handleEdit} data={props.data} id='editor__content' />}
+    return <Sidebar {...rest} id='editor' title={type ? `Edit ${type}` : `Editor`}>
+        {Control && <Control onRequestEdit={handleEdit} data={data} id='editor__content' />}
         {!Control && <p id='editor__content'>Select a region, section, or section member to edit their details</p>}
-    </div>
+    </Sidebar>
 }
 
 export default Editor;

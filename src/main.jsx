@@ -1050,13 +1050,14 @@ class App extends Component {
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestNewSection={this.handleClickedNewSectionButton} />
 
-            <Editor expanded={this.state.rosterOpen}
+            {this.state.editorId && <Editor expanded={this.state.rosterOpen}
                 data={[...this.state.project.regions, ...this.state.project.sections, ...this.state.project.members].find(current => current.id === this.state.editorId)}
                 onEditRegion={this.handleAcceptRegionEdits}
                 onEditSection={this.handleAcceptSectionEdits}
-                onEditMember={this.handleAcceptMemberEdits} />
-
-            <Roster id='roster'
+                onEditMember={this.handleAcceptMemberEdits}
+                onClickedBack={() => this.setState({editorId: null})} />}
+            
+            {!this.state.editorId && <Roster id='roster'
                 editorId={this.state.editorId}
                 sections={this.state.project.sections}
                 members={this.state.project.members}
@@ -1071,7 +1072,7 @@ class App extends Component {
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
                 onRequestSelectMember={this.handleRequestedSelectMember}
-                onRequestDeleteMember={this.handleRequestedDeleteMember} />
+                onRequestDeleteMember={this.handleRequestedDeleteMember} />}
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
                 onSelectTemplate={this.handleSelectNewProjectTemplate}
