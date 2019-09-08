@@ -18,7 +18,6 @@ const Roster = props => {
         onRequestBatchAdd,
         onRequestDeleteRegion,
         onRequestMoveRegion,
-        onRequestDeleteSection,
         onRequestSelectMember,
         ...rest
     } = props;
