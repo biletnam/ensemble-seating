@@ -1,0 +1,8 @@
+.integer-input {
+    display: flex;
+    align-items: center;
+}
+
+.integer-input__text-field {
+    flex-grow: 1;
+}
