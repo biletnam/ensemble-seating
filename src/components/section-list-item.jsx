@@ -4,7 +4,7 @@ import { IconButton } from '@rmwc/icon-button';
 import { ListItem, ListGroup } from '@rmwc/list';
 import { Elevation } from '@rmwc/elevation';
 
-import SectionMember from './section-member.jsx';
+import SectionMember from './member-list-item.jsx';
 import ColorSquare from './color-square.jsx';
 
 import '@material/textfield/dist/mdc.textfield.min.css';

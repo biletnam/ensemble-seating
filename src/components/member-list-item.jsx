@@ -11,7 +11,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import DeleteIcon from '../icons/baseline-delete-24px.jsx';
 import EditIcon from '../icons/baseline-edit-24px.jsx';
 
-class SectionMember extends PureComponent {
+class MemberListItem extends PureComponent {
     constructor(props) {
         super(props);
 
@@ -60,4 +60,4 @@ class SectionMember extends PureComponent {
     }
 }
 
-export default SectionMember;
+export default MemberListItem;
