@@ -114,7 +114,7 @@ export function saveProject(user, project, name) {
             const members = [];
             for (const member of project.members) {
                 members.push(member.id);
-                promises.push(saveMemberEdits(user, project, member));
+                promises.push(saveMemberEdits(user, name, member));
             }
 
             promises.push(
