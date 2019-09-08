@@ -10,7 +10,6 @@ class MemberEditor extends PureComponent {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
-        this.handleClickedDelete = this.handleClickedDelete.bind(this);
     }
 
     handleChange(event) {
