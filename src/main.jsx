@@ -1052,7 +1052,7 @@ class App extends Component {
                 onEditRegion={this.handleAcceptRegionEdits}
                 onEditSection={this.handleAcceptSectionEdits}
                 onEditMember={this.handleAcceptMemberEdits}
-                onRequestDeleteRegion={this.handleRequestedDeleteRegion}
+                onRequestDeleteRegion={this.state.project.regions.length > 1 && this.handleRequestedDeleteRegion}
                 onRequestDeleteSection={this.handleRequestedDeleteSection}
                 onRequestDeleteMember={this.handleRequestedDeleteMember}
                 onClickedBack={() => this.setState({editorId: null})} />}
