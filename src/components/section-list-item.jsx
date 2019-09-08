@@ -25,7 +25,6 @@ class SectionListItem extends PureComponent {
         this.handleClickedMemberListItem = this.handleClickedMemberListItem.bind(this);
         this.handleClickedSectionButton = this.handleClickedSectionButton.bind(this);
         this.handleClickedBatchAddMembers = this.handleClickedBatchAddMembers.bind(this);
-        this.handleClickedDeleteSection = this.handleClickedDeleteSection.bind(this);
     }
 
     handleClickedNewPersonButton() {
@@ -46,10 +45,6 @@ class SectionListItem extends PureComponent {
     handleClickedBatchAddMembers() {
         if (this.props.onRequestBatchAdd)
             this.props.onRequestBatchAdd(this.props.data.id);
-    }
-
-    handleClickedDeleteSection() {
-        this.props.onRequestDeleteSection(this.props.data.id);
     }
 
     render() {
