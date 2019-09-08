@@ -10,7 +10,6 @@ import RegionListItem from './region-list-item.jsx';
 const Roster = props => {
     const {
         onDragEnd,
-        editorId,
         regions,
         sections,
         members,
@@ -20,7 +19,6 @@ const Roster = props => {
         onRequestDeleteRegion,
         onRequestMoveRegion,
         onRequestDeleteSection,
-        onRequestDeleteMember,
         onRequestSelectMember,
         ...rest
     } = props;
@@ -29,7 +27,6 @@ const Roster = props => {
         <DragDropContext onDragEnd={onDragEnd}>
             {regions.map(currentRegion => <RegionListItem
                 key={currentRegion.id}
-                editorId={editorId}
                 region={currentRegion}
                 sections={sections.filter(currentSection => currentSection.region === currentRegion.id)}
                 members={members}
@@ -41,8 +38,6 @@ const Roster = props => {
 
                 onRequestDeleteRegion={onRequestDeleteRegion}
                 onRequestMoveRegion={onRequestMoveRegion}
-                onRequestDeleteSection={onRequestDeleteSection}
-                onRequestDeleteMember={onRequestDeleteMember}
 
                 onRequestSelectMember={onRequestSelectMember} />
             )}

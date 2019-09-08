@@ -35,10 +35,6 @@
     min-height: 48px;
 }
 
-.roster__region-heading-container--selected {
-    background-color: lightblue;
-}
-
 .roster__region-heading-text {
     white-space: nowrap;
     overflow: hidden;

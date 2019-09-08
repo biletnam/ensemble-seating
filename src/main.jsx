@@ -1058,7 +1058,6 @@ class App extends Component {
                 onClickedBack={() => this.setState({editorId: null})} />}
             
             {!this.state.editorId && <Roster id='roster'
-                editorId={this.state.editorId}
                 sections={this.state.project.sections}
                 members={this.state.project.members}
                 regions={this.state.project.regions}
@@ -1067,12 +1066,10 @@ class App extends Component {
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}
                 onRequestBatchAdd={this.handleRequestedBatchAddMembers}
-                onRequestDeleteSection={this.handleRequestedDeleteSection}
                 onRequestMoveRegion={this.handleRequestedMoveRegion}
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
-                onRequestSelectMember={this.handleRequestedSelectMember}
-                onRequestDeleteMember={this.handleRequestedDeleteMember} />}
+                onRequestSelectMember={this.handleRequestedSelectMember} />}
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
                 onSelectTemplate={this.handleSelectNewProjectTemplate}

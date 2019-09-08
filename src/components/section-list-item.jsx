@@ -4,7 +4,7 @@ import { IconButton } from '@rmwc/icon-button';
 import { ListItem, ListGroup } from '@rmwc/list';
 import { Elevation } from '@rmwc/elevation';
 
-import SectionMember from './member-list-item.jsx';
+import MemberListItem from './member-list-item.jsx';
 import ColorSquare from './color-square.jsx';
 
 import '@material/textfield/dist/mdc.textfield.min.css';
@@ -16,16 +16,13 @@ import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 import PersonAddIcon from '../icons/baseline-person_add-24px.jsx';
 import GroupAddIcon from '../icons/baseline-group_add-24px.jsx';
-import DeleteIcon from '../icons/baseline-delete-24px.jsx';
-
-const editStyle = {marginLeft: 'auto'};
 
 class SectionListItem extends PureComponent {
     constructor(props) {
         super(props);
 
         this.handleClickedNewPersonButton = this.handleClickedNewPersonButton.bind(this);
-        this.handleClickedSectionMember = this.handleClickedSectionMember.bind(this);
+        this.handleClickedMemberListItem = this.handleClickedMemberListItem.bind(this);
         this.handleClickedSectionButton = this.handleClickedSectionButton.bind(this);
         this.handleClickedBatchAddMembers = this.handleClickedBatchAddMembers.bind(this);
         this.handleClickedDeleteSection = this.handleClickedDeleteSection.bind(this);
@@ -36,7 +33,7 @@ class SectionListItem extends PureComponent {
             this.props.onRequestNewPerson(this.props.data.id);
     }
 
-    handleClickedSectionMember(memberId) {
+    handleClickedMemberListItem(memberId) {
         if (this.props.onRequestSelectMember)
             this.props.onRequestSelectMember(memberId);
     }
@@ -66,12 +63,9 @@ class SectionListItem extends PureComponent {
                         {...provided.draggableProps}>
                         <Elevation z={1}>
                             <ListGroup>
-                                <ListItem {...provided.dragHandleProps} key={this.props.data.id} onClick={this.handleClickedSectionButton} selected={this.props.data.id === this.props.editorId}>
+                                <ListItem {...provided.dragHandleProps} key={this.props.data.id} onClick={this.handleClickedSectionButton}>
                                     <p>{this.props.data.name}</p>
                                     <ColorSquare color={this.props.data.color} />
-                                    {this.props.data.id === this.props.editorId && <React.Fragment>
-                                        <IconButton onClick={this.handleClickedDeleteSection} icon={<DeleteIcon />} label='Delete section' style={editStyle} />
-                                    </React.Fragment>}
                                 </ListItem>
 
                                 <Droppable droppableId={this.props.data.id} type='member'>
@@ -79,13 +73,10 @@ class SectionListItem extends PureComponent {
                                         <div ref={provided.innerRef} {...provided.droppableProps}>
                                             {/* Individual performers */}
                                             {this.props.members.map((person, personIndex) => {
-                                                return <SectionMember key={person.id} 
+                                                return <MemberListItem key={person.id} 
                                                     index={personIndex} 
                                                     data={person}
-                                                    onClick={this.handleClickedSectionMember}
-                                                    selected={person.id === this.props.editorId}
-                                                    onRequestEditMember={this.props.onRequestEditMember}
-                                                    onRequestDeleteMember={this.props.onRequestDeleteMember} />
+                                                    onClick={this.handleClickedMemberListItem} />
                                             })}
                                             
                                             {provided.placeholder}

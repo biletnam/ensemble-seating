@@ -61,7 +61,7 @@ class RegionListItem extends PureComponent {
                     {/* Iterate over sections here */}
                     <Ripple>
                     <Elevation z='1'
-                        className={`roster__region-heading-container${this.props.editorId == this.props.region.id ? ' roster__region-heading-container--selected' : ''}`}
+                        className='roster__region-heading-container'
                         onClick={() => this.props.onRequestSelectMember(this.props.region.id)}>
                         <span className='roster__region-heading-text'>{this.props.region.name}</span>
                         {this.props.showEditAndDeleteControls && <ListActionMenu
@@ -73,20 +73,11 @@ class RegionListItem extends PureComponent {
                     </Elevation></Ripple>
                     {this.props.sections.map((currentSection, currentIndex) => {
                         return <SectionListItem key={currentSection.id}
-                            editorId={this.props.editorId}
                             data={currentSection}
                             index={currentIndex}
                             members={this.props.members.filter(currentMember => currentMember.section === currentSection.id)}
                             onRequestNewPerson={this.props.onRequestNewPerson}
                             onRequestBatchAdd={this.props.onRequestBatchAdd}
-
-                            // To do: update other components so the editor dialog is shown
-                            onRequestEditSection={this.props.onRequestEditSection}
-                            onRequestEditMember={this.props.onRequestEditMember}
-
-                            onRequestDeleteSection={this.props.onRequestDeleteSection}
-                            onRequestDeleteMember={this.props.onRequestDeleteMember}
-
                             onRequestSelectMember={this.props.onRequestSelectMember} />
                     })}
                     
