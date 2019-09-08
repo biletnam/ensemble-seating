@@ -10,10 +10,11 @@
 
 @media screen and (min-width: 800px) {
     .sidebar {
+        --sidebar-transition-duration: .15s;
         border-top: none;
         border-left: 1px solid #aaa;
         position: relative;
-        transition: transform .15s ease-in-out;
+        transition: transform var(--sidebar-transition-duration) ease-in-out, visibility 0s linear 0s;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -21,6 +22,8 @@
 
     .sidebar--collapsed {
         transform: translateX(100%);
+        transition-delay: 0s, var(--sidebar-transition-duration);
+        visibility: hidden;
     }
 
     .sidebar__scrollable-container {

@@ -1,6 +1,7 @@
 .inline-input {
     -webkit-appearance: none;
     border: none;
+    border-radius: 0;
     outline: none;
     color: currentColor;
     background-color: transparent;
