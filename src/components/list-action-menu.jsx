@@ -17,6 +17,7 @@ class ListActionMenu extends PureComponent {
     }
 
     handleClick(event) {
+        event.stopPropagation();
         if (typeof this.props.onSelectAction === 'function')
             this.props.onSelectAction(event.target.dataset.actionType);
     }

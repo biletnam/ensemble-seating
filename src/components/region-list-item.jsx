@@ -43,6 +43,7 @@ class RegionListItem extends PureComponent {
             const splitAction = action.split('-');
             this.props.onRequestMoveRegion(this.props.region.id, splitAction[splitAction.length - 1]);
         }
+        this.setState({actionMenuOpen: false});
     }
 
     handleRequestToggleActionMenu(event) {
