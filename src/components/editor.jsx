@@ -57,9 +57,8 @@ const Editor = props => {
             onRequestDeleteMember(data.id);
     }
 
-    return <Sidebar {...rest} id='editor' title={type ? `Edit ${type}` : `Editor`} onClickedDelete={!(type == 'region' && !onRequestDeleteRegion) && handleDelete}>
+    return <Sidebar {...rest} id='editor' title={`Edit ${type == 'member' ? 'section member' : type}`} onClickedDelete={!(type == 'region' && !onRequestDeleteRegion) && handleDelete}>
         {Control && <Control onRequestEdit={handleEdit} data={data} id='editor__content' />}
-        {!Control && <p id='editor__content'>Select a region, section, or section member to edit their details</p>}
     </Sidebar>
 }
 
