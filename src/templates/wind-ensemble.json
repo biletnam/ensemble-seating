@@ -1,0 +1,195 @@
+{
+    "regions": [
+        {
+            "name": "Wind ensemble",
+            "id": "region-1",
+            "curvedLayout": true,
+            "angle": 100
+        }
+    ],
+    "sections": [
+        {
+            "name": "Clarinet",
+            "color": "#b5deff",
+            "id": "section-1",
+            "region": "region-1",
+            "offsetType": "first-row",
+            "offsetValue": 0,
+            "rowSettings": [3]
+        },
+        {
+            "name": "Piccolo",
+            "color": "#90f78c",
+            "id": "section-2",
+            "region": "region-1",
+            "offsetType": "first-row",
+            "offsetValue": 0,
+            "rowSettings": [1]
+        },
+        {
+            "name": "Flute 1",
+            "color": "#727ef9",
+            "id": "section-3",
+            "region": "region-1",
+            "offsetType": "first-row",
+            "offsetValue": 0,
+            "rowSettings": [2]
+        },
+        {
+            "name": "Flute 2",
+            "color": "#8cf2a0",
+            "id": "section-4",
+            "region": "region-1",
+            "offsetType": "first-row",
+            "offsetValue": 0,
+            "rowSettings": [3]
+        },
+        {
+            "name": "Clarinet 3",
+            "color": "#f293da",
+            "id": "section-5",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 2,
+            "rowSettings": [3]
+        },
+        {
+            "name": "Clarinet 2",
+            "color": "#76fcea",
+            "id": "section-6",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 2,
+            "rowSettings": [3]
+        },
+        {
+            "name": "English Horn",
+            "color": "#ffb6a5",
+            "id": "section-7",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 2,
+            "rowSettings": [1]
+        },
+        {
+            "name": "Oboe 2",
+            "color": "#ffc5aa",
+            "id": "section-8",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 2,
+            "rowSettings": [2]
+        },
+        {
+            "name": "French Horn",
+            "color": "#f9e8b8",
+            "id": "section-9",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 3,
+            "rowSettings": [4]
+        },
+        {
+            "name": "Alto Sax",
+            "color": "#a2fc94",
+            "id": "section-10",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 3,
+            "rowSettings": [3]
+        },
+        {
+            "name": "Tenor Sax",
+            "color": "#fc76ae",
+            "id": "section-11",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 3,
+            "rowSettings": [2]
+        },
+        {
+            "name": "Bari Sax",
+            "color": "#aefce2",
+            "id": "section-12",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 3,
+            "rowSettings": [1]
+        },
+        {
+            "name": "Trumpet",
+            "color": "#f7b8a3",
+            "id": "section-13",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 4,
+            "rowSettings": [2]
+        },
+        {
+            "name": "Cornet",
+            "color": "#ff77dd",
+            "id": "section-14",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 4,
+            "rowSettings": [5]
+        },
+        {
+            "name": "Euphonium",
+            "color": "#68d6e2",
+            "id": "section-15",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 4,
+            "rowSettings": [2]
+        },
+        {
+            "name": "Bass Clarinet",
+            "color": "#ddf492",
+            "id": "section-16",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 4,
+            "rowSettings": [2]
+        },
+        {
+            "name": "Bassoon",
+            "color": "#f79ed5",
+            "id": "section-17",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 4,
+            "rowSettings": [2]
+        },
+        {
+            "name": "Trombone",
+            "color": "#ffb5d0",
+            "id": "section-18",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 5,
+            "rowSettings": [4]
+        },
+        {
+            "name": "Tuba",
+            "color": "#ffddc1",
+            "id": "section-19",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 5,
+            "rowSettings": [3]
+        }
+    ],
+    "members": [],
+    "settings": {
+        "seatNameLabels": "initials",
+        "downstageTop": false,
+        "implicitSeatsVisible": false,
+        "seatGap": 1.0,
+        "seatSize": 32,
+        "seatLabelFontSize": 16
+    },
+    "appVersion": null,
+    "created": null,
+    "modified": null
+}

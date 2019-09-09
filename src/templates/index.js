@@ -1,6 +1,8 @@
 import blank from './blank.json';
 import stringOrchestra from './string-orchestra.json';
 import fullOrchestra from './full-orchestra.json';
+import windEnsemble from './wind-ensemble.json';
+import concertChoir from './concert-choir.json';
 
 const templates = [
     {
@@ -17,7 +19,17 @@ const templates = [
         name: 'Full orchestra',
         id: 'full-orchestra',
         data: fullOrchestra
+    },
+    {
+        name: 'Wind ensemble',
+        id: 'wind-ensemble',
+        data: windEnsemble
+    },
+    {
+        name: 'Concert choir',
+        id: 'concert-choir',
+        data: concertChoir
     }
 ]
 
-export {templates};
+export { templates };

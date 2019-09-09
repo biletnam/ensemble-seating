@@ -1,0 +1,60 @@
+{
+    "regions": [
+        {
+            "name": "Concert choir",
+            "id": "region-1",
+            "curvedLayout": true,
+            "angle": 100
+        }
+    ],
+    "sections": [
+        {
+            "name": "Soprano",
+            "color": "#91ffa3",
+            "id": "section-1",
+            "region": "region-1",
+            "offsetType": "first-row",
+            "offsetValue": 0,
+            "rowSettings": [8, 8, 0, 0]
+        },
+        {
+            "name": "Alto",
+            "color": "#fcb900",
+            "id": "section-2",
+            "region": "region-1",
+            "offsetType": "first-row",
+            "offsetValue": 0,
+            "rowSettings": [8, 8, 0, 0]
+        },
+        {
+            "name": "Bass",
+            "color": "#d590f4",
+            "id": "section-3",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 3,
+            "rowSettings": [8, 8]
+        },
+        {
+            "name": "Tenor",
+            "color": "#fc9b99",
+            "id": "section-4",
+            "region": "region-1",
+            "offsetType": "custom-row",
+            "offsetValue": 3,
+            "rowSettings": [8, 8]
+        }
+    ],
+    "members": [],
+    "settings": {
+        "seatNameLabels": "initials",
+        "downstageTop": false,
+        "implicitSeatsVisible": false,
+        "seatGap": 1.0,
+        "seatSize": 32,
+        "seatLabelFontSize": 16
+    },
+    "appVersion": null,
+    "created": null,
+    "modified": null
+}
