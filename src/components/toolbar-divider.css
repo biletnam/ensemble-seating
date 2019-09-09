@@ -1,0 +1,13 @@
+.toolbar-divider {
+    align-self: center;
+    height: 1em;
+    margin: 0 1em;
+    border: none;
+    border-left: 1px solid #fff;
+}
+
+@media screen and (max-width: 799px) {
+    .toolbar-divider {
+        display: none;
+    }
+}

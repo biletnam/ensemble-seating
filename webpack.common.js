@@ -12,6 +12,7 @@ const packageJsonInfo = require(__dirname + '/package.json');
 const APP_INFO = {
     VERSION: JSON.stringify(packageJsonInfo.version),
     NAME: JSON.stringify(packageJsonInfo.appName),
+    FEEDBACK: JSON.stringify(packageJsonInfo.feedbackUrl),
     CODENAME: JSON.stringify(packageJsonInfo.appCodename),
     DESCRIPTION: JSON.stringify(packageJsonInfo.description),
     HOMEPAGE: JSON.stringify(packageJsonInfo.homepage)

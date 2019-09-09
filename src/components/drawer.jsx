@@ -149,7 +149,7 @@ class MenuDrawer extends PureComponent {
 
                     <ListDivider />
 
-                    <ListItem data-name='feedback' tag='a' href='https://goo.gl/forms/UJ0XwlMNNjrskdQ33' target='_blank' rel='noopener'><ListItemGraphic icon={<FeedbackIcon />} />Feedback</ListItem>
+                    <ListItem data-name='feedback' tag='a' href={APP_INFO.FEEDBACK} target='_blank' rel='noopener'><ListItemGraphic icon={<FeedbackIcon />} />Feedback</ListItem>
                     <ListItem data-name='about' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<InfoIcon />} />About</ListItem>
                 </List>
             </DrawerContent>

@@ -1,0 +1,19 @@
+.toolbar-link {
+    color: #fff;
+    fill: currentColor;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    line-height: 3em;
+    padding: 0 .5em;
+}
+
+.toolbar-link__icon {
+    margin-right: .5em;
+}
+
+@media screen and (max-width: 799px) {
+    .toolbar-link {
+        display: none;
+    }
+}

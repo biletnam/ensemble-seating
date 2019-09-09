@@ -3,16 +3,17 @@ import React, {Component} from 'react';
 import './toolbar.css';
 
 import { Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, ToolbarMenuIcon, ToolbarIcon } from '@rmwc/toolbar';
-
 import '@material/toolbar/dist/mdc.toolbar.min.css';
-import '@material/textfield/dist/mdc.textfield.min.css';
-import '@material/floating-label/dist/mdc.floating-label.min.css';
-import '@material/notched-outline/dist/mdc.notched-outline.min.css';
-import '@material/line-ripple/dist/mdc.line-ripple.min.css';
+
+import { Button } from '@rmwc/button';
+import '@material/button/dist/mdc.button.css';
 
 import InlineInput from './inline-input.jsx';
+import ToolbarDivider from './toolbar-divider.jsx';
+import ToolbarLink from './toolbar-link.jsx';
 
 import MenuIcon from '../icons/baseline-menu-24px.jsx';
+import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
 import HorizontalSplitIcon from '../icons/baseline-horizontal_split-24px.jsx';
 import RotateIcon from '../icons/baseline-rotate_90_degrees_ccw-24px.jsx';
 import MenuOpenIcon from '../icons/baseline-menu_open-24px.jsx';
@@ -33,6 +34,10 @@ const MainToolbar = props => (
             </ToolbarSection>
 
             <ToolbarSection alignEnd>
+                <ToolbarLink href={APP_INFO.FEEDBACK} icon={<FeedbackIcon />}>Send feedback</ToolbarLink>
+
+                <ToolbarDivider />
+
                 <ToolbarIcon tag='button'
                     name='region'
                     title='Create new region'
