@@ -84,7 +84,7 @@ class RegionListItem extends PureComponent {
                     
                     {provided.placeholder}
 
-                    {this.props.forceNewSectionButton && <div className='roster__section-container'>
+                    {this.props.forceNewSectionButton && <div className='section-list-item'>
                         <Button onClick={this.handleClickedNewSection} raised><ButtonIcon icon={<AddIcon />} /> New section</Button>
                     </div>}
                 </div>

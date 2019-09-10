@@ -40,12 +40,3 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-.roster__section-container {
-    background-color: #fff;
-    margin-top: var(--sidebar-padding);
-}
-
-.roster__section-container  .mdc-list-group {
-    border: 1px solid #ddd;
-}

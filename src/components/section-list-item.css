@@ -1,0 +1,9 @@
+.section-list-item {
+    background-color: #fff;
+    margin-top: var(--sidebar-padding);
+}
+
+.section-list-item__titlebar {
+    padding: 0 var(--sidebar-padding);
+    font-weight: bold;
+}

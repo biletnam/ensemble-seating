@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import tinycolor from 'tinycolor2';
 
 import './seat.css';
 
@@ -37,6 +38,7 @@ class Seat extends PureComponent {
 
         const style = {
             backgroundColor: selected ? '#fff' : color,
+            color: tinycolor(color).isLight() ? '#333' : '#fff',
             visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
             left: 'unset',
             top: 'unset',
