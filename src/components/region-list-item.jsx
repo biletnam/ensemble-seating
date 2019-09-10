@@ -79,6 +79,7 @@ class RegionListItem extends PureComponent {
                             members={this.props.members.filter(currentMember => currentMember.section === currentSection.id)}
                             onRequestNewPerson={this.props.onRequestNewPerson}
                             onRequestBatchAdd={this.props.onRequestBatchAdd}
+                            onRequestShuffle={this.props.onRequestShuffleSection}
                             onRequestSelectMember={this.props.onRequestSelectMember} />
                     })}
                     

@@ -16,6 +16,7 @@ const Roster = props => {
         onRequestNewSection,
         onRequestNewPerson,
         onRequestBatchAdd,
+        onRequestShuffleSection,
         onRequestDeleteRegion,
         onRequestMoveRegion,
         onRequestSelectMember,
@@ -34,6 +35,7 @@ const Roster = props => {
                 onRequestNewSection={onRequestNewSection}
                 onRequestNewPerson={onRequestNewPerson}
                 onRequestBatchAdd={onRequestBatchAdd}
+                onRequestShuffleSection={onRequestShuffleSection}
 
                 onRequestDeleteRegion={onRequestDeleteRegion}
                 onRequestMoveRegion={onRequestMoveRegion}

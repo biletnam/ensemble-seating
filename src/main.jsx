@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
 import semver from 'semver';
+import { knuthShuffle } from 'knuth-shuffle';
 
 import Stage from './components/stage.jsx';
 import Drawer from './components/drawer.jsx';
@@ -117,6 +118,7 @@ class App extends Component {
         this.handleRequestedSelectMember = this.handleRequestedSelectMember.bind(this);
         this.handleRequestedBatchAddMembers = this.handleRequestedBatchAddMembers.bind(this);
         this.handleAcceptedBatchAdd = this.handleAcceptedBatchAdd.bind(this);
+        this.handleRequestedShuffleSection = this.handleRequestedShuffleSection.bind(this);
         this.handleChangeProjectSetting = this.handleChangeProjectSetting.bind(this);
         this.handleSectionsListDragEnd = this.handleSectionsListDragEnd.bind(this);
         
@@ -608,6 +610,23 @@ class App extends Component {
         this.batchAddMembers(members, this.state.batchAddSectionId);
     }
 
+    handleRequestedShuffleSection(sectionId) {
+        // Remove and clone the member who is moving
+        const membersToShuffle = this.state.project.members.filter(member => member.section === sectionId);
+        const existingMembers = this.state.project.members.filter(member => member.section !== sectionId);
+
+        existingMembers.push(...knuthShuffle(membersToShuffle));
+
+        this.setState({
+            project: Object.assign({}, this.state.project, {members: existingMembers})
+        }, () => {
+            if (this.state.user) {
+                saveMemberOrder(this.state.user, this.state.projectName, existingMembers.map(member => member.id));
+                this.cleanUpAfterEdit();
+            }
+        })
+    }
+
     handleChangeProjectSetting(newSetting) {
         const newSettings = Object.assign({}, this.state.project.settings, newSetting);
         this.setState({
@@ -1066,6 +1085,7 @@ class App extends Component {
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}
                 onRequestBatchAdd={this.handleRequestedBatchAddMembers}
+                onRequestShuffleSection={this.handleRequestedShuffleSection}
                 onRequestMoveRegion={this.handleRequestedMoveRegion}
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
