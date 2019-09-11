@@ -7,7 +7,7 @@ const BODY_CONTENT = <div>
     <h3>
         {APP_INFO.NAME} v{APP_INFO.VERSION} "{APP_INFO.CODENAME}"
     </h3>
-    
+    <p><a target='_blank' rel='noopener' href={`https://github.com/acmertz/ensemble-seating/releases/tag/v${APP_INFO.VERSION}`}>What's new&hellip;</a></p>
     <p>Ensemble Seating helps you create a seating chart for your musical ensembles, section by section.</p>
     <p>This project is open source. <a target='_blank' href='https://github.com/acmertz/ensemble-seating' rel='noopener'>View the source on GitHub</a></p>
 </div>;
