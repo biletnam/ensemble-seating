@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
 import semver from 'semver';
+import debounce from 'lodash.debounce';
 
 import Stage from './components/stage.jsx';
 import Drawer from './components/drawer.jsx';
@@ -99,7 +100,7 @@ class App extends Component {
         this.state.project = createProjectFromTemplate();
 
         this.handleUserTriggeredUpdate = this.handleUserTriggeredUpdate.bind(this);
-        this.saveSession = this.saveSession.bind(this);
+        this.saveSession = debounce(this.saveSession.bind(this), 500);
         this.deleteSection = this.deleteSection.bind(this);
         this.deleteMember = this.deleteMember.bind(this);
         this.batchAddMembers = this.batchAddMembers.bind(this);
