@@ -100,7 +100,7 @@ class App extends Component {
         this.state.project = createProjectFromTemplate();
 
         this.handleUserTriggeredUpdate = this.handleUserTriggeredUpdate.bind(this);
-        this.saveSession = debounce(this.saveSession.bind(this), 500);
+        this.saveSession = debounce(this.saveSession.bind(this), 500, { leading: true, trailing: true });
         this.deleteSection = this.deleteSection.bind(this);
         this.deleteMember = this.deleteMember.bind(this);
         this.batchAddMembers = this.batchAddMembers.bind(this);
