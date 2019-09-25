@@ -85,9 +85,9 @@ function ExportImageDialog (props) {
                         onChange={event => setWidth(event.target.value)}
                         onBlur={event => {
                             const newWidth = parseInt(event.target.value),
-                                newHeight = Math.floor(width * (height / width));
-                            setWidth(newWidth);
-                            setHeight(newHeight);
+                                newHeight = newWidth * (originalHeight / originalWidth);
+                            setWidth(Math.floor(newWidth));
+                            setHeight(Math.floor(newHeight));
                         }}
                         value={width} />
                 </div>
@@ -97,9 +97,9 @@ function ExportImageDialog (props) {
                         onChange={event => setHeight(event.target.value)}
                         onBlur={event => {
                             const newHeight = parseInt(event.target.value),
-                                newWidth = Math.floor(newHeight * (width / height));
-                            setHeight(newHeight);
-                            setWidth(newWidth)
+                                newWidth = newHeight * (originalWidth / originalHeight);
+                            setHeight(Math.floor(newHeight));
+                            setWidth(Math.floor(newWidth))
                         }}
                         value={height} />
                 </div>
