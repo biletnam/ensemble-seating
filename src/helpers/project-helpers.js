@@ -780,7 +780,7 @@ export function shuffleSection(sectionId, project) {
     return Object.assign({}, project, {members: existingMembers});
 }
 
-export function exportProjectFile(projectName, projectForExport, options) {
+export async function exportProjectFile(projectName, projectForExport, options) {
     const regions = projectForExport.regions;
     const sections = projectForExport.sections;
     const members = projectForExport.members;
@@ -803,7 +803,7 @@ export function exportProjectFile(projectName, projectForExport, options) {
             extension = 'svg';
         }
         else {
-            result = renderImage(regions, sections, members, settings);
+            result = await renderImage(regions, sections, members, settings);
             if (options.format == 'jpeg') {
                 mime = 'image/jpeg';
                 extension = 'jpg';
@@ -824,7 +824,7 @@ export function exportProjectFile(projectName, projectForExport, options) {
         download.href = URL.createObjectURL(blob);
     }
     else
-        download.href = result;
+        download.href = result instanceof Blob ? URL.createObjectURL(result) : result;
 
     document.body.appendChild(download);
     download.click();

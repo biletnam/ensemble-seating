@@ -1,4 +1,6 @@
 import 'array-flat-polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';

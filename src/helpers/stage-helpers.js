@@ -449,6 +449,41 @@ function flipStageDirection(positionedSeats, options) {
     return trimOuterSpacing(seats);
 }
 
+/**
+ * Divide an entire phrase in an array of phrases, all with the max pixel length given.
+ * The words are initially separated by the space char.
+ * Adapted from https://stackoverflow.com/a/16599668
+ * @param phrase
+ * @param length
+ * @return
+ */
+function getLines(ctx,phrase,maxPxLength,textStyle) {
+    var wa=phrase.split(" "),
+        phraseArray=[],
+        lastPhrase=wa[0],
+        measure=0,
+        splitChar=" ";
+    if (wa.length <= 1) {
+        return wa
+    }
+    ctx.font = textStyle;
+    for (var i=1;i<wa.length;i++) {
+        var w=wa[i];
+        measure=ctx.measureText(lastPhrase+splitChar+w).width;
+        if (measure<maxPxLength) {
+            lastPhrase+=(splitChar+w);
+        } else {
+            phraseArray.push(lastPhrase);
+            lastPhrase=w;
+        }
+        if (i===wa.length-1) {
+            phraseArray.push(lastPhrase);
+            break;
+        }
+    }
+    return phraseArray;
+}
+
 export function renderSVG (regions, sections, members, settings) {
     let seats = calculateSeatPositions(regions, sections, members, settings);
     const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, settings);
@@ -479,40 +514,95 @@ export function renderSVG (regions, sections, members, settings) {
     return svg;
 }
 
+function scaleForCanvas(value, scale) {
+    return Math.floor(value * scale) + .5;
+}
+
 export function renderImage (regions, sections, members, options) {
-    let seats = calculateSeatPositions(regions, sections, members, options);
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
-
-    if (!options.downstageTop)
-        seats = flipStageDirection(seats, options);
-
-    const exportWidth = options.width || layoutWidth;
-    const exportHeight = options.height || layoutHeight;
-    const scale = exportWidth / layoutWidth;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = exportWidth;
-    canvas.height = exportHeight;
-
-    const ctx = canvas.getContext('2d');
+    return new Promise((resolve, reject) => {
+        let seats = calculateSeatPositions(regions, sections, members, options);
+        const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
     
-    // Todo: option to control PNG transparency
-    if (!(options.format === 'png' && options.transparency)) {
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, exportWidth, exportHeight);
-    }
+        if (!options.downstageTop)
+            seats = flipStageDirection(seats, options);
+    
+        const exportWidth = options.width || layoutWidth;
+        const exportHeight = options.height || layoutHeight;
+        const scale = exportWidth / layoutWidth;
+    
+        const canvas = document.createElement('canvas');
+        canvas.width = exportWidth;
+        canvas.height = exportHeight;
+    
+        const ctx = canvas.getContext('2d');
+        
+        if (!(options.format === 'png' && options.transparency)) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, exportWidth, exportHeight);
+        }
+    
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = Math.max(Math.floor(scale), 1);
+    
+        const seatsToRender = seats.filter(seat => !(seat.implicit && !options.implicitSeatsVisible && !seat.member));
+        for (const seat of seatsToRender) {
+            // Render seat
+            ctx.fillStyle = seat.color;
+            const x = scaleForCanvas(seat.x, scale);
+            const y = scaleForCanvas(seat.y, scale);
+            const width = Math.floor(options.seatSize * scale);
+            const height = width;
+            ctx.fillRect(x, y, width, height);
+            ctx.strokeRect(x, y, width, height);
+        }
+    
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#000';
+    
+        const calcFont = `normal ${options.seatLabelFontSize}px sans-serif`;
+        const renderFont = `normal ${options.seatLabelFontSize * scale}px sans-serif`;
+        const seatSizeOffset = .5 * options.seatSize;
+    
+        for (const seat of seatsToRender) {
+            let lines;
+            if (seat.member)
+                lines = getLines(ctx, options.seatNameLabels === 'initials' ? getInitials(seat.member.name) : seat.member.name, options.seatSize * scale, ctx.font);
+            else
+                lines = [`${seat.seat + 1}`];
+            
+            const textHeight = lines.length * options.seatLabelFontSize;
+            let startingY = seat.y + seatSizeOffset - (.5 * textHeight);
 
-    ctx.strokeStyle = '#000';
+            // Offset startingY if the text would be off the screen
+            if (startingY < 0)
+                startingY = 0;
+            else if (startingY + textHeight > layoutHeight)
+                startingY = layoutHeight - textHeight;
 
-    seats.filter(seat => !(seat.implicit && !options.implicitSeatsVisible && !seat.member)).forEach((seat, index) => {
-        ctx.fillStyle = seat.color;
-        const x = Math.floor(seat.x * scale) + .5;
-        const y = Math.floor(seat.y * scale) + .5;
-        const width = Math.floor(options.seatSize * scale);
-        const height = Math.floor(options.seatSize * scale);
-        ctx.fillRect(x, y, width, height);
-        ctx.strokeRect(x, y, width, height);
+            for (let i=0; i<lines.length; i++) {
+                const text = lines[i];
+                ctx.font = calcFont;
+                const lineWidth = ctx.measureText(text).width;
+                const x = seat.x + seatSizeOffset - (.5 * lineWidth);
+                const y = startingY + (options.seatLabelFontSize * i);
+    
+                let screenOffsetX = 0;
+                
+                // Offset X if the text would be off the screen
+                if (x < 0)
+                    screenOffsetX = -1 * x;
+                else if (x + lineWidth > layoutWidth)
+                    screenOffsetX = layoutWidth - (x + lineWidth);
+    
+                ctx.font = renderFont;
+                ctx.fillText(text, scaleForCanvas(x + screenOffsetX, scale), scaleForCanvas(y, scale));
+            }
+        }
+            
+        if (typeof canvas.toBlob === 'function')
+            canvas.toBlob(resolve, `image/${options.format}`, options.quality);
+        else
+            resolve(canvas[exportFn](`image/${options.format}`, options.quality));
     });
-
-    return canvas.toDataURL(`image/${options.format}`, options.quality);
 }
