@@ -9,27 +9,28 @@ import '@material/floating-label/dist/mdc.floating-label.min.css';
 import '@material/notched-outline/dist/mdc.notched-outline.min.css';
 import '@material/line-ripple/dist/mdc.line-ripple.min.css';
 
-import { TextField } from '@rmwc/textfield';
-import '@material/textfield/dist/mdc.textfield.min.css';
-
 import { Slider } from '@rmwc/slider';
 import '@material/slider/dist/mdc.slider.min.css';
+
+import IntegerInput from './integer-input.jsx';
 
 function ExportImageDialog (props) {
     const [format, setFormat] = useState('jpeg');
     const [quality, setQuality] = useState(100);
     const [transparency, setTransparency] = useState(false);
+    const [originalPixelRatio, setOriginalPixelRatio] = useState(window.devicePixelRatio);
     const [originalWidth, setOriginalWidth] = useState(props.imageWidth);
     const [originalHeight, setOriginalHeight] = useState(props.imageHeight);
-    const [width, setWidth] = useState(Math.floor(originalWidth) || 640);
-    const [height, setHeight] = useState(Math.floor(originalHeight) || 360);
+    const [width, setWidth] = useState(Math.floor(originalWidth * window.devicePixelRatio) || 640);
+    const [height, setHeight] = useState(Math.floor(originalHeight * window.devicePixelRatio) || 360);
 
     useEffect(() => {
-        if ((props.imageWidth != originalWidth) || (props.imageHeight != originalHeight)) {
+        if ((props.imageWidth != originalWidth) || (props.imageHeight != originalHeight) || (window.devicePixelRatio != originalPixelRatio)) {
+            setOriginalPixelRatio(window.devicePixelRatio);
             setOriginalWidth(props.imageWidth);
             setOriginalHeight(props.imageHeight);
-            setWidth(Math.floor(props.imageWidth));
-            setHeight(Math.floor(props.imageHeight));
+            setWidth(Math.floor(props.imageWidth * window.devicePixelRatio));
+            setHeight(Math.floor(props.imageHeight * window.devicePixelRatio));
         }
     });
 
@@ -80,26 +81,20 @@ function ExportImageDialog (props) {
 
                 <h2>Dimensions</h2>
                 <div className='text-input-wrapper'>
-                    <TextField pattern='\d+' label='Width'
-                        data-setting-type='width'
-                        onChange={event => setWidth(event.target.value)}
-                        onBlur={event => {
-                            const newWidth = parseInt(event.target.value),
-                                newHeight = newWidth * (originalHeight / originalWidth);
-                            setWidth(Math.floor(newWidth));
-                            setHeight(Math.floor(newHeight));
+                    <IntegerInput label='Width'
+                        onChange={newWidth => {
+                            const newHeight = Math.floor(newWidth * (originalHeight / originalWidth));
+                            setWidth(newWidth)
+                            setHeight(newHeight)
                         }}
                         value={width} />
                 </div>
                 <div className='text-input-wrapper'>
-                    <TextField pattern='\d+' label='Height'
-                        data-setting-type='height'
-                        onChange={event => setHeight(event.target.value)}
-                        onBlur={event => {
-                            const newHeight = parseInt(event.target.value),
-                                newWidth = newHeight * (originalWidth / originalHeight);
-                            setHeight(Math.floor(newHeight));
-                            setWidth(Math.floor(newWidth))
+                    <IntegerInput label='Height'
+                        onChange={newHeight => {
+                            const newWidth = Math.floor(newHeight * (originalWidth / originalHeight));
+                            setHeight(newHeight)
+                            setWidth(newWidth);
                         }}
                         value={height} />
                 </div>
