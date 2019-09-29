@@ -609,8 +609,8 @@ export function renderSVG (regions, sections, members, options) {
     return svg;
 }
 
-function scaleForCanvas(value, scale) {
-    return Math.floor(value * scale) + .5;
+function scaleForCanvas(value, scale, offset = false) {
+    return Math.floor(value * scale) + (offset ? .5 : 0);
 }
 
 export function renderImage (regions, sections, members, options) {
@@ -644,8 +644,9 @@ export function renderImage (regions, sections, members, options) {
         for (const seat of seatsToRender) {
             // Render seat
             ctx.fillStyle = seat.color;
-            const x = scaleForCanvas(seat.x, scale);
-            const y = scaleForCanvas(seat.y, scale);
+            const needsOffset = ctx.lineWidth % 2 !== 0;
+            const x = scaleForCanvas(seat.x, scale, needsOffset);
+            const y = scaleForCanvas(seat.y, scale, needsOffset);
             const width = Math.floor(options.seatSize * scale);
             const height = width;
             ctx.fillRect(x, y, width, height);
