@@ -484,33 +484,128 @@ function getLines(ctx,phrase,maxPxLength,textStyle) {
     return phraseArray;
 }
 
-export function renderSVG (regions, sections, members, settings) {
-    let seats = calculateSeatPositions(regions, sections, members, settings);
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, settings);
+const svgNS = 'http://www.w3.org/2000/svg';
+const defaultMeasureStyle = {opacity: 0, pointerEvents: 'none', position: 'absolute'};
+function measureDimensions(text, container = document.body) {
+    let el;
+    if (container.closest('svg')) {
+        el = document.createElementNS(svgNS, 'text');
+        el.textContent = text;
+    }
+    else {
+        el = document.createElement('span');
+        el.innerText = text;
+    }
 
-    if (!settings.downstageTop)
-        seats = flipStageDirection(seats, settings);
+    Object.assign(el.style, defaultMeasureStyle);
+    container.appendChild(el);
+    const bounds = el.getBoundingClientRect();
+    return container.removeChild(el) && { width: bounds.width, height: bounds.height };
+}
 
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
+function wrapAt(text, maxWidth, container) {
+    return text.split(' ').reduce((allLines, current) => {
+        if (allLines.length === 0)
+            allLines.push(current);
+        else {
+            if (measureDimensions(`${allLines[allLines.length - 1]} ${current}`, container || undefined).width > maxWidth)
+                allLines.push(current);
+            else
+                allLines[allLines.length - 1] = `${allLines[allLines.length - 1]} ${current}`;
+        }
+        return allLines;
+    }, []);
+}
+
+export function renderSVG (regions, sections, members, options) {
+    let seats = calculateSeatPositions(regions, sections, members, options);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
+
+    if (!options.downstageTop)
+        seats = flipStageDirection(seats, options);
+
+    const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.style.fontFamily = 'sans-serif';
+    svg.style.fontSize = options.seatLabelFontSize;
+    svg.style.visibility = 'hidden';
+    svg.style.position = 'absolute';
 
     svg.setAttribute('width', layoutWidth);
     svg.setAttribute('height', layoutHeight);
+    svg.setAttribute('dominant-baseline', 'hanging');
+    svg.setAttribute('text-anchor', 'middle');
     svg.setAttribute('viewbox', `0 0 ${layoutWidth} ${layoutHeight}`);
+    document.body.appendChild(svg);
 
-    seats.filter(seat => !(seat.implicit && !settings.implicitSeatsVisible && !seat.member)).forEach((seat, index) => {
-        const rect = document.createElementNS(ns, 'rect');
-        rect.setAttribute('width', settings.seatSize || seatSize);
-        rect.setAttribute('height', settings.seatSize || seatSize);
-        rect.setAttributeNS(ns, 'stroke', 'black');
-        rect.setAttributeNS(ns, 'strokeWidth', '1');
-        rect.setAttributeNS(ns, 'fill', seat.color);
-        rect.setAttributeNS(ns, 'x', seat.x);
-        rect.setAttributeNS(ns, 'y', seat.y);
+    // Render seats
+    const seatsToRender = seats.filter(seat => !(seat.implicit && !options.implicitSeatsVisible && !seat.member));
+    for (const seat of seatsToRender) {
+        const rect = document.createElementNS(svgNS, 'rect');
+        rect.setAttribute('width', options.seatSize || seatSize);
+        rect.setAttribute('height', options.seatSize || seatSize);
+        rect.setAttributeNS(svgNS, 'stroke', 'black');
+        rect.setAttributeNS(svgNS, 'strokeWidth', '1');
+        rect.setAttributeNS(svgNS, 'fill', seat.color);
+        rect.setAttributeNS(svgNS, 'x', seat.x);
+        rect.setAttributeNS(svgNS, 'y', seat.y);
         svg.appendChild(rect);
-    });
+    }
 
+    const seatSizeOffset = .5 * options.seatSize;
+
+    // Render labels
+    for (const seat of seatsToRender) {
+        let lines;
+        if (seat.member)
+            lines = wrapAt(options.seatNameLabels === 'initials' ? getInitials(seat.member.name) : seat.member.name, options.seatSize, svg);
+        else
+            lines = [`${seat.seat + 1}`];
+        
+        const labelText = document.createElementNS(svgNS, 'text');
+        labelText.setAttribute('x', seat.x);
+
+        for (let i=0; i<lines.length; i++) {
+            const lineText = document.createElementNS(svgNS, 'tspan');
+            lineText.setAttribute('x', seat.x + seatSizeOffset);
+            if (i > 0)
+                lineText.setAttribute('dy', '1em');
+            lineText.textContent = lines[i];
+            labelText.appendChild(lineText);
+        }
+        svg.appendChild(labelText);
+
+        const boundingBox = labelText.getBoundingClientRect();
+
+        const seatCenterY = seat.y + seatSizeOffset;
+        let labelCandidateY = seatCenterY - (.5 * boundingBox.height);
+        if (labelCandidateY < 0)
+            labelCandidateY = 0;
+        else if (labelCandidateY + boundingBox.height > layoutHeight)
+            labelCandidateY = layoutHeight - boundingBox.height;
+        labelText.setAttribute('y', labelCandidateY);
+
+        if (boundingBox.x < 0) {
+            const offsetX = .5 * boundingBox.width;
+            labelText.setAttribute('x', offsetX);
+            for (const line of labelText.childNodes) {
+                line.setAttribute('x', offsetX);
+            }
+        }
+        else if (boundingBox.x + boundingBox.width > layoutWidth) {
+            // Bounding box contains actual coordinates from the top left of the element.
+            // However, the element's 'x' proprety is at the center of the element. Make
+            // sure to offset it appropriately!
+            const offsetX = layoutWidth - (.5 * boundingBox.width);
+            labelText.setAttribute('x', offsetX);
+            for (const line of labelText.childNodes)
+            line.setAttribute('x', offsetX);
+        }
+    }
+
+    svg.remove();
+    svg.style.position = null;
+    svg.style.visibility = null;
     return svg;
 }
 
@@ -544,6 +639,7 @@ export function renderImage (regions, sections, members, options) {
         ctx.strokeStyle = '#000';
         ctx.lineWidth = Math.max(Math.floor(scale), 1);
     
+        // Render seats
         const seatsToRender = seats.filter(seat => !(seat.implicit && !options.implicitSeatsVisible && !seat.member));
         for (const seat of seatsToRender) {
             // Render seat
@@ -564,6 +660,7 @@ export function renderImage (regions, sections, members, options) {
         const renderFont = `normal ${options.seatLabelFontSize * scale}px sans-serif`;
         const seatSizeOffset = .5 * options.seatSize;
     
+        // Render labels
         for (const seat of seatsToRender) {
             let lines;
             if (seat.member)
