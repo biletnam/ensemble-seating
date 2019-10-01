@@ -17,7 +17,7 @@ import IntegerInput from './integer-input.jsx';
 
 import './edit-section.css';
 
-import ClearIcon from '../icons/baseline-clear-24px.jsx';
+import ClearIcon from '../icons/clear-24px.svg';
 
 class SectionEditor extends PureComponent {
     constructor(props) {

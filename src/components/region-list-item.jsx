@@ -12,8 +12,8 @@ import '@material/ripple/dist/mdc.ripple.min.css';
 
 import ListActionMenu from './list-action-menu.jsx';
 import SectionListItem from './section-list-item.jsx';
-import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
-import AddIcon from '../icons/baseline-add-24px.jsx';
+import MoreIcon from '../icons/more_vert-24px.svg';
+import AddIcon from '../icons/add-24px.svg';
 
 import { Droppable } from 'react-beautiful-dnd';
 

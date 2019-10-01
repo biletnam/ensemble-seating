@@ -12,12 +12,12 @@ import InlineInput from './inline-input.jsx';
 import ToolbarDivider from './toolbar-divider.jsx';
 import ToolbarLink from './toolbar-link.jsx';
 
-import MenuIcon from '../icons/baseline-menu-24px.jsx';
-import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
-import HorizontalSplitIcon from '../icons/baseline-horizontal_split-24px.jsx';
-import RotateIcon from '../icons/baseline-rotate_90_degrees_ccw-24px.jsx';
-import MenuOpenIcon from '../icons/baseline-menu_open-24px.jsx';
-import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
+import MenuIcon from '../icons/menu-24px.svg';
+import FeedbackIcon from '../icons/feedback-24px.svg';
+import HorizontalSplitIcon from '../icons/horizontal_split-24px.svg';
+import RotateIcon from '../icons/rotate_90_degrees_ccw-24px.svg';
+import MenuOpenIcon from '../icons/menu_open-24px.svg';
+import MoreIcon from '../icons/more_vert-24px.svg';
 
 const MainToolbar = props => (
     <Toolbar id={props.id}>

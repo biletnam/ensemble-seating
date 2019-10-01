@@ -16,14 +16,14 @@ import UserWidget from './user-widget.jsx';
 import ExportActionMenu from './export-action-menu.jsx';
 import ExportImageDialog from './export-image-dialog.jsx';
 
-import PrintIcon from '../icons/baseline-print-24px.jsx';
-import DeleteForeverIcon from '../icons/baseline-delete_forever-24px.jsx';
-import NoteAddIcon from '../icons/baseline-note_add-24px.jsx';
-import CopyIcon from '../icons/baseline-file_copy-24px.jsx';
-import FolderOpenIcon from '../icons/baseline-folder_open-24px.jsx';
-import SaveAltIcon from '../icons/baseline-save_alt-24px.jsx';
-import FeedbackIcon from '../icons/baseline-feedback-24px.jsx';
-import InfoIcon from '../icons/baseline-info-24px.jsx';
+import PrintIcon from '../icons/print-24px.svg';
+import DeleteForeverIcon from '../icons/delete_forever-24px.svg';
+import NoteAddIcon from '../icons/note_add-24px.svg';
+import CopyIcon from '../icons/file_copy-24px.svg';
+import FolderOpenIcon from '../icons/folder_open-24px.svg';
+import SaveAltIcon from '../icons/save_alt-24px.svg';
+import FeedbackIcon from '../icons/feedback-24px.svg';
+import InfoIcon from '../icons/info-24px.svg';
 
 import { browseForFile } from '../helpers/project-helpers.js';
 import { queue as dialogQueue } from './dialog-queue.jsx';

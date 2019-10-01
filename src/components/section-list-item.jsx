@@ -17,10 +17,10 @@ import MemberListItem from './member-list-item.jsx';
 
 import './section-list-item.css';
 
-import PersonAddIcon from '../icons/baseline-person_add-24px.jsx';
-import GroupAddIcon from '../icons/baseline-group_add-24px.jsx';
-import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
-import ShuffleIcon from '../icons/baseline-shuffle-24px.jsx';
+import PersonAddIcon from '../icons/person_add-24px.svg';
+import GroupAddIcon from '../icons/group_add-24px.svg';
+import MoreIcon from '../icons/more_vert-24px.svg';
+import ShuffleIcon from '../icons/shuffle-24px.svg';
 
 const SectionListItem = props => {
     const [menuOpen, setMenuOpen] = useState(false);

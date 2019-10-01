@@ -11,8 +11,8 @@ import '@material/icon-button/dist/mdc.icon-button.css';
 
 import './integer-input.css';
 
-import AddIcon from '../icons/baseline-add-24px.jsx';
-import RemoveIcon from '../icons/baseline-remove-24px.jsx';
+import AddIcon from '../icons/add-24px.svg';
+import RemoveIcon from '../icons/remove-24px.svg';
 
 const IntegerInput = props => {
     const {onChange, min, max, className, ...rest} = props;

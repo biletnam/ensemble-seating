@@ -7,9 +7,9 @@ import '@material/icon-button/dist/mdc.icon-button.css';
 
 import './sidebar-title.css';
 
-import DeleteIcon from '../icons/baseline-delete-24px.jsx';
+import DeleteIcon from '../icons/delete-24px.svg';
 
-import BackIcon from '../icons/baseline-back-24px.jsx';
+import BackIcon from '../icons/arrow_back-24px.svg';
 
 const SidebarTitle = props => {
     return <Elevation z='1' tag='h2' className='sidebar-title'>

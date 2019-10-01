@@ -14,7 +14,7 @@ import '@material/list/dist/mdc.list.css';
 import { IconButton } from '@rmwc/icon-button';
 import '@material/icon-button/dist/mdc.icon-button.css';
 
-import MoreIcon from '../icons/baseline-more_vert-24px.jsx';
+import MoreIcon from '../icons/more_vert-24px.svg';
 
 import { listProjects, renameProject, loadProject, saveDiff, duplicateProject, deleteProject } from '../helpers/project-helpers.js';
 import './project-list.css';
