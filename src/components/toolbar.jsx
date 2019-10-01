@@ -1,12 +1,11 @@
-import React, {Component} from 'react';
+import React from 'react';
 
 import './toolbar.css';
 
 import { Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, ToolbarMenuIcon, ToolbarIcon } from '@rmwc/toolbar';
 import '@material/toolbar/dist/mdc.toolbar.min.css';
 
-import { Button } from '@rmwc/button';
-import '@material/button/dist/mdc.button.css';
+import TimeAgo from 'react-timeago';
 
 import InlineInput from './inline-input.jsx';
 import ToolbarDivider from './toolbar-divider.jsx';
@@ -30,6 +29,11 @@ const MainToolbar = props => (
                     onClick={props.onToolbarButtonClick} />
                 <ToolbarTitle>
                     <InlineInput value={props.projectName} placeholder='Untitled project' onChange={props.onRequestRenameProject} autosaveTimeout={10000} />
+                    <div className='toolbar__last-saved'>
+                        {props.saving && 'Saving…'}
+                        {props.lastSave && !props.saving && <>Saved <TimeAgo date={props.lastSave} minPeriod={10} /></>}
+                        {!props.lastSave && !props.saving && 'Not saved'}
+                    </div>
                 </ToolbarTitle>
             </ToolbarSection>
 

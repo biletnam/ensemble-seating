@@ -155,7 +155,7 @@ export function saveDiff(user, oldProject, newProject, name) {
     const settingsDiff = Object.assign({}, updatedDiff(oldSettings, newSettings), addedDiff(oldSettings, newSettings));
     promises.push(saveMetadata(user, name, settingsDiff));
 
-    return promises.length > 0 ? Promise.all(promises) : Promise.resolve();
+    return promises.length > 0 ? Promise.all(promises).then(() => newSettings.modified) : Promise.resolve(newSettings.modified);
 }
 
 function saveMetadata(user, name, metadata) {

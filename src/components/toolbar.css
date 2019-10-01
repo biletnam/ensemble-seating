@@ -2,6 +2,13 @@
     grid-area: toolbar;
 }
 
+.toolbar__last-saved {
+    display: inline-block;
+    margin-left: 1em;
+    font-size: .8em;
+    color: #ddd;
+}
+
 @media screen and (max-width: 799px) {
     #toolbar__toggle-roster-button {
         display: none;

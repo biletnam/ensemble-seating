@@ -81,6 +81,8 @@ function createFreshState(user) {
         project: null,
         initProject: false,
         projectName: null,
+        saving: false,
+        saved: false,
         message: null,
         updateAvailable: false,
         user
@@ -187,6 +189,7 @@ class App extends Component {
                             const newState = {
                                 project: Object.assign({}, project),
                                 projectName: initProject,
+                                saved: true,
                                 user
                             }
                             let upgradedProject = false;
@@ -312,9 +315,11 @@ class App extends Component {
 
     saveSession(oldProject, newProject) {
         if (this.state.user) {
+            this.setState({ saving: true });
             projectExists(this.state.user, this.state.projectName).then(exists => {
-                saveDiff(this.state.user, exists ? oldProject : {}, newProject, this.state.projectName).then(() => {
+                saveDiff(this.state.user, exists ? oldProject : {}, newProject, this.state.projectName).then(saveTime => {
                     updateProjectQueryString(this.state.projectName);
+                    this.setState({ project: Object.assign({}, this.state.project, { modified: saveTime }), saving: false, saved: true });
                 });
             })
         }
@@ -646,6 +651,7 @@ class App extends Component {
                 }
             }
             newState.projectName = projectName;
+            newState.saved = true;
             updateProjectQueryString(newState.projectName);
             this.setState(newState, () => {
                 if (upgradedProject)
@@ -778,6 +784,8 @@ class App extends Component {
                 rosterOpen={this.state.rosterOpen}
                 onRequestRenameProject={this.handleAcceptRenameProject}
                 projectName={this.state.projectName}
+                lastSave={this.state.saved && this.state.project.modified}
+                saving={this.state.saving}
                 onToolbarButtonClick={this.handleClickedToolbarButton} />
 
             <Stage id='stage'
