@@ -9,6 +9,12 @@
     color: #ddd;
 }
 
+@media screen and (max-width: 959px) {
+    .toolbar__last-saved {
+        display: none;
+    }
+}
+
 @media screen and (max-width: 799px) {
     #toolbar__toggle-roster-button {
         display: none;
