@@ -708,17 +708,18 @@ class App extends Component {
     handleAcceptRenameProject (newName) {
         if (this.state.user) {
             const oldName = this.state.projectName;
-            renameProject(this.state.user, oldName, newName).then(() => {
-                this.setState({projectName: newName});
+            this.setState({ saving: true });
+            renameProject(this.state.user, oldName, newName).then(saveTime => {
+                this.setState({ projectName: newName, project: Object.assign({}, this.state.project, { modified: saveTime }), saving: false, saved: true });
                 updateProjectQueryString(newName);
             }).catch((err) => {
                 if (err.name === 'NotAuthenticatedError') {
                     // User is not authenticated. Swallow the error and keep the new name locally.
-                    this.setState({ projectName: newName });
+                    this.setState({ projectName: newName, saving: false });
                 }
                 else if (err.name == 'NotFoundError') {
                     // Project with that name does not exist. Keep the new name, and do a full save.
-                    this.setState({ projectName: newName });
+                    this.setState({ projectName: newName, saving: false });
                 }
                 else if (err.name == 'NameCollisionError') {
                     // Project with that name already exists.

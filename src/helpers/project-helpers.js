@@ -224,9 +224,9 @@ export function renameProject(user, oldName, newName) {
                         projectToSave = upgradeProject(projectToSave);
 
                     
-                    saveDiff(user, {}, projectToSave, newName).then(() => {
+                    saveDiff(user, {}, projectToSave, newName).then(saveTime => {
                         deleteProject(user, oldName).then(() => {
-                            resolve();
+                            resolve(saveTime);
                         });
                     });
                 }
