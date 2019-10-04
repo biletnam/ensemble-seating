@@ -3,7 +3,7 @@
   "appName": "Ensemble Seating",
   "appCodename": "Debut",
   "feedbackUrl": "https://goo.gl/forms/UJ0XwlMNNjrskdQ33",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Generate seating charts for musical ensembles",
   "homepage": "https://seatingch.art",
   "repository": {
