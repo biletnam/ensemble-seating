@@ -7,12 +7,7 @@ import '@material/card/dist/mdc.card.css';
 import '@material/button/dist/mdc.button.css';
 import '@material/icon-button/dist/mdc.icon-button.css';
 
-import { Menu, MenuSurfaceAnchor, MenuItem } from '@rmwc/menu';
-import '@material/menu/dist/mdc.menu.css';
-import '@material/menu-surface/dist/mdc.menu-surface.css';
-import '@material/list/dist/mdc.list.css';
-
-import MenuItemIcon from './menu-item-icon.jsx';
+import ListActionMenu from './list-action-menu.jsx';
 import MemberListItem from './member-list-item.jsx';
 
 import './section-list-item.css';
@@ -20,7 +15,6 @@ import './section-list-item.css';
 import PersonAddIcon from '../icons/person_add-24px.svg';
 import GroupAddIcon from '../icons/group_add-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
-import ShuffleIcon from '../icons/shuffle-24px.svg';
 
 const SectionListItem = props => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -45,12 +39,13 @@ const SectionListItem = props => {
             props.onRequestBatchAdd(props.data.id);
     }
 
-    function handleSelectedMenuItem(event) {
-        switch (event.detail.item.dataset.action) {
+    function handleSelectedMenuItem(action) {
+        switch (action) {
             case 'shuffle':
                 props.onRequestShuffle && props.onRequestShuffle(props.data.id);
                 break;
         }
+        setMenuOpen(false);
     }
 
     return <Draggable key={props.data.id}
@@ -90,16 +85,14 @@ const SectionListItem = props => {
                             <CardActionIcons>
                                 <CardActionIcon onClick={handleClickedNewPersonButton} icon={<PersonAddIcon />} aria-label='Add person' />
                                 <CardActionIcon onClick={handleClickedBatchAddMembers} icon={<GroupAddIcon />} aria-label='Add group' />
-                                {/* <CardActionIcon onClick={handleClickedBatchAddMembers} icon={<ShuffleIcon />} aria-label='Add group' /> */}
-                                <MenuSurfaceAnchor>
-                                    <Menu open={menuOpen} onClose={() => setMenuOpen(false)} onSelect={handleSelectedMenuItem}>
-                                        <MenuItem data-action='shuffle'>
-                                            <MenuItemIcon icon={<ShuffleIcon />} />
-                                            Shuffle
-                                        </MenuItem>
-                                    </Menu>
-                                    <CardActionIcon onClick={() => setMenuOpen(true)} icon={<MoreIcon />} />
-                                </MenuSurfaceAnchor>
+                                
+                                <ListActionMenu
+                                    shuffle='section members'
+                                    onSelectAction={handleSelectedMenuItem}
+                                    open={menuOpen}
+                                    onClose={() => setMenuOpen(false)}>
+                                    <CardActionIcon icon={<MoreIcon />} label='Edit section' onClick={() => setMenuOpen(true)} />
+                                </ListActionMenu>
                             </CardActionIcons>
                         </CardActions>
                     </Card>

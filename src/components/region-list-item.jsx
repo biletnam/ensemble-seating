@@ -66,6 +66,7 @@ class RegionListItem extends PureComponent {
                         onClick={() => this.props.onRequestSelectMember(this.props.region.id)}>
                         <span className='roster__region-heading-text'>{this.props.region.name}</span>
                         {this.props.showEditAndDeleteControls && <ListActionMenu
+                            moveToTop moveUp moveDown moveToBottom deleteItem
                             onSelectAction={this.handleActionMenuClick}
                             open={this.state.actionMenuOpen}
                             onClose={this.handleRequestCloseActionMenu}>
