@@ -418,6 +418,10 @@ export function loadProject(user, name) {
                     const unpackedSections = sections.map(current => {
                         const data = Object.assign({id: current}, sectionData[current]);
                         delete data.projectName;
+                        if (!Array.isArray(data.rowSettings)) {
+                            // Todo: clean up or remove this in a future refactoring when the project format is fixed
+                            data.rowSettings = Object.values(data.rowSettings);
+                        }
                         return data;
                     });
     
