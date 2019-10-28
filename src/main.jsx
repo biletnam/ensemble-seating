@@ -35,17 +35,13 @@ import {
     updateProjectQueryString,
     resetProjectQueryString,
     getUnusedProjectName,
-    createProjectFromTemplate,
     renameProject,
-    validateProject,
     listProjects,
     idbGetLastAppVersion,
     idbSetLastAppVersion,
     idbSaveTemporaryProject,
     idbLoadTemporaryProject,
     idbDeleteTemporaryProject,
-    isBlankProject,
-    duplicateProject,
     deleteRegion,
     deleteSection,
     deleteMember,
@@ -60,12 +56,41 @@ import {
     applyMemberEdits,
     shuffleSection,
     exportProjectFile,
-    projectExists
+    projectExists,
+    Project
 } from './helpers/project-helpers.js';
 
 import './main.css';
 import { getLayoutDimensions, calculateSeatPositions } from './helpers/stage-helpers.js';
 
+/**
+ * A number, or a string containing a number.
+ * @typedef {Object} AppState
+ * @property {string} batchAddSectionId
+ * @property {string} batchAddSectionName
+ * @property {boolean} batchAddDialogOpen
+ * @property {boolean} projectOptionsDialogOpen
+ * @property {boolean} newProjectDialogOpen
+ * @property {boolean} showFirstLaunch
+ * @property {boolean} openProjectDialogOpen
+ * @property {boolean} drawerOpen
+ * @property {boolean} rosterOpen
+ * @property {string} editorId
+ * @property {Project} project
+ * @property {boolean} initProject
+ * @property {string} projectName
+ * @property {boolean} saving
+ * @property {boolean} saved
+ * @property {string} message
+ * @property {boolean} updateAvailable
+ * @property {Object} user
+ */
+
+ /**
+  * 
+  * @param {*} user 
+  * @returns {AppState}
+  */
 function createFreshState(user) {
     return {
         batchAddSectionId: null,
@@ -101,7 +126,7 @@ class App extends Component {
         this.firstLaunch = true;
 
         this.state = createFreshState();
-        this.state.project = createProjectFromTemplate();
+        this.state.project = Project.fromTemplate('blank');
 
         this.handleUserTriggeredUpdate = this.handleUserTriggeredUpdate.bind(this);
         this.saveSession = debounce(this.saveSession.bind(this), 500, { leading: true, trailing: true });
@@ -229,8 +254,9 @@ class App extends Component {
             // Not logged in. Create fresh project (app launches with fresh project)
             idbLoadTemporaryProject().then(idbProject => {
                 if (idbProject) {
+                    const project = Project.fromObject(idbProject);
                     this.setState({
-                        project: projectNeedsUpgrade(idbProject) ? upgradeProject(idbProject) : idbProject
+                        project: projectNeedsUpgrade(project) ? upgradeProject(project) : project
                     }, () => {
                         resetProjectQueryString();
                         hideLoadingScreen();
@@ -273,7 +299,7 @@ class App extends Component {
             this.setState({user}, () => {
                 if (user) {
                     // User logs in; has a "fresh" (unmodified, just started) project
-                    if (isBlankProject(this.state.project)) {
+                    if (Project.isTemplate(this.state.project, 'blank')) {
                         listProjects(user).then(cloudProjects => {
                             // Load project if it already exists
                             if (Object.keys(cloudProjects).indexOf(this.state.projectName) !== -1) {
@@ -397,7 +423,7 @@ class App extends Component {
         deleteProject(this.state.user, this.state.projectName).then(() => {
             getUnusedProjectName(this.state.user).then(name => {
                 const newState = Object.assign({}, createFreshState(this.state.user), {
-                    project: createProjectFromTemplate(),
+                    project: Project.fromTemplate('blank'),
                     projectName: name
                 });
         
@@ -588,7 +614,7 @@ class App extends Component {
 
     handleRequestDuplicateProject() {
         getUnusedProjectName(this.state.user, this.state.projectName).then(name => {
-            const newProject = duplicateProject(this.state.project);
+            const newProject = Project.clone(this.state.project);
             const newState = Object.assign({},
                 createFreshState(this.state.user),
                 {
@@ -605,8 +631,8 @@ class App extends Component {
     }
 
     handleRequestImportProject(project, name) {
-        if (validateProject(project)) {
-            const newProject = duplicateProject(project);
+        try {
+            const newProject = Project.clone(project);
             const newState = Object.assign({},
                 createFreshState(this.state.user),
                 {
@@ -634,7 +660,7 @@ class App extends Component {
             else 
                 this.setState(newState);
         }
-        else {
+        catch {
             console.error(new Error('Unable to load project - invalid format.'));
         }
     }
@@ -662,7 +688,7 @@ class App extends Component {
 
     /* DIALOG EVENTS */
     handleSelectNewProjectTemplate(template) {
-        const project = createProjectFromTemplate(template);
+        const project = Project.fromTemplate(template);
         if (this.state.user) {
             getUnusedProjectName(this.state.user).then(name => {
                 this.setState(Object.assign({},

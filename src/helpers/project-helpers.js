@@ -63,6 +63,10 @@ export function idbDeleteTemporaryProject () {
 }
 
 /* DOM/window updates */
+/**
+ * Sets the current browser query string to the given project name
+ * @param {string} name 
+ */
 export function updateProjectQueryString(name) {
     const searchParams = new URLSearchParams(location.search);
     searchParams.delete('project');
@@ -83,6 +87,12 @@ export function resetProjectQueryString() {
     document.title = APP_NAME;
 }
 
+/**
+ * 
+ * @param {Array<{id: string}>} oldItems 
+ * @param {Array<{id: string}>} newItems 
+ * @returns {boolean}
+ */
 function orderChanged(oldItems, newItems) {
     return JSON.stringify(oldItems.map(item => item.id)) !== JSON.stringify(newItems.map(item => item.id));
 }
@@ -95,6 +105,12 @@ function reduceById(items) {
     }, {});
 }
 
+/**
+ * 
+ * @param {Project} project 
+ * @param {boolean} updateDateModified 
+ * @returns {ProjectSettings}
+ */
 function getSettings(project, updateDateModified) {
     return Object.assign({}, project.settings || {}, {
         appVersion: project.appVersion || undefined,
@@ -308,16 +324,27 @@ export function deleteMemberData(user, id) {
     })
 }
 
+/**
+ * 
+ * @param {Project} project 
+ * @returns {boolean}
+ */
 export function projectNeedsUpgrade(project) {
     return semver.lt(project.appVersion, PROJECT_FORMAT_VER);
 }
 
+/**
+ * Given a project, returns a copy of the project that is upgraded to the most recent app version
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function upgradeProject(project) {
+    // Parse as a plain object first since it might not be in the appropriate Project format
     let finalProject = JSON.parse(JSON.stringify(project));
 
     if (semver.lt(finalProject.appVersion, '0.2.0')) {
         finalProject.appVersion = '0.2.0';
-        finalProject.regions = [createRegion()];
+        finalProject.regions = [new Region()];
         finalProject.regions[finalProject.regions.length - 1].curvedLayout = finalProject.settings.curvedLayout;
         for (let i=0; i<finalProject.sections.length; i++) {
             finalProject.sections[i].region = finalProject.regions[finalProject.regions.length -1].id;
@@ -329,18 +356,18 @@ export function upgradeProject(project) {
     if (semver.lt(finalProject.appVersion, '0.3.0')) {
         finalProject.appVersion = '0.3.0';
         finalProject.sections = finalProject.sections.map(currentSection => {
-            return Object.assign({}, currentSection, {
+            return Section.fromObject(Object.assign({}, currentSection, {
                 offsetType: 'first-row',
                 offsetValue: 0
-            });
+            }));
         });
     }
     if (semver.lt(finalProject.appVersion, '0.8.0')) {
         finalProject.appVersion = '0.8.0';
         finalProject.regions = finalProject.regions.map(currentRegion => {
-            return Object.assign({}, currentRegion, {
+            return Region.fromObject(Object.assign({}, currentRegion, {
                 angle: 180
-            });
+            }));
         });
     }
     if (semver.lt(finalProject.appVersion, '0.10.0')) {
@@ -360,10 +387,16 @@ export function upgradeProject(project) {
         }
     }
 
-    return finalProject;
+    return Project.fromObject(finalProject);
 }
 
 /* Project info and stats */
+/**
+ * 
+ * @param {*} user 
+ * @param {string} name 
+ * @returns {Promise<string>}
+ */
 export function getUnusedProjectName(user, name = DEFAULT_NAME) {
     return listProjects(user).then(projects => {
         let num = 1, found = false;
@@ -379,6 +412,12 @@ export function getUnusedProjectName(user, name = DEFAULT_NAME) {
     });
 }
 
+/**
+ * 
+ * @param {*} user 
+ * @param {string} name 
+ * @returns {Promise<Project|Error>}
+ */
 export function loadProject(user, name) {
     return new Promise((resolve, reject) => {
         if (user) {
@@ -412,19 +451,19 @@ export function loadProject(user, name) {
                     const unpackedRegions = regions.map(current => {
                         const data = Object.assign({id: current}, regionData[current]);
                         delete data.projectName;
-                        return data;
+                        return Region.fromObject(data);
                     });
     
                     const unpackedSections = sections.map(current => {
                         const data = Object.assign({id: current}, sectionData[current]);
                         delete data.projectName;
-                        return data;
+                        return Section.fromObject(data);
                     });
     
                     const unpackedMembers = members.map(current => {
                         const data = Object.assign({id: current}, memberData[current]);
                         delete data.projectName;
-                        return data;
+                        return Member.fromObject(data);
                     });
     
                     resolve({
@@ -446,6 +485,11 @@ export function loadProject(user, name) {
     })
 }
 
+/**
+ * 
+ * @param {*} user 
+ * @returns {Object.<string, ProjectSettings>}
+ */
 export function listProjects(user) {
     return new Promise((resolve, reject) => {
         if (user) {
@@ -458,146 +502,278 @@ export function listProjects(user) {
     });
 }
 
-/* Create types */
-export function createProjectFromTemplate (templateId = 'blank') {
-    // Get project from templates
-    const project = templates.find(template => template.id === templateId).data;
-    return duplicateProject(project);
-}
-
-export function isBlankProject(project) {
-    const empty = createProjectFromTemplate();
-    const emptyRegion = empty.regions.length > 0 ? JSON.parse(JSON.stringify(empty.regions[0])) : '';
-    const projectRegion = project.regions.length > 0 ? JSON.parse(JSON.stringify(project.regions[0])) : '';
-
-    delete emptyRegion.id;
-    delete projectRegion.id;
-    return  (
-        project.appVersion === empty.appVersion &&
-        JSON.stringify(emptyRegion) === JSON.stringify(projectRegion) && project.regions.length === 1 && empty.regions.length === 1 &&
-        JSON.stringify(project.sections) === JSON.stringify(empty.sections) &&
-        JSON.stringify(project.members) === JSON.stringify(empty.members) &&
-        JSON.stringify(project.settings) === JSON.stringify(empty.settings)
-    )
-}
-
-export function duplicateProject(oldProject) {
-    const project = JSON.parse(JSON.stringify(oldProject));
-
-    // Update regions
-    for (const region of project.regions) {
-        const newId = uuid();
-
-        project.sections.filter(section => section.region === region.id).forEach(section => {
-            section.region = newId;
-        });
-        region.id = newId;
-    }
-
-    // Update sections
-    for (const section of project.sections) {
-        const newId = uuid();
-
-        project.members.filter(member => member.section === section.id).forEach(member => {
-            member.section = newId;
-        });
-        section.id = newId;
-    }
-
-    // Update members
-    for (const member of project.members) {
-        const newId = uuid();
-        member.id = newId;
-    }
-
-    // Update any other metadata
-    const currentTime = Date.now();
-    project.appVersion = PROJECT_FORMAT_VER;
-    project.created = currentTime;
-    project.modified = currentTime;
-    
-    return project;
-}
-
 export const DEFAULT_SECTION_ROW_LENGTH = 2;
 
-export function createRegion (name = 'Untitled region') {
-    return {
-        name,
-        id: uuid(),
-        curvedLayout: true,
-        angle: 180
+/**
+ * @typedef {Object} ProjectSettings
+ * @property {boolean} downstageTop If true, orients the seating chart so the audience is at the top
+ * @property {boolean} implicitSeatsVisible If true, seats that were generated automatically will always be shown, even if they don't have a member
+ * @property {number} seatGap The space, in pixels, by which to separate seats from row to row
+ * @property {number} seatLabelFontSize The label font size, in pixels
+ * @property {('initials'|'full')} seatNameLabels Render seat name labels as initials or full names
+ * @property {number} seatSize The seat size, in pixels
+ */
+
+/**
+ * Class representing a project
+ */
+export class Project {
+    constructor () {
+        /**
+         * @type {string}
+         * The version of the app in which the project was created
+         */
+        this.appVersion = PROJECT_FORMAT_VER;
+
+        /**
+         * @type {number}
+         * The date the project was created
+         */
+        this.created = Date.now();
+
+        /**
+         * @type {number}
+         * The date the project was last modified
+         */
+        this.modified = this.created;
+
+        /**
+         * @type {Array<Region>}
+         * An array of Regions in the project
+         */
+        this.regions = [];
+
+        /**
+         * @type {Array<Section>}
+         * An array of Sections in the project
+         */
+        this.sections = [];
+
+        /**
+         * @type {Array<Member>}
+         * An array of Members in the project
+         */
+        this.members = [];
+
+        /**
+         * @type {ProjectSettings}
+         * Settings to configure project display and behavior
+         */
+        this.settings = {
+            seatNameLabels: 'initials',
+            downstageTop: false,
+            implicitSeatsVisible: false,
+            seatGap: 1.0,
+            seatSize: 32,
+            seatLabelFontSize: 16
+        };
+    }
+
+    /**
+     * @param {Project} project
+     * @param {Project} project
+     * @param {string} templateId 
+     * @returns {boolean}
+     */
+    static isTemplate(project, templateId = 'blank') {
+        const empty = Project.fromTemplate(templateId);
+        const emptyRegion = JSON.parse(JSON.stringify(empty.regions[0]));
+        const projectRegion = JSON.parse(JSON.stringify(project.regions[0]));
+
+        delete emptyRegion.id;
+        delete projectRegion.id;
+        return  (
+            project.appVersion === empty.appVersion &&
+            JSON.stringify(emptyRegion) === JSON.stringify(projectRegion) && project.regions.length === 1 && empty.regions.length === 1 &&
+            JSON.stringify(project.sections) === JSON.stringify(empty.sections) &&
+            JSON.stringify(project.members) === JSON.stringify(empty.members) &&
+            JSON.stringify(project.settings) === JSON.stringify(empty.settings)
+        )
+    }
+    
+    /**
+     * @param {Object} obj
+     * @returns {Project}
+     */
+    static fromObject (obj) {
+        const project = new Project();
+        
+        project.regions = obj.regions.map(region => (
+            Region.fromObject(region)
+        ));
+
+        project.sections = obj.sections.map(section => (
+            Section.fromObject(section)
+        ));
+
+        project.members = obj.members.map(member => (
+            Member.fromObject(member)
+        ));
+        
+        Object.assign(project.settings, obj.settings);
+        
+        return project;
+    }
+
+    /**
+     * 
+     * @param {string} templateId
+     * @returns {Project}
+     */
+    static fromTemplate (templateId = 'blank') {
+        return Project.clone(templates.find(template => template.id === templateId).data);
+    }
+
+    /**
+     * @param {Project} oldProject
+     * @returns {Project}
+     */
+    static clone (oldProject) {
+        const project = Project.fromObject(oldProject);
+        
+        // Update regions
+        for (let i=0; i<project.regions.length; i++) {
+            const newId = uuid();
+
+            project.sections.filter(section => section.region === project.regions[i].id).forEach(section => {
+                section.region = newId;
+            });
+
+            project.regions[i] = Region.fromObject(Object.assign({}, project.regions[i], {id: newId}));
+        }
+
+        // Update sections
+        for (let i=0; i<project.sections; i++) {
+            const newId = uuid();
+
+            project.members.filter(member => member.section === project.sections[i].id).forEach(member => {
+                member.section = newId;
+            });
+
+            project.sections[i] = Section.fromObject(Object.assign({}, project.sections[i], {id: newId}));
+        }
+
+        // Update members
+        for (let i=0; i<project.members.length; i++) {
+            const newId = uuid();
+            project.members[i] = Member.fromObject(Object.assign({}, project.members[i], {id: newId}));
+        }
+
+        // Update any other metadata
+        project.appVersion = PROJECT_FORMAT_VER;
+        project.created = Date.now();
+        project.modified = project.created;
+        
+        return project;
     }
 }
 
-export function createSection (name = 'Untitled', regionId = null) {
-    return {
-        name,
-        color: randomColor({luminosity: 'light'}),
-        id: uuid(),
-        region: regionId,
-        offsetType: 'first-row',
-        offsetValue: 0,
-        rowSettings: [2, 4, 4]
-    };
-}
+export class Region {
+    constructor (name = 'Untitled region') {
+        /**
+         * @type {string}
+         */
+        this.name = name;
 
-export function createPerson (name = 'New person', sectionId = null) {
-    return {
-        name: name,
-        id: uuid(),
-        section: sectionId,
-        notes: ''
+        /**
+         * @type {string}
+         */
+        this.id = uuid();
+
+        /**
+         * @type {boolean}
+         */
+        this.curvedLayout = true;
+
+        /**
+         * @type {number}
+         */
+        this.angle = 180;
+    }
+
+    /**
+     * @returns {Region}
+     */
+    static fromObject (obj) {
+        return Object.assign(new Region(), obj);
     }
 }
 
-export function isRegion (obj) {
-    return JSON.stringify(Object.keys(obj).sort()) == JSON.stringify(Object.keys(createRegion()).sort());
+export class Section {
+    constructor (name = 'Untitled', regionId = null) {
+        /**
+         * @type {string}
+         */
+        this.name = name;
+
+        /**
+         * @type {string}
+         */
+        this.color = randomColor({luminosity: 'light'});
+
+        /**
+         * @type {string}
+         */
+        this.id = uuid();
+
+        /**
+         * @type {string}
+         */
+        this.region = regionId;
+
+        /**
+         * @type {('first-row'|'custom-row'|'last-row')}
+         */
+        this.offsetType = 'first-row';
+
+        /**
+         * @type {number}
+         */
+        this.offsetValue = 0;
+
+        /**
+         * @type {Array<number>}
+         */
+        this.rowSettings = [2, 4, 4];
+    }
+
+    /**
+     * @returns {Section}
+     */
+    static fromObject (obj) {
+        return Object.assign(new Section(), obj);
+    }
 }
 
-export function isSection (obj) {
-    return JSON.stringify(Object.keys(obj).sort()) == JSON.stringify(Object.keys(createSection()).sort());
-}
+export class Member {
+    constructor (name = 'New person', sectionId = null) {
+        /**
+         * @type {string}
+         */
+        this.name = name;
 
-export function isMember (obj) {
-    return JSON.stringify(Object.keys(obj).sort()) == JSON.stringify(Object.keys(createPerson()).sort());
-}
+        /**
+         * @type {string}
+         */
+        this.id = uuid();
 
-/* Clone types */
+        /**
+         * @type {string}
+         */
+        this.section = sectionId;
 
-export function cloneRegion (region) {
-    return Object.assign({}, region);
-}
+        /**
+         * @type {string}
+         */
+        this.notes = '';
+    }
 
-export function cloneSection (section) {
-    const newSection = Object.assign({}, section);
-    newSection.rowSettings = section.rowSettings.slice();
-    return newSection;
-}
-
-export function clonePerson (person) {
-    return Object.assign({}, person);
-}
-
-export function validateProject(project) {
-    let valid = true;
-
-    if (!Array.isArray(project.regions))
-        valid = false;
-    if (!Array.isArray(project.sections))
-        valid = false;
-    if (!Array.isArray(project.members))
-        valid = false;
-    if (typeof project.settings !== 'object')
-        valid = false;
-    if (typeof project.appVersion !== 'string')
-        valid = false;
-    if (typeof project.created !== 'number')
-        valid = false;
-    if (typeof project.modified !== 'number')
-        valid = false;
-
-    return valid;
+    /**
+     * @returns {Member}
+     */
+    static fromObject (obj) {
+        return Object.assign(new Member(), obj);
+    }
 }
 
 export function browseForFile () {
@@ -632,35 +808,63 @@ export function browseForFile () {
     });
 }
 
-// Given a region ID and project, returns a new copy of the project with the region removed
+/**
+ * Given a region ID and project, returns a new copy of the project with the region removed
+ * @param {string} regionId 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function deleteRegion(regionId, project) {
     const regions = project.regions.filter(region => region.id !== regionId);
     const sections = project.sections.filter(section => section.region !== regionId);
     const members = project.members.filter(member => sections.some(section => section.id === member.section));
 
-    return Object.assign({}, project, {regions, sections, members})
+    return Project.fromObject(Object.assign({}, project, {regions, sections, members}));
 }
 
-// Given a section ID and project, returns a new copy of the project with the section removed
+/**
+ * Given a section ID and project, returns a new copy of the project with the section removed
+ * @param {string} sectionId 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function deleteSection(sectionId, project) {
     const sections = project.sections.filter(section => section.id !== sectionId);
     const members = project.members.filter(member => member.section !== sectionId);
 
-    return Object.assign({}, project, {sections, members})
+    return Project.fromObject(Object.assign({}, project, {sections, members}));
 }
 
-// Given a member ID and project, returns a new copy of the project with the member removed
+/**
+ * Given a member ID and project, returns a new copy of the project with the member removed
+ * @param {string} memberId 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function deleteMember(memberId, project) {
     const members = project.members.filter(member => member.id !== memberId);
-    return Object.assign({}, project, {members});
+    return Project.fromObject(Object.assign({}, project, {members}));
 }
 
-// Given a list of names, a section ID, and a project, returns a new copy of the project with the members added
+/**
+ * Given a list of names, a section ID, and a project, returns a new copy of the project with the members added
+ * @param {Array<string>} names 
+ * @param {string} sectionId 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function batchAddMembers(names, sectionId, project) {
-    const members = project.members.concat(names.map(name => createPerson(name ? name : undefined, sectionId)));
-    return Object.assign({}, project, { members });
+    const members = project.members.concat(names.map(name => new Member(name ? name : undefined, sectionId)));
+    return Project.fromObject(Object.assign({}, project, { members }));
 }
 
+/**
+ * Given a region ID, an array index, and a project, returns a new copy of the project with the region moved to the given index
+ * @param {string} regionId 
+ * @param {number} index 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function moveRegionToIndex(regionId, index, project) {
     const regions = project.regions.slice();
     const indexOfRegion = regions.findIndex(current => current.id === regionId);
@@ -668,9 +872,17 @@ export function moveRegionToIndex(regionId, index, project) {
     const [removed] = regions.splice(indexOfRegion, 1);
     regions.splice(index, 0, removed);
 
-    return Object.assign({}, project, {regions});
+    return Project.fromObject(Object.assign({}, project, {regions}));
 }
 
+/**
+ * Given a section ID, a region ID, an array index, and a project, returns a new copy of the project with the section moved to the given index in the specified region
+ * @param {string} sectionId 
+ * @param {string} regionId 
+ * @param {number} index 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function moveSectionToRegion(sectionId, regionId, index, project) {
     // Group sections by region
     const sectionsByRegion = project.regions.reduce((acc, region) => {
@@ -689,9 +901,16 @@ export function moveSectionToRegion(sectionId, regionId, index, project) {
     sectionsByRegion[regionId].splice(index, 0, removed);
     const sections = Object.values(sectionsByRegion).reduce((acc, val) => acc.concat(val), []);
 
-    return Object.assign({}, project, {sections});
+    return Project.fromObject(Object.assign({}, project, {sections}));
 }
 
+/**
+ * Given a member ID, a section ID, an array index, and a project, returns a new copy of the project with the member moved to the given index in the specified section
+ * @param {string} memberId 
+ * @param {string} sectionId 
+ * @param {number} index 
+ * @param {Project} project 
+ */
 export function moveMemberToSection(memberId, sectionId, index, project) {
     // Remove and clone the member who is moving
     const removed = Object.assign({}, project.members.find(member => member.id === memberId), {section: sectionId});
@@ -708,76 +927,104 @@ export function moveMemberToSection(memberId, sectionId, index, project) {
     // Reinsert the removed section and set the state
     members.push(...destinationSectionMembers);
 
-    return Object.assign({}, project, {members});
+    return Project.fromObject(Object.assign({}, project, {members}));
 }
 
+/**
+ * Given a project, returns a copy of the project with a new blank region added to it
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function addNewRegion(project) {
-    const regions = [createRegion(), ...project.regions];
-    return Object.assign({}, project, {regions});
+    const regions = [new Region(), ...project.regions];
+    return Project.fromObject(Object.assign({}, project, {regions}));
 }
 
+/**
+ * Given a region ID and a project, returns a copy of the project with a new blank section added to the specified region
+ * @param {string} regionId 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function addNewSection(regionId, project) {
     const sections = project.sections.slice();
     const regions = project.regions.slice();
 
-    let newSection, newRegion;
+    sections.push(new Section());
 
-    newSection = createSection();
-    sections.push(newSection);
-    if (regions.length === 0) {
-        // There are no regions. Create one and assign the new section to it.
-        newRegion = createRegion();
-        regions.push(newRegion);
-        sections[sections.length - 1].region = regions[regions.length - 1].id;
-    }
-    else {
-        // Assign the section to the given region; otherwise, assign it to the first region
-        sections[sections.length - 1].region = regionId || regions[0].id;
-    }
+    // Assign the section to the given region; otherwise, assign it to the first region
+    sections[sections.length - 1].region = regionId || regions[0].id;
 
-    return Object.assign({}, project, {sections: sections, regions: regions});
+    return Project.fromObject(Object.assign({}, project, {sections: sections, regions: regions}));
 }
 
+/**
+ * Given a region ID, region data, and a project, returns a copy of the project with the data merged into the region with the given ID
+ * @param {string} regionId 
+ * @param {Region} data 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function applyRegionEdits(regionId, data, project) {
     const regions = project.regions.slice();
 
     const originalData = regions.find(region => region.id === regionId);
-    const updatedRegion = Object.assign({}, originalData, data);
+    const updatedRegion = Object.assign(new Region(), originalData, data);
     const indexOfRegion = regions.indexOf(originalData);
     regions.splice(indexOfRegion, 1, updatedRegion);
 
-    return Object.assign({}, project, {regions});
+    return Project.fromObject(Object.assign({}, project, {regions}));
 }
 
+/**
+ * Given a section ID, section data, and a project, returns a copy of the project with the data merged into the section with the given ID
+ * @param {string} sectionId 
+ * @param {Section} data 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function applySectionEdits(sectionId, data, project) {
     const sections = project.sections.slice();
 
     const originalData = sections.find(section => section.id === sectionId);
     const indexOfSection = sections.indexOf(originalData);
-    const updatedSection = Object.assign({}, originalData, data);
+    const updatedSection = Object.assign(new Section(), originalData, data);
     sections.splice(indexOfSection, 1, updatedSection);
 
-    return Object.assign({}, project, {sections});
+    return Project.fromObject(Object.assign({}, project, {sections}));
 }
 
+/**
+ * Given a member ID, member data, and a project, returns a copy of the project with the data merged into the member with the given ID
+ * @param {string} memberId 
+ * @param {Member} data 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function applyMemberEdits(memberId, data, project) {
     const members = project.members.slice();
         
     const originalData = members.find(member => member.id === memberId);
     const indexOfMember = members.indexOf(originalData);
-    const updatedMember = Object.assign({}, originalData, data);
+    const updatedMember = Object.assign(new Member(), originalData, data);
     members.splice(indexOfMember, 1, updatedMember);
 
-    return Object.assign({}, project, {members});
+    return Project.fromObject(Object.assign({}, project, {members}));
 }
 
+/**
+ * Given a section ID and a project, returns a copy of the project with the section's members shuffled into a new, randomized order
+ * @param {string} sectionId 
+ * @param {Project} project 
+ * @returns {Project}
+ */
 export function shuffleSection(sectionId, project) {
     const membersToShuffle = project.members.filter(member => member.section === sectionId);
     const existingMembers = project.members.filter(member => member.section !== sectionId);
 
     existingMembers.push(...knuthShuffle(membersToShuffle));
 
-    return Object.assign({}, project, {members: existingMembers});
+    return Project.fromObject(Object.assign({}, project, {members: existingMembers}));
 }
 
 export async function exportProjectFile(projectName, projectForExport, options) {
