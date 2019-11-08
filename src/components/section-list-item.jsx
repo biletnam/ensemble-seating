@@ -15,13 +15,14 @@ import './section-list-item.css';
 import PersonAddIcon from '../icons/person_add-24px.svg';
 import GroupAddIcon from '../icons/group_add-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
+import { byOrder } from '../helpers/project-helpers.js';
 
 const SectionListItem = props => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     function handleClickedNewPersonButton() {
         if (props.onRequestNewPerson)
-            props.onRequestNewPerson(props.data.id);
+            props.onRequestNewPerson(props.sectionId);
     }
 
     function handleClickedMemberListItem(memberId) {
@@ -31,25 +32,27 @@ const SectionListItem = props => {
 
     function handleClickedSectionButton() {
         if (props.onRequestSelectMember)
-            props.onRequestSelectMember(props.data.id);
+            props.onRequestSelectMember(props.sectionId);
     }
 
     function handleClickedBatchAddMembers() {
         if (props.onRequestBatchAdd)
-            props.onRequestBatchAdd(props.data.id);
+            props.onRequestBatchAdd(props.sectionId);
     }
 
     function handleSelectedMenuItem(action) {
         switch (action) {
             case 'shuffle':
-                props.onRequestShuffle && props.onRequestShuffle(props.data.id);
+                props.onRequestShuffle && props.onRequestShuffle(props.sectionId);
                 break;
         }
         setMenuOpen(false);
     }
 
-    return <Draggable key={props.data.id}
-        draggableId={props.data.id}
+    const memberEntries = Object.entries(props.members).sort(byOrder);
+
+    return <Draggable key={props.sectionId}
+        draggableId={props.sectionId}
         index={props.index}
         type='section'>
             {(provided, snapshot) => (
@@ -60,19 +63,20 @@ const SectionListItem = props => {
                         <CardPrimaryAction className='section-list-item__titlebar'
                             style={{backgroundColor:props.data.color,color:tinycolor(props.data.color).isLight()?'#333':'#fff'}}
                             {...provided.dragHandleProps}
-                            key={props.data.id}
+                            key={props.sectionId}
                             onClick={handleClickedSectionButton}>
                             <p>{props.data.name}</p>
                         </CardPrimaryAction>
 
-                        <Droppable droppableId={props.data.id} type='member'>
+                        <Droppable droppableId={props.sectionId} type='member'>
                             {(provided, snapshot) => (
                                 <div ref={provided.innerRef} {...provided.droppableProps}>
                                     {/* Individual performers */}
-                                    {props.members.map((person, personIndex) => {
-                                        return <MemberListItem key={person.id} 
+                                    {memberEntries.map(([personId, person], personIndex) => {
+                                        return <MemberListItem key={personId} 
                                             index={personIndex} 
                                             data={person}
+                                            memberId={personId}
                                             onClick={handleClickedMemberListItem} />
                                     })}
                                     

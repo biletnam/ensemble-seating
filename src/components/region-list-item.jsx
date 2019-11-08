@@ -33,15 +33,15 @@ class RegionListItem extends PureComponent {
 
     handleClickedNewSection() {
         if (typeof this.props.onRequestNewSection === 'function')
-            this.props.onRequestNewSection(this.props.region.id);
+            this.props.onRequestNewSection(this.props.regionId);
     }
 
     handleActionMenuClick(action) {
         if (action === 'delete' && typeof this.props.onRequestDeleteRegion === 'function')
-            this.props.onRequestDeleteRegion(this.props.region.id);
+            this.props.onRequestDeleteRegion(this.props.regionId);
         else if (typeof this.props.onRequestMoveRegion === 'function') {
             const splitAction = action.split('-');
-            this.props.onRequestMoveRegion(this.props.region.id, splitAction[splitAction.length - 1]);
+            this.props.onRequestMoveRegion(this.props.regionId, splitAction[splitAction.length - 1]);
         }
         this.setState({actionMenuOpen: false});
     }
@@ -56,14 +56,14 @@ class RegionListItem extends PureComponent {
     }
 
     render() {
-        return <Droppable droppableId={this.props.region.id} type='section'>
+        return <Droppable droppableId={this.props.regionId} type='section'>
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className='roster__droppable-section-area'>
                     {/* Iterate over sections here */}
                     <Ripple>
                     <Elevation z='1'
                         className='roster__region-heading-container'
-                        onClick={() => this.props.onRequestSelectMember(this.props.region.id)}>
+                        onClick={() => this.props.onRequestSelectMember(this.props.regionId)}>
                         <span className='roster__region-heading-text'>{this.props.region.name}</span>
                         {this.props.showEditAndDeleteControls && <ListActionMenu
                             moveToTop moveUp moveDown moveToBottom deleteItem
@@ -73,11 +73,15 @@ class RegionListItem extends PureComponent {
                             <IconButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
                         </ListActionMenu>}
                     </Elevation></Ripple>
-                    {this.props.sections.map((currentSection, currentIndex) => {
-                        return <SectionListItem key={currentSection.id}
+                    {Object.entries(this.props.sections).map(([sectionId, currentSection], currentIndex) => {
+                        return <SectionListItem key={sectionId}
                             data={currentSection}
+                            sectionId={sectionId}
                             index={currentIndex}
-                            members={this.props.members.filter(currentMember => currentMember.section === currentSection.id)}
+                            members={Object.fromEntries(
+                                Object.entries(this.props.members)
+                                .filter(([, currentMember]) => currentMember.section === sectionId)
+                            )}
                             onRequestNewPerson={this.props.onRequestNewPerson}
                             onRequestBatchAdd={this.props.onRequestBatchAdd}
                             onRequestShuffle={this.props.onRequestShuffleSection}

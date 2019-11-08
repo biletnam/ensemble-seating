@@ -14,12 +14,12 @@ class MemberListItem extends PureComponent {
 
     handleClick() {
         if (this.props.onClick)
-            this.props.onClick(this.props.data.id);
+            this.props.onClick(this.props.memberId);
     }
 
     render() {
-        return <Draggable key={this.props.data.id}
-            draggableId={this.props.data.id}
+        return <Draggable key={this.props.memberId}
+            draggableId={this.props.memberId}
             index={this.props.index}
             type='member'>
                 {(provided, snapshot) => (

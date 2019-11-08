@@ -9,6 +9,7 @@ import { Region, Section, Member } from '../helpers/project-helpers';
 const Editor = props => {
     let { 
         data,
+        editorId,
         onEditRegion,
         onEditSection,
         onEditMember,
@@ -43,15 +44,15 @@ const Editor = props => {
 
     function handleDelete() {
         if (data instanceof Region)
-            onRequestDeleteRegion(data.id);
+            onRequestDeleteRegion(editorId);
         else if (data instanceof Section)
-            onRequestDeleteSection(data.id);
+            onRequestDeleteSection(editorId);
         else if (data instanceof Member)
-            onRequestDeleteMember(data.id);
+            onRequestDeleteMember(editorId);
     }
 
     return <Sidebar {...rest} id='editor' title={`Edit ${friendlyName}`} onClickedDelete={!(data instanceof Region && !onRequestDeleteRegion) && handleDelete}>
-        {Control && <Control onRequestEdit={handleEdit} data={data} id='editor__content' />}
+        {Control && <Control onRequestEdit={handleEdit} data={data} editorId={editorId} id='editor__content' />}
     </Sidebar>
 }
 

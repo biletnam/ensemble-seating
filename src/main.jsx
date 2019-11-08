@@ -30,8 +30,6 @@ import {
     saveDiff,
     loadProject,
     deleteProject,
-    projectNeedsUpgrade,
-    upgradeProject,
     updateProjectQueryString,
     resetProjectQueryString,
     getUnusedProjectName,
@@ -212,19 +210,15 @@ class App extends Component {
                     loadProject(user, initProject).then(project => {
                         if (project) {
                             const newState = {
-                                project: Object.assign({}, project),
+                                project: Project.fromObject(project),
                                 projectName: initProject,
                                 saved: true,
                                 user
                             }
-                            let upgradedProject = false;
-                            if (projectNeedsUpgrade(project)) {
-                                upgradedProject = true;
-                                newState.project = upgradeProject(project);
-                            }
 
-                            if (upgradedProject)
-                                this.saveSession(project, newState.project)
+                            if (semver.gt(newState.project.appVersion, project.appVersion)) {
+                                this.saveSession(project, newState.project);
+                            }
 
                             this.setState(newState, () => {
                                 updateProjectQueryString(newState.projectName, user);
@@ -254,9 +248,8 @@ class App extends Component {
             // Not logged in. Create fresh project (app launches with fresh project)
             idbLoadTemporaryProject().then(idbProject => {
                 if (idbProject) {
-                    const project = Project.fromObject(idbProject);
                     this.setState({
-                        project: projectNeedsUpgrade(project) ? upgradeProject(project) : project
+                        project: Project.fromObject(idbProject)
                     }, () => {
                         resetProjectQueryString();
                         hideLoadingScreen();
@@ -479,7 +472,7 @@ class App extends Component {
     }
 
     handleRequestedBatchAddMembers(sectionId) {
-        const requestedSection = this.state.project.sections.find(current => current.id === sectionId);
+        const requestedSection = this.state.project.sections[sectionId];
         this.setState({
             batchAddSectionId: sectionId,
             batchAddSectionName: requestedSection.name,
@@ -509,15 +502,15 @@ class App extends Component {
     }
 
     handleRequestedDeleteRegion(regionId) {
-        const requestedRegion = this.state.project.regions.find(current => current.id === regionId);
-        const affectedSections = this.state.project.sections.filter(current => current.region === regionId);
+        const requestedRegion = this.state.project.regions[regionId];
+        const affectedSections = Object.entries(this.state.project.sections).filter(([,section]) => section.region === regionId);
 
         dialogQueue.confirm({
             title: `Delete "${requestedRegion.name}" region?`,
             body: <>
                 <p>This will also delete the following sections and all their section members:</p>
                 <ul>
-                    {affectedSections.map(current => <li key={current.id}>{current.name}</li>)}
+                    {affectedSections.map(([sectionId, sectionData]) => <li key={sectionId}>{sectionData.name}</li>)}
                 </ul>
             </>
         }).then(confirmed => {
@@ -527,7 +520,7 @@ class App extends Component {
     }
 
     handleRequestedDeleteSection(sectionId) {
-        const requestedSection = this.state.project.sections.find(current => current.id === sectionId);
+        const requestedSection = this.state.project.sections[sectionId];
 
         dialogQueue.confirm({
             title: `Delete "${requestedSection.name}" section?`,
@@ -539,8 +532,8 @@ class App extends Component {
     }
 
     handleRequestedDeleteMember(memberId) {
-        const requestedMember = this.state.project.members.find(current => current.id === memberId);
-        const memberSection = this.state.project.sections.find(current => current.id === requestedMember.section);
+        const requestedMember = this.state.project.members[memberId];
+        const memberSection = this.state.project.sections[requestedMember.section];
 
         dialogQueue.confirm({
             title: `Delete ${requestedMember.name}?`,
@@ -552,7 +545,7 @@ class App extends Component {
     }
 
     handleRequestedMoveRegion(regionId, direction) {
-        const currentIndex = this.state.project.regions.findIndex(current => current.id === regionId);
+        const currentIndex = this.state.project.regions[regionId].order;
         let destinationIndex = currentIndex;
 
         switch (direction) {
@@ -564,11 +557,11 @@ class App extends Component {
                     destinationIndex--;
                 break;
             case 'down':
-                if (destinationIndex < this.state.project.regions.length - 1)
+                if (destinationIndex < Object.keys(this.state.project.regions).length - 1)
                     destinationIndex++;
                 break;
             case 'bottom':
-                destinationIndex = this.state.project.regions.length - 1;
+                destinationIndex = Object.keys(this.state.project.regions).length - 1;
                 break;
         }
 
@@ -668,20 +661,18 @@ class App extends Component {
     handleRequestOpenProject(projectName) {
         loadProject(this.state.user, projectName).then(savedProject => {
             const newState = createFreshState(this.state.user);
-            let upgradedProject = false;
+            
             if (savedProject) {
-                newState.project = Object.assign({}, savedProject);
-                if (projectNeedsUpgrade(newState.project)) {
-                    upgradedProject = true;
-                    newState.project = upgradeProject(newState.project);
-                }
+                newState.project = Project.fromObject(savedProject);
             }
             newState.projectName = projectName;
             newState.saved = true;
+
             updateProjectQueryString(newState.projectName);
             this.setState(newState, () => {
-                if (upgradedProject)
+                if (semver.gt(newState.project.appVersion, savedProject.appVersion)) {
                     this.saveSession(savedProject, this.state.project);
+                }
             });
         })        
     }
@@ -820,6 +811,7 @@ class App extends Component {
                 project={this.state.project}
                 regions={this.state.project.regions}
                 sections={this.state.project.sections}
+                members={this.state.project.members}
                 settings={this.state.project.settings}
                 editorId={this.state.editorId}
                 expanded={!this.state.rosterOpen}
@@ -827,11 +819,12 @@ class App extends Component {
                 onRequestNewSection={this.handleClickedNewSectionButton} />
 
             {this.state.editorId && <Editor expanded={this.state.rosterOpen}
-                data={[...this.state.project.regions, ...this.state.project.sections, ...this.state.project.members].find(current => current.id === this.state.editorId)}
+                data={this.state.project.regions[this.state.editorId] || this.state.project.sections[this.state.editorId] || this.state.project.members[this.state.editorId]}
+                editorId={this.state.editorId}
                 onEditRegion={this.handleAcceptRegionEdits}
                 onEditSection={this.handleAcceptSectionEdits}
                 onEditMember={this.handleAcceptMemberEdits}
-                onRequestDeleteRegion={this.state.project.regions.length > 1 && this.handleRequestedDeleteRegion}
+                onRequestDeleteRegion={Object.keys(this.state.project.regions).length > 1 && this.handleRequestedDeleteRegion}
                 onRequestDeleteSection={this.handleRequestedDeleteSection}
                 onRequestDeleteMember={this.handleRequestedDeleteMember}
                 onClickedBack={() => this.setState({editorId: null})} />}

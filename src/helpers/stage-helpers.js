@@ -1,9 +1,13 @@
-import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project-helpers.js';
+import { DEFAULT_SECTION_ROW_LENGTH, Region, Section, Member } from '../helpers/project-helpers.js';
 
 export const seatSize = 32;
 export const seatGap = 1;
 export const regionGap = 2 * seatSize;
 
+/**
+ * 
+ * @param {Array<number|string>} rows 
+ */
 export function sumRows(rows) {
     let sum = 0;
     for (let i=0; i<rows.length; i++) {
@@ -22,97 +26,153 @@ export function getInitials(name) {
 }
 
 /**
- * Gets the section's absolute offset from the front of the ensemble
- * @param {object} currentSection 
- * @param {number} numOfRows 
- * @returns {number}
+ * @typedef {Object} SeatData
+ * @property {string} id
+ * @property {string} section
+ * @property {number} seat
+ * @property {string} member
+ * @property {boolean} implicit
+ * @property {string} color
+ * @property {number} x
+ * @property {number} y
  */
-function getRowOffset(currentSection, numOfRows) {
-    let rowOffset = 0;
-    if (currentSection.offsetType === 'custom-row')
-        rowOffset = parseInt(currentSection.offsetValue, 10) - 1;
-    else if (currentSection.offsetType === 'last-row')
-        rowOffset = numOfRows;
 
-    return rowOffset;
+/**
+ * 
+ * @param {[string, Region|Section|Member]} a 
+ * @param {[string, Region|Section|Member]} b 
+ */
+function byEntryOrder (a, b) {
+    if (a[1].order < b[1].order) {
+        return -1;
+    }
+    else if (a[1].order > b[1].order) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
+/**
+ * 
+ * @param {Array<[string, Section]>} sectionEntries 
+ * @returns {number}
+ */
+function getNumberOfRows (sectionEntries) {
+    return Math.max(...sectionEntries
+        .map(([, sectionData]) => sectionData.rowSettings.length)
+    );
+}
+
+ /**
+  * 
+  * @param {Object<string, Section>} sectionData 
+  * @return {Array<Array<SeatData>>}
+  */
 export function generateRows(sectionData) {
-    // 1.) find how many rows there are, ignoring 'last-row' offsets
-    // 2.) then, find the 'last-row' section with the most number of rows
-    //     and add it to the total
-    let lastRowMax = 0;
-    let origNumOfRows = Math.max(...sectionData.map(section => {
-        let returnValue = 0;
+    let sectionEntries = Object.entries(sectionData).sort(byEntryOrder);
+    let hasLastRowSection = false;
 
-        if (section.offsetType === 'first-row')
-            returnValue = section.rowSettings.length;
-        else if (section.offsetType === 'custom-row') {
-            const rowOffset = parseInt(section.offsetValue, 10);
-            returnValue = section.rowSettings.length + rowOffset;
+    // Normalize row offsets
+
+    sectionEntries = sectionEntries.map(([sectionId, sectionData], index) => {
+        if (sectionData.offsetType === 'first-row') {
+            return [sectionId, sectionData];
         }
-        else if (section.rowSettings.length > lastRowMax)
-            lastRowMax = section.rowSettings.length;
+        else if (sectionData.offsetType === 'custom-row') {
+            const paddedRowSettings = sectionData.rowSettings.slice();
+            // offsetValue is 1-based - skip 0
+            for (let i=1; i<sectionData.offsetValue; i++) {
+                paddedRowSettings.unshift(0);
+            }
+            return [sectionId, Section.fromObject(Object.assign({}, sectionData, {
+                rowSettings: paddedRowSettings
+            }))];
+        }
+        else if (sectionData.offsetType === 'last-row') {
+            // Check again later to set up 'last-row' offsets
+            hasLastRowSection = true;
+            return [sectionId, sectionData];
+        }
+    });
 
-        return returnValue;        
-    }));
+    let numOfRows = getNumberOfRows(
+        sectionEntries.filter(([,sectionData]) => sectionData.offsetType !== 'last-row')
+    );
 
-    const numOfRows = origNumOfRows + lastRowMax;
+    if (hasLastRowSection) {
+        // Go through all sections set to 'last-row', offsetting them
+        // based on the total number of static rows
+        sectionEntries = sectionEntries.map(([sectionId, sectionData]) => {
+            if (sectionData.offsetType === 'last-row') {
+                const paddedRowSettings = sectionData.rowSettings.slice();
+                for (let i=0; i<numOfRows; i++) {
+                    paddedRowSettings.unshift(0);
+                }
+                return [sectionId, Section.fromObject(Object.assign({}, sectionData, {
+                    rowSettings: paddedRowSettings
+                }))];
+            }
+            else {
+                return [sectionId, sectionData];
+            }
+        });
+        numOfRows = getNumberOfRows(sectionEntries);
+    }
 
+    /**
+     * @type {Array<Array<SeatData>>}
+     */
     const rows = [];
     
     for (let i=0; i<numOfRows; i++) {
         const currentRow = [];
-        
-        // Determine if implicit seats would be needed to maintain section alignment
-        // Conditions (any or all):
-        // 1.) A section has an offsetType of 'last-row'
-        // 2.) A section has an offsetType of 'custom-row' and we're not to that row yet
-        // 3.) No sections have seats in the current row
-        let implicitNeeded = sectionData.some(currentSection => {
-            if (currentSection.offsetType === 'last-row')
+
+        // If there exists a section with seats in the current row that also had seats in the
+        // previous row, other sections need to contribute implicit seats past their last row.
+
+        // This helps sections with multiple rows keep their shape as
+        // as they go to the back of the ensemble and help seats stay
+        // aligned with others in their section from row to row.
+        const implicitNeeded = sectionEntries.some(([entryId, entryData]) => {
+            if (entryData.offsetType === 'last-row' && entryData.rowSettings[i] > 0) {
                 return true;
+            }
             else {
-                const rowOffset = getRowOffset(currentSection, origNumOfRows);
-                const hasCurrent = typeof currentSection.rowSettings[i - rowOffset] === 'number',
-                    hasPrevious = typeof currentSection.rowSettings[(i - rowOffset) - 1] === 'number';
-    
-                return hasCurrent && hasPrevious;
+                return typeof entryData.rowSettings[i] === 'number'
+                && entryData.rowSettings[i] > 0
+                && entryData.rowSettings.slice(0, i)
+                        .some(rowLength => (typeof rowLength === 'number' && rowLength > 0));
             }
         });
 
-        for (const currentSection of sectionData) {
+        for (const [sectionId, currentSection] of sectionEntries) {
             // If it has seats in the current row, add them to the current row.
-            // Otherwise, reuse the settings from the last available row if
-            // at least one other section had seats in the previous row.
-
-            // This helps sections with multiple rows keep their shape as
-            // as they go to the back of the ensemble and help seats stay
-            // aligned with others in their section from row to row.
-            const rowOffset = getRowOffset(currentSection, origNumOfRows);
-            
-            let currentRowLength,
+            // Otherwise, reuse the settings from the last available row.
+            let currentRowLength = currentSection.rowSettings[i],
                 implicit = false;
 
-            currentRowLength = currentSection.rowSettings[i - rowOffset];
-            if (typeof currentRowLength === 'undefined' && implicitNeeded && currentSection.offsetType !== 'last-row') {
+            // If the section doesn't have any seats in the current row because we're past the end,
+            // it should still contribute "implicit" seats to help keep the other sections aligned
+            // if implicit seats are needed for the current row (see above).
+            if (implicitNeeded && typeof currentRowLength === 'undefined' && i >= currentSection.rowSettings.length) {
                 implicit = true;
-                if (!(currentSection.offsetType === 'custom-row' && rowOffset > i))
-                    currentRowLength = currentSection.rowSettings[currentSection.rowSettings.length - 1];
+                currentRowLength = currentSection.rowSettings[currentSection.rowSettings.length - 1];
             }
 
-            if (typeof currentRowLength === 'number' && (!implicit || (implicit && implicitNeeded))) {
-                for (let k=0; k<currentRowLength; k++) {
-                    // Create a seat and add it to the current row
-                    currentRow.push({
-                        id: `${currentSection.id}-[${i},${k}]`,
-                        section: currentSection.id,
-                        seat: sumRows(currentSection.rowSettings.slice(0, i - rowOffset)) + k,
-                        member: null,
-                        implicit,
-                        color: currentSection.color
-                    });
-                }
+            for (let k=0; k<currentRowLength; k++) {
+                // Create a seat and add it to the current row
+                currentRow.push({
+                    id: `${sectionId}-[${i},${k}]`,
+                    section: sectionId,
+                    seat: sumRows(currentSection.rowSettings.slice(0, i)) + k,
+                    member: null,
+                    implicit,
+                    color: currentSection.color,
+                    x: 0,
+                    y: 0
+                });
             }
         }
 
@@ -120,19 +180,31 @@ export function generateRows(sectionData) {
     }
 
     // Determine which sections need to be rendered mirror image
-    const sectionDirectionTotals = sectionData.reduce((acc, currentSection) => {
-        acc[currentSection.id] = {
+    /**
+     * @typedef SectionDirectionTotals
+     * @property {number} firstHalf
+     * @property {number} secondHalf
+     * @property {boolean} mirror
+     * @property {number} x
+     * @property {number} y
+     */
+
+     /**
+      * @type {Object<string, SectionDirectionTotals>}
+      */
+    const sectionDirectionTotals = sectionEntries.reduce((totals, [sectionId, currentSection]) => {
+        totals[sectionId] = {
             firstHalf: 0,
             secondHalf: 0,
             mirror: null,
             x: null,
             y: null
         };
-        return acc;
+        return totals;
     }, {});
 
     for (const currentRow of rows) {
-        const midpoint = Math.floor(currentRow.length / 2);
+        const midpoint = currentRow.length / 2;
         for (let i=0; i<currentRow.length; i++) {
             const currentSeat = currentRow[i];
             if (i <= midpoint) {
@@ -149,27 +221,29 @@ export function generateRows(sectionData) {
     });
 
     // For each section that needs to be mirrored, reverse its members within each row
-    Object.keys(sectionDirectionTotals).filter(sectionId => sectionDirectionTotals[sectionId].mirror).forEach(sectionId => {
-        for (const currentRow of rows) {
-            let startIndex, endIndex;
-            startIndex = currentRow.findIndex(seat => seat.section === sectionId);
-            
-            for (let i=currentRow.length - 1; i>-1; i--) {
-                if (currentRow[i].section === sectionId) {
-                    endIndex = i + 1;
-                    break;
+    sectionEntries.filter(([sectionId,]) => sectionDirectionTotals[sectionId].mirror)
+        .forEach(([sectionId, sectionData]) => {
+            for (const currentRow of rows) {
+                let startIndex, endIndex;
+                startIndex = currentRow.findIndex(seat => seat.section === sectionId);
+                
+                for (let i=currentRow.length - 1; i>-1; i--) {
+                    if (currentRow[i].section === sectionId) {
+                        endIndex = i + 1;
+                        break;
+                    }
+                }
+
+                // Only attempt to reverse members if the section actually has members in the current row
+                if (startIndex > -1 && endIndex > -1 && endIndex > startIndex) {
+                    const mirroredSeats = currentRow.slice(startIndex, endIndex);
+                    mirroredSeats.reverse();
+
+                    currentRow.splice(startIndex, endIndex - startIndex, ...mirroredSeats);
                 }
             }
-
-            // Only attempt to reverse members if the section actually has members in the current row
-            if (startIndex > -1 && endIndex > -1) {
-                const mirroredSeats = currentRow.slice(startIndex, endIndex);
-                mirroredSeats.reverse();
-
-                currentRow.splice(startIndex, endIndex - startIndex, ...mirroredSeats);
-            }
         }
-    });
+    );
     return rows;
 }
 
@@ -209,7 +283,14 @@ export function getPositionOnCurve (seatNum, rowLength, angle) {
     return position;
 }
 
+/**
+ * 
+ * @param {Array<Array<SeatData>>} rowData 
+ * @param {number} angle 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ */
 export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
+    /** @type {Array<Array<SeatData>>} */
     const rows = JSON.parse(JSON.stringify(rowData));
     const increasePerRow = options.seatSize * (options.seatGap + 1);
 
@@ -244,6 +325,11 @@ export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
     return rows;
 }
 
+/**
+ * 
+ * @param {Array<Array<SeatData>>} rowData 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ */
 export function straightenRows(rowData, options = {seatSize, seatGap}) {
     const rows = JSON.parse(JSON.stringify(rowData));
 
@@ -279,7 +365,13 @@ export function straightenRows(rowData, options = {seatSize, seatGap}) {
     return rows;
 }
 
+/**
+ * Trims the dimensions of the chart to fit the seats
+ * @param {Array<SeatData>} seats 
+ * @returns {Array<SeatData>}
+ */
 export function trimOuterSpacing (seats) {
+    /** @type {Array<SeatData>} */
     const result = JSON.parse(JSON.stringify(seats));
     const minX = Math.min(...result.map(seat => seat.x));
     const minY = Math.min(...result.map(seat => seat.y));
@@ -292,15 +384,28 @@ export function trimOuterSpacing (seats) {
     return result;
 }
 
+/**
+ * Assigns member IDs to each seat, as available
+ * @param {Object<string, Array<[string, Member]>} membersBySection 
+ * @param {Array<Array<SeatData>>} rows 
+ * @returns {Array<Array<SeatData>>}
+ */
 export function seatMembers (membersBySection, rows) {
+    /** @type {Array<Array<SeatData>>} */
     const seatedRows = rows.map(currentRow => currentRow.map(currentSeat => {
-        const member = membersBySection[currentSeat.section][currentSeat.seat];
-        return Object.assign({}, currentSeat, {member: member ? member : null});
+        const [memberId, member] = membersBySection[currentSeat.section][currentSeat.seat] || [];
+        return Object.assign({}, currentSeat, { member: memberId || null });
     }));
 
     return seatedRows;
 }
 
+/**
+ * Gets the dimensions of the chart based on all the available seats
+ * @param {Array<SeatData>} positionedSeats 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ * @returns {[number, number]}
+ */
 export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
     let minX = 0, maxX = 0, minY = 0, maxY = 0;
     for (let i=0; i<positionedSeats.length; i++) {
@@ -316,24 +421,50 @@ export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
     return adjustDimensionsForSeatSize(maxX - minX, maxY - minY, options);
 }
 
+/**
+ * 
+ * @param {number} width 
+ * @param {number} height 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ * @returns {[number, number]}
+ */
 function adjustDimensionsForSeatSize (width, height, options = {seatSize}) {
     return [width + options.seatSize + 1, height + options.seatSize + 1];
 }
 
+/**
+ * 
+ * @param {Array<number>} arr 
+ */
 function sumArray(arr) {
-    return arr.length > 0 ? arr.reduce((a, b) => a + b) : 0;
+    return arr.reduce((a, b) => a + b, 0);
 }
 
+/**
+ * 
+ * @param {Array<number>} rowLengths 
+ * @param {number} numOfMembers 
+ * @return {Array<number>}
+ */
 function ensureEnoughSeats(rowLengths, numOfMembers) {
         // Duplicate the last row until there are enough seats
         const result = rowLengths.slice();
-        const newRowLength = result.length > 1 && result[result.length - 1] > 0 ? result[result.length - 1] : DEFAULT_SECTION_ROW_LENGTH;
+        const newRowLength = result.length > 0 && result[result.length - 1] > 0 ? result[result.length - 1] : DEFAULT_SECTION_ROW_LENGTH;
         while (sumArray(result) < numOfMembers)
             result.push(newRowLength);
         return result;
 }
 
+/**
+ * 
+ * @param {Object<string, Region>} regions 
+ * @param {Object<string, Section>} sections 
+ * @param {Object<string, Member>} members 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ * @returns {Array<SeatData>}
+ */
 export function calculateSeatPositions(regions, sections, members, options) {
+    /** @type {Array<Array<SeatData>>} */
     const seatsByRegion = [];
     const dimensionsByRegion = [];
 
@@ -341,9 +472,15 @@ export function calculateSeatPositions(regions, sections, members, options) {
         maxSeatY = 0,
         minSeatX = 0,
         minSeatY = 0;
-    for (let i=0; i<regions.length; i++) {
-        const region = regions[i];
-        const includedSections = sections.filter(section => section.region === region.id);
+    
+    const regionEntries = Object.entries(regions);
+    const sectionEntries = Object.entries(sections);
+    const memberEntries = Object.entries(members);
+    for (let i=0; i<regionEntries.length; i++) {
+        const [regionId, regionData] = regionEntries[i];
+
+        /** @type {Object<string, Section>} */
+        const includedSections = Object.fromEntries(sectionEntries.filter(([,sectionData]) => sectionData.region === regionId));
         const regionOffset = i > 0 ? maxSeatY + regionGap : 0;
 
         let maxRegionX = 0,
@@ -351,21 +488,30 @@ export function calculateSeatPositions(regions, sections, members, options) {
             minRegionX = 0,
             minRegionY = 0;
 
+        /**
+         * @type {Object<string, Array<[string, Member]>}
+         */
         const membersBySection = {};
-        for (const currentSection of includedSections) {
-            membersBySection[currentSection.id] = members.filter(member => member.section === currentSection.id);
+        for (const sectionId of Object.keys(includedSections)) {
+            membersBySection[sectionId] = memberEntries.filter(([,memberData]) => memberData.section === sectionId);
         }
         
-        const rows = generateRows(includedSections.map(section => Object.assign({}, section, {
-            rowSettings: ensureEnoughSeats(section.rowSettings, membersBySection[section.id].length)
-        })));
+        // Make sure each row generates enough seats for all members
+        Object.keys(includedSections).forEach(sectionId => {
+            includedSections[sectionId] = Section.fromObject(
+                Object.assign({}, includedSections[sectionId], { 
+                    rowSettings: ensureEnoughSeats(includedSections[sectionId].rowSettings, membersBySection[sectionId].length) 
+                })
+            );
+        });
+        const rows = generateRows(includedSections);
 
         // Seat members if any are passed
         let seatedRows = seatMembers(membersBySection, rows);
 
         // Curve rows if necessary, and set container dimensions for scrolling
-        if (region.curvedLayout)
-            seatedRows = curveRows(seatedRows, region.angle, options);
+        if (regionData.curvedLayout)
+            seatedRows = curveRows(seatedRows, regionData.angle, options);
         else
             seatedRows = straightenRows(seatedRows, options);
 
