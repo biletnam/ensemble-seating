@@ -103,6 +103,10 @@ function getSettings(project, updateDateModified) {
     });
 }
 
+function sectionRowSettingsChanged(oldSection, newSection) {
+    return JSON.stringify(oldSection.rowSettings) !== JSON.stringify(newSection.rowSettings);
+}
+
 /* Project edits */
 export function saveDiff(user, oldProject, newProject, name) {
     const promises = [];
@@ -122,16 +126,34 @@ export function saveDiff(user, oldProject, newProject, name) {
         promises.push(saveRegionOrder(user, name, newProject.regions.map(region => region.id)));
 
     // 2. Sections
-    const sectionDiff = detailedDiff(reduceById(oldProject.sections || []), reduceById(newProject.sections));
-    for (const section of Object.entries(sectionDiff.added))
-        promises.push(saveNewSection(user, name, section[0], section[1]));
-    
-    for (const section of Object.keys(sectionDiff.deleted))
-        promises.push(deleteSectionData(user, section));
-    
-    for (const section of Object.entries(sectionDiff.updated))
-        promises.push(saveSectionEdits(user, name, section[0], section[1]));
-    
+    // Check for any new sections and save them
+    const addedSections = newProject.sections.filter(section => !(oldProject.sections || []).some(oldSec => section.id === oldSec.id));
+    for (const section of addedSections) {
+        promises.push(saveNewSection(user, name, section.id, section));
+    }
+
+    // Section row settings cause some interesting issues when you do a deep diff.
+    // For now, manually check section differences to see if an update is needed.
+    for (const section of (oldProject.sections || [])) {
+        const updatedSection = newProject.sections.find(sec => sec.id === section.id);
+        if (updatedSection) {
+            if (sectionRowSettingsChanged(section, updatedSection)) {
+                // Section row settings changed - do a full save, to avoid Firebase array corruption
+                promises.push(saveNewSection(user, name, updatedSection.id, updatedSection));
+            }
+            else {
+                if (JSON.stringify(section) !== JSON.stringify(updatedSection)) {
+                    // Section changed - safe a diff
+                    promises.push(saveSectionEdits(user, name, updatedSection.id, updatedSection));
+                }
+            }
+        }
+        else  {
+            // Section was deleted
+            promises.push(deleteSectionData(user, section.id));
+        }
+    }
+
     if (orderChanged(oldProject.sections || [], newProject.sections))
         promises.push(saveSectionOrder(user, name, newProject.sections.map(section => section.id)));
 
@@ -175,33 +197,39 @@ function saveMemberOrder(user, projectName, members) {
 }
 
 function saveNewRegion(user, projectName, id, regionData) {
-    regionData.projectName = projectName;
-    return firebase.database().ref(`regionData/${user.uid}/${id}`).set(regionData);
+    return firebase.database().ref(`regionData/${user.uid}/${id}`).set(
+        Object.assign({}, regionData, { projectName })
+    );
 }
 
 function saveNewSection(user, projectName, id, sectionData) {
-    sectionData.projectName = projectName;
-    return firebase.database().ref(`sectionData/${user.uid}/${id}`).set(sectionData);
+    return firebase.database().ref(`sectionData/${user.uid}/${id}`).set(
+        Object.assign({}, sectionData, { projectName })
+    );
 }
 
 function saveNewMember(user, projectName, id, memberData) {
-    memberData.projectName = projectName;
-    return firebase.database().ref(`memberData/${user.uid}/${id}`).set(memberData);
+    return firebase.database().ref(`memberData/${user.uid}/${id}`).set(
+        Object.assign({}, memberData, { projectName })
+    );
 }
 
 function saveRegionEdits(user, projectName, id, regionData) {
-    regionData.projectName = projectName;
-    return firebase.database().ref(`regionData/${user.uid}/${id}`).update(regionData);
+    return firebase.database().ref(`regionData/${user.uid}/${id}`).update(
+        Object.assign({}, regionData, { projectName })
+    );
 }
 
 function saveSectionEdits(user, projectName, id, sectionData) {
-    sectionData.projectName = projectName;
-    return firebase.database().ref(`sectionData/${user.uid}/${id}`).update(sectionData);
+    return firebase.database().ref(`sectionData/${user.uid}/${id}`).update(
+        Object.assign({}, sectionData, { projectName })
+    );
 }
 
 function saveMemberEdits(user, projectName, id, memberData) {
-    memberData.projectName = projectName;
-    return firebase.database().ref(`memberData/${user.uid}/${id}`).update(memberData);
+    return firebase.database().ref(`memberData/${user.uid}/${id}`).update(
+        Object.assign({}, memberData, { projectName })
+    );
 }
 
 export function projectExists(user, projectName) {
