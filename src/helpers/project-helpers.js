@@ -386,40 +386,23 @@ export function loadProject(user, name) {
             ]).then(async result => {
                 // New loading code
                 const settings = result[0].val();
+
                 if (settings) {
                     const appVersion = settings.appVersion;
                     const created = settings.created;
-                    const modified = settings.modified;
+                    let modified = settings.modified;
                     delete settings.appVersion;
                     delete settings.created;
                     delete settings.modified;
 
-                    /**
-                     * @type Array<Region>
-                     */
-                    const regionData = Object.entries(result[1].val() || {}).reduce((prev, curr) => {
-                        prev[curr[0]] = Region.fromObject(curr[1]);
-                        return prev;
-                    }, {});
+                    const regionData = result[1].val() || {};
+                    const sectionData = result[2].val() || {};
+                    const memberData = result[3].val() || {};
 
-                    /**
-                     * @type Array<Section>
-                     */
-                    const sectionData = Object.entries(result[2].val() || {}).reduce((prev, curr) => {
-                        prev[curr[0]] = Section.fromObject(curr[1]);
-                        return prev;
-                    }, {});
+                    let regions, sections, members;
 
-                    /**
-                     * @type Array<Member>
-                     */
-                    const memberData = Object.entries(result[3].val() || {}).reduce((prev, curr) => {
-                        prev[curr[0]] = Member.fromObject(curr[1]);
-                        return prev;
-                    }, {});
-
-                    if (semver.lt(appVersion, PROJECT_FORMAT_VER)) {
-                        // Need to assign "order" value to regions, sections, and section members
+                    if (semver.lt(appVersion, '0.16.0')) {
+                        // Arrays of regions, sections, and members
                         const itemOrders = await Promise.all([
                             db.ref(`regions/${user.uid}/${name}`).once('value'),
                             db.ref(`sections/${user.uid}/${name}`).once('value'),
@@ -429,27 +412,67 @@ export function loadProject(user, name) {
                         const regionOrder = itemOrders[0].val() || [];
                         const sectionOrder = itemOrders[1].val() || [];
                         const memberOrder = itemOrders[2].val() || [];
+                        regions = [];
+                        sections = [];
+                        members = [];
 
                         for (let i=0; i<regionOrder.length; i++) {
-                            regionData[regionOrder[i]].order = i;
+                            const id = regionOrder[i];
+                            regions.push(Object.assign({}, regionData[id], { id }));
                         }
                         for (let i=0; i<sectionOrder.length; i++) {
-                            sectionData[sectionOrder[i]].order = i;
+                            const id = sectionOrder[i];
+                            sections.push(Object.assign({}, sectionData[id], { id }));
                         }
                         for (let i=0; i<memberOrder.length; i++) {
-                            memberData[memberOrder[i]].order = i;
+                            const id = memberOrder[i];
+                            members.push(Object.assign({}, memberData[id], { id }));
                         }
                     }
-    
-                    resolve(Project.fromObject({
+                    else {
+                        /**
+                         * @type Array<Region>
+                         */
+                        regions = Object.entries(regionData).reduce((prev, [id, data]) => {
+                            prev[id] = Region.fromObject(data);
+                            return prev;
+                        }, {});
+
+                        /**
+                         * @type Array<Section>
+                         */
+                        sections = Object.entries(sectionData).reduce((prev, [id, data]) => {
+                            prev[id] = Section.fromObject(data);
+                            return prev;
+                        }, {});
+
+                        /**
+                         * @type Array<Member>
+                         */
+                        members = Object.entries(memberData).reduce((prev, [id, data]) => {
+                            prev[id] = Member.fromObject(data);
+                            return prev;
+                        }, {});
+                    }
+
+                    // Upgrade project format if necessary
+                    const upgradedProject = Project.upgrade({
                         settings,
-                        regions: regionData,
-                        sections: sectionData,
-                        members: memberData,
+                        regions,
+                        sections,
+                        members,
                         appVersion,
                         created,
                         modified
-                    }));
+                    });
+
+                    if (semver.lt(appVersion, upgradedProject.appVersion)) {
+                        // If the project was upgraded, do a full save
+                        upgradedProject.modified = await saveDiff(user, {}, upgradedProject, name);
+                        cleanDbFromProjectUpgrade(user, name, upgradedProject.appVersion);
+                    }                    
+    
+                    resolve(Project.fromObject(upgradedProject));
                 }
                 else
                     resolve(null);
@@ -460,6 +483,23 @@ export function loadProject(user, name) {
     })
 }
 
+function cleanDbFromProjectUpgrade(user, name, version) {
+    return new Promise((resolve, reject) => {
+        if (semver.lte(version, '0.16.0')) {
+            // Delete region, section, and member orders
+            resolve(Promise.all([
+                db.ref(`regions/${user.uid}/${name}`).remove(),
+                db.ref(`sections/${user.uid}/${name}`).remove(),
+                db.ref(`members/${user.uid}/${name}`).remove()
+            ]));
+        }
+        else {
+            resolve();
+        }
+    })
+    
+}
+
 /**
  * 
  * @param {*} user 
@@ -468,6 +508,7 @@ export function loadProject(user, name) {
 export function listProjects(user) {
     return new Promise((resolve, reject) => {
         if (user) {
+            const db = firebase.database();
             firebase.database().ref(`projects/${user.uid}`).once('value').then(snapshot => {
                 resolve(snapshot.val() || {});
             });
@@ -619,21 +660,21 @@ export class Project {
         }
         if (semver.lt(finalProject.appVersion, '0.16.0')) {
             finalProject.appVersion = '0.16.0';
-            finalProject.regions = finalProject.regions.reduce((regions, curr) => {
+            finalProject.regions = finalProject.regions.reduce((regions, curr, index) => {
                 const {id, ...rest} = curr;
-                regions[id] = rest;
+                regions[id] = Region.fromObject({ ...rest, order: index });
                 return regions;
             }, {});
 
-            finalProject.sections = finalProject.sections.reduce((sections, curr) => {
+            finalProject.sections = finalProject.sections.reduce((sections, curr, index) => {
                 const {id, ...rest} = curr;
-                sections[id] = rest;
+                sections[id] = Section.fromObject({ ...rest, order: index });
                 return sections;
             }, {});
 
-            finalProject.members = finalProject.members.reduce((members, curr) => {
+            finalProject.members = finalProject.members.reduce((members, curr, index) => {
                 const {id, ...rest} = curr;
-                members[id] = rest;
+                members[id] = Member.fromObject({ ...rest, order: index });
                 return members;
             }, {});
         }
@@ -647,7 +688,7 @@ export class Project {
      */
     static fromObject (source) {
         /** @type {Project} */
-        const obj = Project.upgrade(JSON.parse(JSON.stringify(source)));
+        const obj = JSON.parse(JSON.stringify(source));
         const project = new Project();
         
         project.regions = Object.entries(obj.regions).reduce((regions, [id, data]) => {
