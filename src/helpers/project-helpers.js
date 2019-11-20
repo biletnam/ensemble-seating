@@ -968,24 +968,71 @@ export function deleteMember(memberId, project) {
 }
 
 /**
+ * 
+ * @param {Object<string, Member>} members 
+ * @param {number} startingIndex 
+ * @returns {number}
+ */
+function findUnoccupiedIndex(members, startingIndex) {
+    let result = startingIndex,
+        found = false,
+        occupied = Object.values(members).map(member => member.order);
+    while (!found) {
+        if (occupied.indexOf(result) === -1) {
+            found = true;
+        }
+        else {
+            result++;
+        }
+    }
+    return result;
+}
+
+/**
  * Given a list of names, a section ID, and a project, returns a new copy of the project with the members added
  * @param {Array<string>} names 
  * @param {string} sectionId 
+ * @param {number} startingIndex
  * @param {Project} project 
  * @returns {Project}
  */
-export function batchAddMembers(names, sectionId, project) {
+export function batchAddMembers(names, sectionId, startingIndex, project) {
     const members = Object.assign({}, project.members);
-    const originalCount = Object.values(project.members).filter(member => member.section === sectionId).length;
 
+    let currentIndex = startingIndex;
     for (let i=0; i<names.length; i++) {
+        // Starting at startingIndex, find an unoccupied slot
+        currentIndex = findUnoccupiedIndex(members, currentIndex);
         members[uuid()] = Object.assign(
-            new Member(names[i] ? names[i] : undefined, sectionId),
-            { order: originalCount + i }
+            new Member(names[i] ? names[i] : undefined, sectionId), { order: currentIndex }
         );
+        currentIndex++;
     }
     
-    return Project.fromObject(Object.assign({}, project, { members }));
+    // Make sure there are enough rows for the last seat in this section
+    const lastMemberIndex = Math.max(...Object.values(members)
+        .filter(member => member.section === sectionId)
+        .map(member => member.order));
+
+    /** @type {Object<string, Section>} */
+    const newSections = JSON.parse(JSON.stringify(project.sections));
+    const rowSettings = newSections[sectionId].rowSettings;
+    const numberOfSeats = rowSettings.reduce((a, b) => a + b, 0);
+
+    if (lastMemberIndex >= numberOfSeats) {
+        const lastRowLength = rowSettings[rowSettings.length - 1] || DEFAULT_SECTION_ROW_LENGTH;
+        const seatsNeeded = (lastMemberIndex + 1) - numberOfSeats;
+        const rowsNeeded = Math.ceil(seatsNeeded / lastRowLength);
+
+        for (let i=0; i<rowsNeeded; i++) {
+            newSections[sectionId].rowSettings.push(lastRowLength);
+        }
+    }
+    
+    return Project.fromObject(Object.assign({}, project, { 
+        members,
+        sections: newSections
+    }));
 }
 
 /**
@@ -1071,6 +1118,19 @@ export function moveSectionToRegion(sectionId, regionId, index, project) {
 }
 
 /**
+ * 
+ * @param {Array<[string, Member]>} entries 
+ */
+function padSectionWithEmptySeats (acc, current) {
+    acc[current[1].order] = current;
+    return acc;
+}
+
+function removeEmpties (val) {
+    return val != undefined;
+}
+
+/**
  * Given a member ID, a section ID, an array index, and a project, returns a new copy of the project with the member moved to the given index in the specified section
  * @param {string} memberId 
  * @param {string} sectionId 
@@ -1082,8 +1142,10 @@ export function moveMemberToSection(memberId, sectionId, index, project) {
     const startOrder = project.members[memberId].order;
 
     const memberEntries = Object.entries(project.members).sort(byOrder);
-    const entriesInStartSection = memberEntries.filter(([id, data]) => data.section === startSection);
-    const entriesInDestinationSection = memberEntries.filter(([id, data]) => data.section === sectionId);
+    const entriesInStartSection = memberEntries.filter(([id, data]) => data.section === startSection)
+        .reduce(padSectionWithEmptySeats, []);
+    const entriesInDestinationSection = memberEntries.filter(([id, data]) => data.section === sectionId)
+        .reduce(padSectionWithEmptySeats, []);
 
     const [removed] = entriesInStartSection.splice(startOrder, 1);
 
@@ -1091,32 +1153,45 @@ export function moveMemberToSection(memberId, sectionId, index, project) {
         // Moving within the same section
         entriesInStartSection.splice(index, 0, removed);
         for (let i=0; i<entriesInStartSection.length; i++) {
-            entriesInStartSection[i][1] = Member.fromObject(
-                Object.assign({}, entriesInStartSection[i][1], { order: i })
-            );
+            if (entriesInStartSection[i] != undefined) {
+                entriesInStartSection[i][1] = Member.fromObject(
+                    Object.assign({}, entriesInStartSection[i][1], { 
+                        order: entriesInStartSection[i][0] == memberId ? index : i
+                    })
+                );
+            }
         }
     }
     else {
         entriesInDestinationSection.splice(index, 0, removed);
 
         for (let i=0; i<entriesInStartSection.length; i++) {
-            entriesInStartSection[i][1] = Member.fromObject(
-                Object.assign({}, entriesInStartSection[i][1], { order: i })
-            );
+            if (entriesInStartSection[i] != undefined) {
+                entriesInStartSection[i][1] = Member.fromObject(
+                    Object.assign({}, entriesInStartSection[i][1], { 
+                        order: entriesInStartSection[i][0] == memberId ? index : i
+                    })
+                );
+            }
         }
 
         for (let i=0; i<entriesInDestinationSection.length; i++) {
-            entriesInDestinationSection[i][1] = Member.fromObject(
-                Object.assign({}, entriesInDestinationSection[i][1], { order: i, section: sectionId })
-            );
+            if (entriesInDestinationSection[i] != undefined) {
+                entriesInDestinationSection[i][1] = Member.fromObject(
+                    Object.assign({}, entriesInDestinationSection[i][1], { 
+                        order: entriesInDestinationSection[i][0] == memberId ? index : i,
+                        section: sectionId 
+                    })
+                );
+            }
         }
     }
 
     const updatedMembers = Object.assign(
         {},
         project.members,
-        Object.fromEntries(entriesInStartSection),
-        Object.fromEntries(entriesInDestinationSection)
+        Object.fromEntries(entriesInStartSection.filter(removeEmpties)),
+        Object.fromEntries(entriesInDestinationSection.filter(removeEmpties))
     );
 
     return Project.fromObject(Object.assign({}, project, { members: updatedMembers }));
@@ -1212,6 +1287,8 @@ export function applyMemberEdits(memberId, data, project) {
 export function shuffleSection(sectionId, project) {
     const membersToShuffle = Object.entries(project.members)
         .filter(([id, data]) => data.section === sectionId);
+
+    const occupiedSlots = membersToShuffle.map(([id, data]) => data.order);
         
     /** @type {Array<[string, Member]>} */
     const shuffledMembers = knuthShuffle(membersToShuffle);
@@ -1220,7 +1297,7 @@ export function shuffleSection(sectionId, project) {
     for (let i=0; i<shuffledMembers.length; i++) {
         const [memberId, memberData] = shuffledMembers[i];
         newMembers[memberId] = Member.fromObject(
-            Object.assign({}, memberData, { order: i })
+            Object.assign({}, memberData, { order: occupiedSlots[i] })
         );
     }
 

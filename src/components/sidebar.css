@@ -5,7 +5,11 @@
 }
 
 .sidebar__scrollable-container {
-    padding: var(--sidebar-padding);
+    padding: var(--sidebar-padding) var(--sidebar-padding) 0;
+}
+
+.sidebar__scrollable-container > :last-child {
+    margin-bottom: var(--sidebar-padding);
 }
 
 @media screen and (min-width: 800px) {

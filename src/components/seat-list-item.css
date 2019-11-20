@@ -1,0 +1,12 @@
+.seat-list-item {
+    counter-increment: section-seat-num;
+    display: flex;
+    align-items: center;
+}
+
+.seat-list-item::before {
+    content: counter(section-seat-num) '. ';
+    padding: calc(.5 * var(--sidebar-padding));
+    padding-left: var(--sidebar-padding);
+    min-width: 1.5em;
+}

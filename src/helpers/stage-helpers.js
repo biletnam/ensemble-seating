@@ -393,8 +393,9 @@ export function trimOuterSpacing (seats) {
 export function seatMembers (membersBySection, rows) {
     /** @type {Array<Array<SeatData>>} */
     const seatedRows = rows.map(currentRow => currentRow.map(currentSeat => {
-        const [memberId, member] = membersBySection[currentSeat.section][currentSeat.seat] || [];
-        return Object.assign({}, currentSeat, { member: memberId || null });
+        const [memberId, memberData] = membersBySection[currentSeat.section]
+            .find(([id, data]) => data.order === currentSeat.seat) || [];
+        return Object.assign({}, currentSeat, {member: memberId ? memberId : null});
     }));
 
     return seatedRows;

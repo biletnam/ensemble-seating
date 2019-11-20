@@ -16,11 +16,14 @@ const Roster = props => {
         members,
         onRequestNewSection,
         onRequestNewPerson,
+        onRequestEditPerson,
         onRequestBatchAdd,
+        onRequestDeleteSection,
         onRequestShuffleSection,
         onRequestDeleteRegion,
         onRequestMoveRegion,
         onRequestSelectMember,
+        onRequestDeleteMember,
         ...rest
     } = props;
 
@@ -35,17 +38,20 @@ const Roster = props => {
                 regionId={regionId}
                 sections={Object.fromEntries(sectionEntries.filter(([sectionId, currentSection]) => currentSection.region === regionId))}
                 members={members}
-                showEditAndDeleteControls={regionEntries.length > 1}
+                enableMoveAndDeleteControls={regionEntries.length > 1}
                 forceNewSectionButton={sectionEntries.length > 0 || regionEntries.length > 1}
                 onRequestNewSection={onRequestNewSection}
                 onRequestNewPerson={onRequestNewPerson}
+                onRequestEditPerson={onRequestEditPerson}
                 onRequestBatchAdd={onRequestBatchAdd}
+                onRequestDeleteSection={onRequestDeleteSection}
                 onRequestShuffleSection={onRequestShuffleSection}
 
                 onRequestDeleteRegion={onRequestDeleteRegion}
                 onRequestMoveRegion={onRequestMoveRegion}
 
-                onRequestSelectMember={onRequestSelectMember} />
+                onRequestSelectMember={onRequestSelectMember}
+                onRequestDeleteMember={onRequestDeleteMember} />
             )}
         </DragDropContext>
         {sectionEntries.length === 0 && regionEntries.length === 1 && <p className='roster__no-sections-message'>No sections to display</p>}

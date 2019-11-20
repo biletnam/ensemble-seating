@@ -371,8 +371,9 @@ class App extends Component {
         });
     }
 
-    batchAddMembers(memberNames, sectionId) {
-        const newProject = batchAddMembers(memberNames, sectionId, this.state.project);
+    batchAddMembers(memberNames, sectionId, startingIndex = 0) {
+        const newProject = batchAddMembers(memberNames, sectionId, startingIndex, this.state.project);
+
         this.saveSession(this.state.project, newProject);
         this.setState({
             project: newProject,
@@ -467,8 +468,8 @@ class App extends Component {
         });
     }
 
-    handleRequestedNewPerson(sectionId) {
-        this.batchAddMembers([null], sectionId);
+    handleRequestedNewPerson(sectionId, name = null, startingIndex = 0) {
+        this.batchAddMembers([name], sectionId, startingIndex);
     }
 
     handleRequestedBatchAddMembers(sectionId) {
@@ -532,16 +533,7 @@ class App extends Component {
     }
 
     handleRequestedDeleteMember(memberId) {
-        const requestedMember = this.state.project.members[memberId];
-        const memberSection = this.state.project.sections[requestedMember.section];
-
-        dialogQueue.confirm({
-            title: `Delete ${requestedMember.name}?`,
-            body: `This will delete them from the ${memberSection.name} section.`
-        }).then(confirmed => {
-            if (confirmed)
-                this.deleteMember(memberId);
-        })
+        this.deleteMember(memberId);
     }
 
     handleRequestedMoveRegion(regionId, direction) {
@@ -582,8 +574,19 @@ class App extends Component {
             const destinationId = result.destination.droppableId;
             const destinationIndex = result.destination.index;
 
-            if (result.type === 'member')
-                this.moveMemberToSection(itemId, destinationId, destinationIndex);
+            if (result.type === 'member') {
+                const sourceIndex = result.source.index;
+                const [memberId, memberData] = Object.entries(this.state.project.members)
+                    .find(([id, data]) => data.section === result.source.droppableId && data.order === sourceIndex);
+                if (memberId) {
+                    // Move the section member
+                    this.moveMemberToSection(memberId, destinationId, destinationIndex);
+                }
+                else {
+                    // Todo: enable dragging empty seats
+                }
+            }
+                
             else if (result.type === 'section') {
                 this.moveSectionToIndex(itemId, destinationId, destinationIndex);
             }
@@ -837,12 +840,15 @@ class App extends Component {
                 onRequestNewSection={this.handleClickedNewSectionButton}
                 onDragEnd={this.handleSectionsListDragEnd}
                 onRequestNewPerson={this.handleRequestedNewPerson}
+                onRequestEditPerson={this.handleAcceptMemberEdits}
                 onRequestBatchAdd={this.handleRequestedBatchAddMembers}
                 onRequestShuffleSection={this.handleRequestedShuffleSection}
+                onRequestDeleteSection={this.handleRequestedDeleteSection}
                 onRequestMoveRegion={this.handleRequestedMoveRegion}
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
-                onRequestSelectMember={this.handleRequestedSelectMember} />}
+                onRequestSelectMember={this.handleRequestedSelectMember}
+                onRequestDeleteMember={this.handleRequestedDeleteMember} />}
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
                 onSelectTemplate={this.handleSelectNewProjectTemplate}
