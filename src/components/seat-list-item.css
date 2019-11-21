@@ -2,6 +2,7 @@
     counter-increment: section-seat-num;
     display: flex;
     align-items: center;
+    border: 1px solid transparent;
 }
 
 .seat-list-item::before {
@@ -9,4 +10,11 @@
     padding: calc(.5 * var(--sidebar-padding));
     padding-left: var(--sidebar-padding);
     min-width: 1.5em;
+}
+
+.seat-list-item--dragging {
+    border-color: #ccc;
+    background-color: rgba(255,255,255,.75);
+    box-shadow: 5px 5px 5px rgba(0,0,0,.15);
+    backdrop-filter: blur(10px);
 }

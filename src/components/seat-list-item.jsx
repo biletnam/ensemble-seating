@@ -8,14 +8,18 @@ const SeatListItem = props => {
     const { children, index, seatKey, draggable, ...rest } = props;
 
     return <Draggable draggableId={seatKey} index={index} isDragDisabled={!draggable} type='member'>
-        {(provided, snapshot) => (
-            <li className='seat-list-item' {...rest}
+        {(provided, snapshot) => {
+            let seatClass = 'seat-list-item';
+            if (snapshot.isDragging && !snapshot.isDropAnimating) {
+                seatClass += ' seat-list-item--dragging';
+            }
+            return <li className={seatClass} {...rest}
                 ref={provided.innerRef}
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}>
                 {children}
             </li>
-        )}
+        }}
         
     </Draggable>
 }
