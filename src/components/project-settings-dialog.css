@@ -1,0 +1,3 @@
+.project-settings-dialog .mdc-dialog__surface {
+    width: var(--dialog-width);
+}

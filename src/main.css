@@ -1,3 +1,7 @@
+:root {
+    --dialog-width: 560px;
+}
+
 html {
     font-size: 16px;
     color: #333;
