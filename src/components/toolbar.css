@@ -1,11 +1,12 @@
 #toolbar {
     grid-area: toolbar;
+    position: static;
 }
 
 .toolbar__last-saved {
     display: inline-block;
     margin-left: 1em;
-    font-size: .8em;
+    font-size: .6em;
     color: #ddd;
 }
 

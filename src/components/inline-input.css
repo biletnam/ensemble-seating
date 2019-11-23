@@ -6,7 +6,7 @@
     color: currentColor;
     background-color: transparent;
     border-bottom: 1px solid #fff;
-    font-size: 1em;
+    font-size: .8em;
     padding-left: .25em;
     padding-right: .25em;
     transition: background-color .1s ease-in-out;

@@ -2,8 +2,8 @@ import React from 'react';
 
 import './toolbar.css';
 
-import { Toolbar, ToolbarRow, ToolbarSection, ToolbarTitle, ToolbarMenuIcon, ToolbarIcon } from '@rmwc/toolbar';
-import '@material/toolbar/dist/mdc.toolbar.min.css';
+import { TopAppBar, TopAppBarRow, TopAppBarSection, TopAppBarTitle, TopAppBarActionItem, TopAppBarNavigationIcon } from '@rmwc/top-app-bar';
+import '@material/top-app-bar/dist/mdc.top-app-bar.css';
 
 import TimeAgo from 'react-timeago';
 
@@ -19,43 +19,43 @@ import MenuOpenIcon from '../icons/menu_open-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
 
 const MainToolbar = props => (
-    <Toolbar id={props.id}>
-        <ToolbarRow>
-            <ToolbarSection alignStart>
-                <ToolbarMenuIcon tag='button'
+    <TopAppBar id={props.id} dense>
+        <TopAppBarRow>
+            <TopAppBarSection alignStart>
+                <TopAppBarNavigationIcon tag='button'
                     name='menu'
                     title='Menu'
                     icon={<MenuIcon />}
                     onClick={props.onToolbarButtonClick} />
-                <ToolbarTitle>
+                <TopAppBarTitle>
                     <InlineInput value={props.projectName} placeholder='Untitled project' onChange={props.onRequestRenameProject} autosaveTimeout={10000} />
                     <div className='toolbar__last-saved'>
                         {props.saving && 'Saving…'}
                         {props.lastSave && !props.saving && <>Saved <TimeAgo date={props.lastSave} minPeriod={10} /></>}
                         {!props.lastSave && !props.saving && 'Not saved'}
                     </div>
-                </ToolbarTitle>
-            </ToolbarSection>
+                </TopAppBarTitle>
+            </TopAppBarSection>
 
-            <ToolbarSection alignEnd>
+            <TopAppBarSection alignEnd>
                 <ToolbarLink href={APP_INFO.FEEDBACK} icon={<FeedbackIcon />}>Send feedback</ToolbarLink>
 
                 <ToolbarDivider />
 
-                <ToolbarIcon tag='button'
+                <TopAppBarActionItem tag='button'
                     name='region'
                     title='Create new region'
                     icon={<HorizontalSplitIcon />}
                     onClick={props.onToolbarButtonClick} />
 
-                <ToolbarIcon tag='button'
+                <TopAppBarActionItem tag='button'
                     name='sort'
                     title={props.downstageTop ? 'Downstage top' : 'Downstage bottom'}
                     icon={<RotateIcon />}
                     style={{transform: props.downstageTop ? 'rotate(90deg)' : 'rotateZ(-90deg)'}}
                     onClick={props.onToolbarButtonClick} />
 
-                <ToolbarIcon tag='button'
+                <TopAppBarActionItem tag='button'
                     name='roster'
                     title={props.rosterOpen ? 'Close roster' : 'Open roster'}
                     icon={<MenuOpenIcon />}
@@ -64,14 +64,14 @@ const MainToolbar = props => (
                     onClick={props.onToolbarButtonClick}
                      />
 
-                <ToolbarIcon tag='button'
+                <TopAppBarActionItem tag='button'
                     name='project-settings'
                     title='Project settings'
                     icon={<MoreIcon />}
                     onClick={props.onToolbarButtonClick} />
-            </ToolbarSection>
-        </ToolbarRow>
-    </Toolbar>
+            </TopAppBarSection>
+        </TopAppBarRow>
+    </TopAppBar>
 );
 
 export default MainToolbar;

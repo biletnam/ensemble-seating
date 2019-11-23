@@ -47,7 +47,7 @@
     "@rmwc/snackbar": "^5.7.0",
     "@rmwc/switch": "^5.7.0",
     "@rmwc/textfield": "^5.7.0",
-    "@rmwc/toolbar": "^5.7.0",
+    "@rmwc/top-app-bar": "^5.7.0",
     "@svgr/webpack": "^4.3.3",
     "array-flat-polyfill": "^1.0.1",
     "autoprefixer": "^9.7.1",
