@@ -26,13 +26,18 @@
     padding: 0 var(--sidebar-padding);
     margin: 0 calc(-1 * var(--sidebar-padding));
     background-color: #efefef;
+    font-size: .9rem;
     position: sticky;
     top: 0;
     z-index: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 48px;
+}
+
+.roster__region-heading-container .mdc-menu-surface--anchor {
+    width: var(--sidebar-titlebar-height);
+    height: var(--sidebar-titlebar-height);
 }
 
 .roster__region-heading-text {

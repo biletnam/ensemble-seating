@@ -87,7 +87,7 @@ const SectionListItem = props => {
                             style={{backgroundColor:props.data.color,color:tinycolor(props.data.color).isLight()?'#333':'#fff'}}
                             {...provided.dragHandleProps}
                             key={props.sectionId}>
-                            <p>{props.data.name}</p>
+                            {props.data.name}
                         </CardPrimaryAction>
 
                         <Droppable droppableId={props.sectionId} type='member'>

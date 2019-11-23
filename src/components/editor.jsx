@@ -6,6 +6,8 @@ import MemberEditor from './edit-member.jsx';
 import Sidebar from './sidebar.jsx';
 import { Region, Section, Member } from '../helpers/project-helpers';
 
+import './editor.css';
+
 const Editor = props => {
     let { 
         data,

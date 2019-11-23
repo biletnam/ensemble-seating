@@ -3,12 +3,10 @@ import React, { PureComponent } from 'react';
 import { IconButton } from '@rmwc/icon-button';
 import { Button, ButtonIcon } from '@rmwc/button';
 import { Elevation } from '@rmwc/elevation';
-import { Ripple } from '@rmwc/ripple';
 
 import '@material/icon-button/dist/mdc.icon-button.min.css';
 import '@material/button/dist/mdc.button.min.css';
 import '@material/elevation/dist/mdc.elevation.min.css';
-import '@material/ripple/dist/mdc.ripple.min.css';
 
 import ListActionMenu from './list-action-menu.jsx';
 import SectionListItem from './section-list-item.jsx';
@@ -16,6 +14,8 @@ import MoreIcon from '../icons/more_vert-24px.svg';
 import AddIcon from '../icons/add-24px.svg';
 
 import { Droppable } from 'react-beautiful-dnd';
+
+import SidebarTitlebarButton from './sidebar-titlebar-button.jsx';
 
 class RegionListItem extends PureComponent {
     constructor(props) {
@@ -62,7 +62,6 @@ class RegionListItem extends PureComponent {
             {(provided, snapshot) => (
                 <div ref={provided.innerRef} {...provided.droppableProps} className='roster__droppable-section-area'>
                     {/* Iterate over sections here */}
-                    <Ripple>
                     <Elevation z='1'
                         className='roster__region-heading-container'>
                         <span className='roster__region-heading-text'>{this.props.region.name}</span>
@@ -76,9 +75,9 @@ class RegionListItem extends PureComponent {
                             onSelectAction={this.handleActionMenuClick}
                             open={this.state.actionMenuOpen}
                             onClose={this.handleRequestCloseActionMenu}>
-                            <IconButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
+                            <SidebarTitlebarButton icon={<MoreIcon />} label='Edit region' onClick={this.handleRequestToggleActionMenu} />
                         </ListActionMenu>
-                    </Elevation></Ripple>
+                    </Elevation>
                     {Object.entries(this.props.sections).map(([sectionId, currentSection], currentIndex) => {
                         return <SectionListItem key={sectionId}
                             data={currentSection}
@@ -100,7 +99,7 @@ class RegionListItem extends PureComponent {
                     {provided.placeholder}
 
                     {this.props.forceNewSectionButton && <div className='section-list-item'>
-                        <Button onClick={this.handleClickedNewSection} raised><ButtonIcon icon={<AddIcon />} /> New section</Button>
+                        <Button dense onClick={this.handleClickedNewSection} raised><ButtonIcon icon={<AddIcon />} /> New section</Button>
                     </div>}
                 </div>
             )}

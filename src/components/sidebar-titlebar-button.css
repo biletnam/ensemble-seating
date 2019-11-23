@@ -1,0 +1,16 @@
+.sidebar-titlebar-button {
+    width: var(--sidebar-titlebar-height);
+    height: var(--sidebar-titlebar-height);
+    padding: .25em;
+    display: flex;
+}
+
+.sidebar-titlebar-button > svg {
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar-titlebar-button::before, .sidebar-titlebar-button::after {
+    width: 100%;
+    height: 100%;
+}

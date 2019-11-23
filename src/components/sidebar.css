@@ -1,5 +1,6 @@
 .sidebar {
-    --sidebar-padding: 1rem;
+    --sidebar-padding: .75rem;
+    --sidebar-titlebar-height: 35px;
     grid-area: sidebar;
     border-top: 1px solid #aaa;
 }
@@ -33,6 +34,7 @@
     .sidebar__scrollable-container {
         flex-grow: 1;
         overflow-y: scroll;
+        overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
     }
 }

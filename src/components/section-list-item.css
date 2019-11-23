@@ -4,8 +4,8 @@
 }
 
 .section-list-item__titlebar {
-    padding: 0 var(--sidebar-padding);
-    font-weight: bold;
+    padding: var(--sidebar-padding);
+    font-size: .9rem;
 }
   
 .section-list-item__seat {
