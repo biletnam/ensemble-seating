@@ -15,7 +15,6 @@ import MenuIcon from '../icons/menu-24px.svg';
 import FeedbackIcon from '../icons/feedback-24px.svg';
 import HorizontalSplitIcon from '../icons/horizontal_split-24px.svg';
 import RotateIcon from '../icons/rotate_90_degrees_ccw-24px.svg';
-import MenuOpenIcon from '../icons/menu_open-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
 
 const MainToolbar = props => (
@@ -54,15 +53,6 @@ const MainToolbar = props => (
                     icon={<RotateIcon />}
                     style={{transform: props.downstageTop ? 'rotate(90deg)' : 'rotateZ(-90deg)'}}
                     onClick={props.onToolbarButtonClick} />
-
-                <TopAppBarActionItem tag='button'
-                    name='roster'
-                    title={props.rosterOpen ? 'Close roster' : 'Open roster'}
-                    icon={<MenuOpenIcon />}
-                    style={{transform: props.rosterOpen ? 'rotateZ(180deg)' : ''}}
-                    id='toolbar__toggle-roster-button'
-                    onClick={props.onToolbarButtonClick}
-                     />
 
                 <TopAppBarActionItem tag='button'
                     name='project-settings'

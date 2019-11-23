@@ -37,6 +37,7 @@
     "@rmwc/dialog": "^5.7.0",
     "@rmwc/drawer": "^5.7.0",
     "@rmwc/elevation": "^5.7.0",
+    "@rmwc/fab": "^5.7.0",
     "@rmwc/icon-button": "^5.7.0",
     "@rmwc/list": "^5.7.0",
     "@rmwc/menu": "^5.7.1",

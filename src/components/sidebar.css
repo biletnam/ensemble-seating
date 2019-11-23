@@ -1,3 +1,7 @@
+:root {
+    --sidebar-transition-duration: .15s;
+}
+
 .sidebar {
     --sidebar-padding: .75rem;
     --sidebar-titlebar-height: 35px;
@@ -15,20 +19,32 @@
 
 @media screen and (min-width: 800px) {
     .sidebar {
-        --sidebar-transition-duration: .15s;
         border-top: none;
         border-left: 1px solid #aaa;
         position: relative;
-        transition: transform var(--sidebar-transition-duration) ease-in-out, visibility 0s linear 0s;
+        transition: transform var(--sidebar-transition-duration) ease-in-out;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow: visible;
+        min-height: 0;
+        background-color: #fff;
+    }
+
+    .sidebar__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        transition: visibility 0s linear 0s;
     }
 
     .sidebar--collapsed {
         transform: translateX(100%);
-        transition-delay: 0s, var(--sidebar-transition-duration);
+    }
+
+    .sidebar--collapsed > .sidebar__content {
         visibility: hidden;
+        transition-delay: var(--sidebar-transition-duration);
     }
 
     .sidebar__scrollable-container {

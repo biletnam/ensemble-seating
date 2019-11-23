@@ -450,10 +450,6 @@ class App extends Component {
             newState.projectOptionsDialogOpen = true;
         }
 
-        if (event.target.name === 'roster') {
-            newState.rosterOpen = !this.state.rosterOpen;
-        }
-
         if (saveNeeded)
             this.saveSession(this.state.project, newState.project);
 
@@ -830,7 +826,8 @@ class App extends Component {
                 onRequestDeleteRegion={Object.keys(this.state.project.regions).length > 1 && this.handleRequestedDeleteRegion}
                 onRequestDeleteSection={this.handleRequestedDeleteSection}
                 onRequestDeleteMember={this.handleRequestedDeleteMember}
-                onClickedBack={() => this.setState({editorId: null})} />}
+                onClickedBack={() => this.setState({editorId: null})}
+                onToggleSidebar={() => this.setState({rosterOpen: !this.state.rosterOpen})} />}
             
             {!this.state.editorId && <Roster id='roster'
                 sections={this.state.project.sections}
@@ -848,7 +845,8 @@ class App extends Component {
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
                 onRequestSelectMember={this.handleRequestedSelectMember}
-                onRequestDeleteMember={this.handleRequestedDeleteMember} />}
+                onRequestDeleteMember={this.handleRequestedDeleteMember}
+                onToggleSidebar={() => this.setState({rosterOpen: !this.state.rosterOpen})} />}
 
             <NewProjectDialog open={this.state.newProjectDialogOpen}
                 onSelectTemplate={this.handleSelectNewProjectTemplate}
