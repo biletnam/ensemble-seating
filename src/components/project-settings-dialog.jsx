@@ -15,6 +15,8 @@ import '@material/line-ripple/dist/mdc.line-ripple.min.css';
 import '@material/switch/dist/mdc.switch.min.css';
 import '@material/form-field/dist/mdc.form-field.min.css';
 
+import './project-settings-dialog.css';
+
 const fontSizes = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 
 class ProjectSettingsDialog extends PureComponent {
@@ -50,6 +52,7 @@ class ProjectSettingsDialog extends PureComponent {
         title='Display options'
         acceptLabel='Done'
         cancelLabel={null}
+        className='project-settings-dialog'
         body={<div>
                 <h3>Labels</h3>
                 <div className='text-input-wrapper'>

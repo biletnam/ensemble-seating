@@ -4,6 +4,16 @@
 }
 
 .section-list-item__titlebar {
-    padding: 0 var(--sidebar-padding);
-    font-weight: bold;
+    padding: var(--sidebar-padding);
+    font-size: .9rem;
+}
+  
+.section-list-item__seat {
+  margin-left: calc(2 * var(--sidebar-padding));
+}
+
+.section-list-item__member-list {
+    counter-set: section-seat-num var(--start-seat-num);
+    padding: 0;
+    margin: 0;
 }

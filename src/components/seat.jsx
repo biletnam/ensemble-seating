@@ -18,7 +18,7 @@ class Seat extends PureComponent {
 
     handleClick() {
         if (this.props.member && typeof this.props.onRequestSelectMember === 'function') {
-            this.props.onRequestSelectMember(this.props.member.id);
+            this.props.onRequestSelectMember(this.props.memberId);
         }
     }
 
@@ -59,7 +59,9 @@ class Seat extends PureComponent {
         style[xStyle] = typeof x === 'number' && !isNaN(x) ? x : 'unset';
         style[yStyle] = typeof y === 'number' && !isNaN(y) ? y : 'unset';
 
-        return <span {...props} className={`seat${implicit ? ' seat--implicit' : ''}${member ? ' seat--occupied' : ''}`}
+        const {memberId, ...rest} = props;
+
+        return <span {...rest} className={`seat${implicit ? ' seat--implicit' : ''}${member ? ' seat--occupied' : ''}`}
             title={member ? member.name : '' } 
             data-seat-number={seatNumber + 1}
             style={style} >

@@ -30,22 +30,22 @@ class SectionEditor extends PureComponent {
 
     updateSectionName(newName) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {name: newName});
+            this.props.onRequestEdit(this.props.editorId, {name: newName});
     }
 
     updateSectionColor(newColor) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {color: newColor});
+            this.props.onRequestEdit(this.props.editorId, {color: newColor});
     }
 
     updateSectionOffsetType(newType) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {offsetType: newType});
+            this.props.onRequestEdit(this.props.editorId, {offsetType: newType});
     }
 
     updateSectionOffsetValue(newValue) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {offsetValue: newValue});
+            this.props.onRequestEdit(this.props.editorId, {offsetValue: newValue});
     }
 
     updateRowSetting(row, value) {
@@ -54,7 +54,7 @@ class SectionEditor extends PureComponent {
         saveData.rowSettings[row] = value;
 
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, saveData);
+            this.props.onRequestEdit(this.props.editorId, saveData);
     }
 
     handleColorChange(color, event) {
@@ -67,7 +67,7 @@ class SectionEditor extends PureComponent {
         saveData['rowSettings'].push(DEFAULT_SECTION_ROW_LENGTH)
 
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, saveData);
+            this.props.onRequestEdit(this.props.editorId, saveData);
     }
 
     handleClickedRemoveRow(row) {
@@ -77,12 +77,12 @@ class SectionEditor extends PureComponent {
             saveData.rowSettings.splice(row, 1);
 
             if (this.props.onRequestEdit)
-                this.props.onRequestEdit(this.props.data.id, saveData);
+                this.props.onRequestEdit(this.props.editorId, saveData);
         }
     }
 
     render() {
-        const {data, onRequestEdit, ...rest} = this.props;
+        const {data, onRequestEdit, editorId, ...rest} = this.props;
         return <div {...rest}>
             {data && <>
                 <div>

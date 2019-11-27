@@ -19,7 +19,7 @@ class Region extends PureComponent {
 
     handleClickedNewSectionButton() {
         if (typeof this.props.onRequestNewSection === 'function')
-            this.props.onRequestNewSection(this.props.id);
+            this.props.onRequestNewSection(this.props.regionId);
     }
 
     handleMemberSelected(memberId) {
@@ -42,15 +42,16 @@ class Region extends PureComponent {
 
             return <div className='stage__region' style={{ width: `${layoutWidth}px`, height: `${layoutHeight}px` }}>
                 {positionedSeats.map((currentSeat, seatIndex) => {
-                    const member = currentSeat.member;
+                    const member = this.props.members[currentSeat.member];
                     return <Seat key={currentSeat.id}
                         member={member}
+                        memberId={currentSeat.member}
                         implicit={currentSeat.implicit}
                         implicitSeatsVisible={this.props.settings.implicitSeatsVisible}
                         seatNameLabels={this.props.settings.seatNameLabels}
                         seatNumber={currentSeat.seat + 1}
                         color={currentSeat.color}
-                        selected={member && this.props.editorId === member.id}
+                        selected={member && this.props.editorId === currentSeat.member}
                         x={currentSeat.x}
                         y={currentSeat.y}
                         downstageTop={this.props.settings.downstageTop}

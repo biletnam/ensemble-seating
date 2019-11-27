@@ -1,3 +1,7 @@
+:root {
+    --dialog-width: 560px;
+}
+
 html {
     font-size: 16px;
     color: #333;
@@ -52,7 +56,7 @@ button {
     
     #app {
         display: grid;
-        grid-template-columns: 1fr 400px;
+        grid-template-columns: 1fr 300px;
         grid-template-rows: auto 1fr;
         grid-template-areas: 'toolbar toolbar'
                              'stage sidebar';

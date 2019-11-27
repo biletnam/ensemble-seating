@@ -4,22 +4,14 @@ import RegionEditor from './edit-region.jsx';
 import SectionEditor from './edit-section.jsx';
 import MemberEditor from './edit-member.jsx';
 import Sidebar from './sidebar.jsx';
-import { isRegion, isSection, isMember } from '../helpers/project-helpers';
+import { Region, Section, Member } from '../helpers/project-helpers';
 
-function getEditorType(data) {
-    if (data) {
-        if (isRegion(data))
-            return 'region';
-        else if (isSection(data))
-            return 'section';
-        else if (isMember(data))
-            return 'member';
-    }
-}
+import './editor.css';
 
 const Editor = props => {
     let { 
         data,
+        editorId,
         onEditRegion,
         onEditSection,
         onEditMember,
@@ -29,36 +21,40 @@ const Editor = props => {
         ...rest 
     } = props;
 
-    const type = getEditorType(data);
-
-    let Control;
-    if (type == 'region')
+    let Control, friendlyName;
+    if (data instanceof Region) {
         Control = RegionEditor;
-    else if (type == 'section')
+        friendlyName = 'region';
+    }
+    else if (data instanceof Section) {
         Control = SectionEditor;
-    else if (type == 'member')
+        friendlyName = 'section';
+    }
+    else if (data instanceof Member) {
         Control = MemberEditor;
+        friendlyName = 'section member';
+    }
 
     function handleEdit(editorId, newData) {
-        if (type == 'region')
+        if (data instanceof Region)
             onEditRegion(editorId, newData);
-        else if (type == 'section')
+        else if (data instanceof Section)
             onEditSection(editorId, newData);
-        else if (type == 'member')
+        else if (data instanceof Member)
             onEditMember(editorId, newData);
     }
 
     function handleDelete() {
-        if (type == 'region')
-            onRequestDeleteRegion(data.id);
-        else if (type == 'section')
-            onRequestDeleteSection(data.id);
-        else if (type == 'member')
-            onRequestDeleteMember(data.id);
+        if (data instanceof Region)
+            onRequestDeleteRegion(editorId);
+        else if (data instanceof Section)
+            onRequestDeleteSection(editorId);
+        else if (data instanceof Member)
+            onRequestDeleteMember(editorId);
     }
 
-    return <Sidebar {...rest} id='editor' title={`Edit ${type == 'member' ? 'section member' : type}`} onClickedDelete={!(type == 'region' && !onRequestDeleteRegion) && handleDelete}>
-        {Control && <Control onRequestEdit={handleEdit} data={data} id='editor__content' />}
+    return <Sidebar {...rest} id='editor' title={`Edit ${friendlyName}`} onClickedDelete={!(data instanceof Region && !onRequestDeleteRegion) && handleDelete}>
+        {Control && <Control onRequestEdit={handleEdit} data={data} editorId={editorId} id='editor__content' />}
     </Sidebar>
 }
 

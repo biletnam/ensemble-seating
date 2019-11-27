@@ -6,6 +6,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import Sidebar from './sidebar.jsx';
 import RegionListItem from './region-list-item.jsx';
+import { byOrder } from '../helpers/project-helpers';
 
 const Roster = props => {
     const {
@@ -15,35 +16,45 @@ const Roster = props => {
         members,
         onRequestNewSection,
         onRequestNewPerson,
+        onRequestEditPerson,
         onRequestBatchAdd,
+        onRequestDeleteSection,
         onRequestShuffleSection,
         onRequestDeleteRegion,
         onRequestMoveRegion,
         onRequestSelectMember,
+        onRequestDeleteMember,
         ...rest
     } = props;
 
+    const regionEntries = Object.entries(regions).sort(byOrder);
+    const sectionEntries = Object.entries(sections).sort(byOrder);
+
     return <Sidebar {...rest} title='Roster'>
         <DragDropContext onDragEnd={onDragEnd}>
-            {regions.map(currentRegion => <RegionListItem
-                key={currentRegion.id}
+            {regionEntries.map(([regionId, currentRegion]) => <RegionListItem
+                key={regionId}
                 region={currentRegion}
-                sections={sections.filter(currentSection => currentSection.region === currentRegion.id)}
+                regionId={regionId}
+                sections={Object.fromEntries(sectionEntries.filter(([sectionId, currentSection]) => currentSection.region === regionId))}
                 members={members}
-                showEditAndDeleteControls={regions.length > 1}
-                forceNewSectionButton={sections.length > 0 || regions.length > 1}
+                enableMoveAndDeleteControls={regionEntries.length > 1}
+                forceNewSectionButton={sectionEntries.length > 0 || regionEntries.length > 1}
                 onRequestNewSection={onRequestNewSection}
                 onRequestNewPerson={onRequestNewPerson}
+                onRequestEditPerson={onRequestEditPerson}
                 onRequestBatchAdd={onRequestBatchAdd}
+                onRequestDeleteSection={onRequestDeleteSection}
                 onRequestShuffleSection={onRequestShuffleSection}
 
                 onRequestDeleteRegion={onRequestDeleteRegion}
                 onRequestMoveRegion={onRequestMoveRegion}
 
-                onRequestSelectMember={onRequestSelectMember} />
+                onRequestSelectMember={onRequestSelectMember}
+                onRequestDeleteMember={onRequestDeleteMember} />
             )}
         </DragDropContext>
-        {sections.length === 0 && regions.length === 1 && <p className='roster__no-sections-message'>No sections to display</p>}
+        {sectionEntries.length === 0 && regionEntries.length === 1 && <p className='roster__no-sections-message'>No sections to display</p>}
     </Sidebar>
 };
 

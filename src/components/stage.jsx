@@ -20,16 +20,21 @@ class Stage extends PureComponent {
     render() {
         const regionsToRender = [];
 
-        for (let i=0; i< this.props.regions.length; i++) {
-            const currentRegion =  this.props.regions[i];
-            const currentSections = this.props.sections.filter(section => section.region === currentRegion.id);
-            const currentSeats = this.props.seats.filter(seat => currentSections.some(section => section.id === seat.section));
+        const regionEntries = Object.entries(this.props.regions);
+        const sectionEntries = Object.entries(this.props.sections);
+        const memberEntries = Object.entries(this.props.sections);
+
+        for (let i=0; i<regionEntries.length; i++) {
+            const [currentId, currentRegion] = regionEntries[i];
+            const currentSections = sectionEntries.filter(([, section]) => section.region === currentId);
+            const currentSeats = this.props.seats.filter(seat => currentSections.some(([sectionId, sectionData]) => sectionId === seat.section));
             const trimmedSeats = trimOuterSpacing(currentSeats);
 
             regionsToRender.push(
-                <Region key={currentRegion.id}
+                <Region key={currentId}
                     seats={trimmedSeats}
-                    {...currentRegion}
+                    members={this.props.members}
+                    regionId={currentId}
                     settings={this.props.settings}
                     editorId={this.props.editorId}
                     onRequestSelectMember={this.props.onRequestSelectMember}

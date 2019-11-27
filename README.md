@@ -1,5 +1,5 @@
 ## Ensemble Seating
-Ensemble Seating is Progressive Web App ([PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)) designed to help music teacher layout seating charts for their ensembles.
+Ensemble Seating is Progressive Web App ([PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)) designed to help music teachers layout seating charts for their ensembles.
 
 Features:
 

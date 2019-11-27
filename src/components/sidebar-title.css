@@ -2,12 +2,13 @@
     background-color: #efefef;
     margin: 0;
     padding: 0 var(--sidebar-padding);
-    line-height: 48px;
-    font-weight: lighter;
+    font-size: .9rem;
+    font-weight: bold;
     z-index: 1;
     display: flex;
     align-items: center;
     z-index: 2;
+    line-height: var(--sidebar-titlebar-height);
 }
 
 .sidebar-title__back-button {

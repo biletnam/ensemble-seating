@@ -25,16 +25,16 @@ class RegionEditor extends PureComponent {
             saveData[event.target.name] = event.target.value;
 
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, saveData);
+            this.props.onRequestEdit(this.props.editorId, saveData);
     }
 
     handleSliderInput(event) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, { angle: event.target.value });
+            this.props.onRequestEdit(this.props.editorId, { angle: event.target.value });
     }
 
     render() {
-        const {data, onRequestEdit, ...rest} = this.props;
+        const {data, onRequestEdit, editorId, ...rest} = this.props;
         return <div {...rest}>
             {data && <React.Fragment>
                 <div className='text-input-wrapper'>

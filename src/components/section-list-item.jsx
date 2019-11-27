@@ -9,47 +9,73 @@ import '@material/icon-button/dist/mdc.icon-button.css';
 
 import ListActionMenu from './list-action-menu.jsx';
 import MemberListItem from './member-list-item.jsx';
+import SeatListItem from './seat-list-item.jsx';
 
 import './section-list-item.css';
 
-import PersonAddIcon from '../icons/person_add-24px.svg';
 import GroupAddIcon from '../icons/group_add-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
+import { byOrder, Member } from '../helpers/project-helpers.js';
 
 const SectionListItem = props => {
     const [menuOpen, setMenuOpen] = useState(false);
 
-    function handleClickedNewPersonButton() {
-        if (props.onRequestNewPerson)
-            props.onRequestNewPerson(props.data.id);
+    function handleCreatedMemberListItem(name, seatIndex) {
+        props.onRequestNewPerson && props.onRequestNewPerson(props.sectionId, name, seatIndex);
     }
 
-    function handleClickedMemberListItem(memberId) {
-        if (props.onRequestSelectMember)
-            props.onRequestSelectMember(memberId);
+    function handleEditedMemberListItem(id, data) {
+        props.onRequestEditPerson && props.onRequestEditPerson(id, data);
     }
 
     function handleClickedSectionButton() {
         if (props.onRequestSelectMember)
-            props.onRequestSelectMember(props.data.id);
+            props.onRequestSelectMember(props.sectionId);
     }
 
     function handleClickedBatchAddMembers() {
         if (props.onRequestBatchAdd)
-            props.onRequestBatchAdd(props.data.id);
+            props.onRequestBatchAdd(props.sectionId);
     }
 
     function handleSelectedMenuItem(action) {
         switch (action) {
+            case 'delete':
+                props.onRequestDelete && props.onRequestDelete(props.sectionId);
+                break;
+            case 'settings':
+                handleClickedSectionButton();
+                break;
             case 'shuffle':
-                props.onRequestShuffle && props.onRequestShuffle(props.data.id);
+                props.onRequestShuffle && props.onRequestShuffle(props.sectionId);
                 break;
         }
         setMenuOpen(false);
     }
 
-    return <Draggable key={props.data.id}
-        draggableId={props.data.id}
+    /** @type {Array<[string, Member]>} */
+    const memberEntries = Object.entries(props.members).sort(byOrder);
+
+    const seatList = [];
+    let currentIndex = 0;
+    for (let i=0; i<props.data.rowSettings.length; i++) {
+        for (let k=0; k<props.data.rowSettings[i]; k++) {
+            const thisSeat = currentIndex;
+            const [memberId, memberData] = memberEntries.find(([id, data]) => data.order === thisSeat) || [];
+            const seatKey = `section-${props.data.name}-seat-${thisSeat}`;
+            seatList.push(<SeatListItem draggable={memberData != null} seatKey={seatKey} key={seatKey} index={thisSeat}>
+                    <MemberListItem data={memberData} memberId={memberId}
+                        onCreate={name => handleCreatedMemberListItem(name, thisSeat)}
+                        onEdit={handleEditedMemberListItem}
+                        onDelete={props.onRequestDeleteMember} />
+                </SeatListItem>
+            );
+            currentIndex++;
+        }
+    }
+
+    return <Draggable key={props.sectionId}
+        draggableId={props.sectionId}
         index={props.index}
         type='section'>
             {(provided, snapshot) => (
@@ -60,34 +86,28 @@ const SectionListItem = props => {
                         <CardPrimaryAction className='section-list-item__titlebar'
                             style={{backgroundColor:props.data.color,color:tinycolor(props.data.color).isLight()?'#333':'#fff'}}
                             {...provided.dragHandleProps}
-                            key={props.data.id}
-                            onClick={handleClickedSectionButton}>
-                            <p>{props.data.name}</p>
+                            key={props.sectionId}>
+                            {props.data.name}
                         </CardPrimaryAction>
 
-                        <Droppable droppableId={props.data.id} type='member'>
+                        <Droppable droppableId={props.sectionId} type='member'>
                             {(provided, snapshot) => (
-                                <div ref={provided.innerRef} {...provided.droppableProps}>
-                                    {/* Individual performers */}
-                                    {props.members.map((person, personIndex) => {
-                                        return <MemberListItem key={person.id} 
-                                            index={personIndex} 
-                                            data={person}
-                                            onClick={handleClickedMemberListItem} />
-                                    })}
-                                    
+                                <ol className='section-list-item__member-list'
+                                    ref={provided.innerRef} {...provided.droppableProps}>
+                                    {seatList}
                                     {provided.placeholder}
-                                </div>
+                                </ol>
                             )}
                         </Droppable>
 
                         <CardActions>
                             <CardActionIcons>
-                                <CardActionIcon onClick={handleClickedNewPersonButton} icon={<PersonAddIcon />} aria-label='Add person' />
                                 <CardActionIcon onClick={handleClickedBatchAddMembers} icon={<GroupAddIcon />} aria-label='Add group' />
                                 
                                 <ListActionMenu
                                     shuffle='section members'
+                                    deleteItem
+                                    settings
                                     onSelectAction={handleSelectedMenuItem}
                                     open={menuOpen}
                                     onClose={() => setMenuOpen(false)}>

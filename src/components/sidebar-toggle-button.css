@@ -1,0 +1,23 @@
+.sidebar-toggle-button {
+    --sidebar-toggle-size: 30px;
+    position: absolute;
+    top: .5rem;
+    right: calc(100% + .5rem);
+    z-index: 2;
+    width: var(--sidebar-toggle-size);
+    height: var(--sidebar-toggle-size);
+}
+
+.sidebar-toggle-button > .mdc-fab__icon {
+    --toggle-icon-size: calc(.6 * var(--sidebar-toggle-size));
+    width: var(--toggle-icon-size);
+    height: var(--toggle-icon-size);
+}
+
+.sidebar-toggle-button > .mdc-fab__icon {
+    transition: none;
+}
+
+.sidebar-toggle-button--offset > .mdc-fab__icon {
+    transform: rotateZ(180deg);
+}
