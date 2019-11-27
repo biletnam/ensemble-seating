@@ -808,7 +808,7 @@ export function shuffleSection(sectionId, project) {
     return Object.assign({}, project, {members: existingMembers});
 }
 
-export async function exportProjectFile(projectName, projectForExport, options) {
+export async function exportProjectFile(projectName = 'Untitled project', projectForExport, options) {
     const regions = projectForExport.regions;
     const sections = projectForExport.sections;
     const members = projectForExport.members;
