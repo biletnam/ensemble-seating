@@ -1306,7 +1306,7 @@ export function shuffleSection(sectionId, project) {
     );
 }
 
-export async function exportProjectFile(projectName, projectForExport, options) {
+export async function exportProjectFile(projectName = 'Untitled project', projectForExport, options) {
     const regions = projectForExport.regions;
     const sections = projectForExport.sections;
     const members = projectForExport.members;

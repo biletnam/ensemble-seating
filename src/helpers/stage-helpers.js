@@ -473,16 +473,16 @@ export function calculateSeatPositions(regions, sections, members, options) {
         maxSeatY = 0,
         minSeatX = 0,
         minSeatY = 0;
-    
+
     const regionEntries = Object.entries(regions);
     const sectionEntries = Object.entries(sections);
     const memberEntries = Object.entries(members);
-    for (let i=0; i<regionEntries.length; i++) {
+    for (let i=regionEntries.length-1; i>-1; i--) {
         const [regionId, regionData] = regionEntries[i];
 
         /** @type {Object<string, Section>} */
         const includedSections = Object.fromEntries(sectionEntries.filter(([,sectionData]) => sectionData.region === regionId));
-        const regionOffset = i > 0 ? maxSeatY + regionGap : 0;
+        const regionOffset = i < regionEntries.length - 1 ? maxSeatY + regionGap : 0;
 
         let maxRegionX = 0,
             maxRegionY = 0,

@@ -6,8 +6,9 @@ import './project-tile.css';
 class ProjectTile extends PureComponent {
     render() {
         const regionData = JSON.parse(JSON.stringify(this.props.data.regions));
+      
         const regionEntries = Object.entries(regionData);
-        if (!this.props.data.settings.downstageTop)
+        if (this.props.data.settings.downstageTop)
             regionEntries.reverse();
         
         return <button type='button' {...this.props}

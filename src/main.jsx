@@ -785,7 +785,7 @@ class App extends Component {
                 onRequestNewProject={this.handleRequestNewProject}
                 onRequestDuplicateProject={this.handleRequestDuplicateProject}
                 onRequestImportProject={this.handleRequestImportProject}
-                onRequestExportProject={options => exportProjectFile(this.state.projectName, this.state.project, options)}
+                onRequestExportProject={options => exportProjectFile(this.state.projectName || undefined, this.state.project, options)}
                 onRequestShowOpenProjectDialog={() => this.setState({openProjectDialogOpen: true})}
                 onRequestDeleteProject={() => this.deleteProject()}
                 onRequestLogin={this.handleRequestLogin}
