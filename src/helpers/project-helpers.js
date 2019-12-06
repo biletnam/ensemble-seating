@@ -1002,7 +1002,11 @@ export function batchAddMembers(names, sectionId, startingIndex, project) {
     let currentIndex = startingIndex;
     for (let i=0; i<names.length; i++) {
         // Starting at startingIndex, find an unoccupied slot
-        currentIndex = findUnoccupiedIndex(members, currentIndex);
+        const membersInSection = Object.fromEntries(
+            Object.entries(members)
+                .filter(([memberId, memberData]) => memberData.section === sectionId)
+        );
+        currentIndex = findUnoccupiedIndex(membersInSection, currentIndex);
         members[uuid()] = Object.assign(
             new Member(names[i] ? names[i] : undefined, sectionId), { order: currentIndex }
         );
