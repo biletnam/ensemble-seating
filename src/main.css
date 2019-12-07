@@ -79,6 +79,7 @@ button {
 }
 
 .text-input-wrapper:not(:first-child) {
+    display: block;
     margin-top: 1em;
 }
 

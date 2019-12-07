@@ -93,6 +93,7 @@ function createFreshState(user) {
     return {
         batchAddSectionId: null,
         batchAddSectionName: null,
+        batchAddEmptySeats: null,
         batchAddDialogOpen: false,
         projectOptionsDialogOpen: false,
         newProjectDialogOpen: false,
@@ -470,15 +471,29 @@ class App extends Component {
 
     handleRequestedBatchAddMembers(sectionId) {
         const requestedSection = this.state.project.sections[sectionId];
+        const membersInSection = Object.values(this.state.project.members)
+            .filter(memberData => memberData.section === sectionId)
+            .map(memberData => memberData.order);
+        
+        const allSeatPositions = [];
+        for (let i=0; i<requestedSection.rowSettings.length; i++) {
+            for (let k=0; k<requestedSection.rowSettings[i]; k++) {
+                allSeatPositions.push(allSeatPositions.length);
+            }
+        }
+
+        const emptySeats = allSeatPositions.filter(seatNum => !membersInSection.includes(seatNum));
+
         this.setState({
             batchAddSectionId: sectionId,
             batchAddSectionName: requestedSection.name,
+            batchAddEmptySeats: emptySeats,
             batchAddDialogOpen: true
         });
     }
 
-    handleAcceptedBatchAdd(members) {
-        this.batchAddMembers(members, this.state.batchAddSectionId);
+    handleAcceptedBatchAdd(members, startingIndex) {
+        this.batchAddMembers(members, this.state.batchAddSectionId, startingIndex);
     }
 
     handleRequestedShuffleSection(sectionId) {
@@ -860,7 +875,8 @@ class App extends Component {
             <BatchAddMembersDialog isOpen={this.state.batchAddDialogOpen}
                 onClose={() => this.setState({ batchAddDialogOpen: false })}
                 onAddMembers={this.handleAcceptedBatchAdd}
-                title={this.state.batchAddSectionName} />
+                title={this.state.batchAddSectionName}
+                emptySeats={this.state.batchAddEmptySeats} />
 
             <ProjectSettingsDialog isOpen={this.state.projectOptionsDialogOpen}
                 onClose={() => this.setState({ projectOptionsDialogOpen: false })}

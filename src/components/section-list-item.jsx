@@ -57,10 +57,9 @@ const SectionListItem = props => {
     const memberEntries = Object.entries(props.members).sort(byOrder);
 
     const seatList = [];
-    let currentIndex = 0;
     for (let i=0; i<props.data.rowSettings.length; i++) {
         for (let k=0; k<props.data.rowSettings[i]; k++) {
-            const thisSeat = currentIndex;
+            const thisSeat = seatList.length;
             const [memberId, memberData] = memberEntries.find(([id, data]) => data.order === thisSeat) || [];
             const seatKey = `section-${props.data.name}-seat-${thisSeat}`;
             seatList.push(<SeatListItem draggable={memberData != null} seatKey={seatKey} key={seatKey} index={thisSeat}>
@@ -70,7 +69,6 @@ const SectionListItem = props => {
                         onDelete={props.onRequestDeleteMember} />
                 </SeatListItem>
             );
-            currentIndex++;
         }
     }
 
