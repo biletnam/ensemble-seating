@@ -10,7 +10,7 @@
     "sections": {},
     "members": {},
     "settings": {
-      "seatNameLabels": "initials",
+      "seatNameLabels": "full",
       "downstageTop": false,
       "implicitSeatsVisible": false,
       "seatGap": 1.0,
