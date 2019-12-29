@@ -12,6 +12,7 @@ const Editor = props => {
     let { 
         data,
         editorId,
+        downstageTop,
         onEditRegion,
         onEditSection,
         onEditMember,
@@ -54,7 +55,8 @@ const Editor = props => {
     }
 
     return <Sidebar {...rest} id='editor' title={`Edit ${friendlyName}`} onClickedDelete={!(data instanceof Region && !onRequestDeleteRegion) && handleDelete}>
-        {Control && <Control onRequestEdit={handleEdit} data={data} editorId={editorId} id='editor__content' />}
+        {Control && <Control onRequestEdit={handleEdit}
+            data={data} editorId={editorId} downstageTop={downstageTop} id='editor__content' />}
     </Sidebar>
 }
 

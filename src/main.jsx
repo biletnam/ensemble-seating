@@ -835,6 +835,7 @@ class App extends Component {
             {this.state.editorId && <Editor expanded={this.state.rosterOpen}
                 data={this.state.project.regions[this.state.editorId] || this.state.project.sections[this.state.editorId] || this.state.project.members[this.state.editorId]}
                 editorId={this.state.editorId}
+                downstageTop={this.state.project.settings.downstageTop}
                 onEditRegion={this.handleAcceptRegionEdits}
                 onEditSection={this.handleAcceptSectionEdits}
                 onEditMember={this.handleAcceptMemberEdits}
