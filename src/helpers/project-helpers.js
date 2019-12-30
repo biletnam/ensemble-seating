@@ -41,6 +41,21 @@ export function idbGetLastAppVersion () {
     });
 }
 
+export function idbSetRosterScrollPosition (pos) {
+    return currentDb.then(db => {
+        const tx = db.transaction('env', 'readwrite');
+        tx.objectStore('env').put(pos, 'rosterScrollPosition');
+        return tx.complete;
+    });
+}
+
+export function idbGetRosterScrollPosition () {
+    return currentDb.then(db => {
+        const tx = db.transaction('env', 'readonly');
+        return tx.objectStore('env').get('rosterScrollPosition');
+    })
+}
+
 export function idbSaveTemporaryProject (project) {
     return currentDb.then(db => {
         const tx = db.transaction(PROJECTS_KEY, 'readwrite');

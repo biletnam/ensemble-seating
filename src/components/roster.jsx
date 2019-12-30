@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 import './roster.css';
 
@@ -6,7 +6,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import Sidebar from './sidebar.jsx';
 import RegionListItem from './region-list-item.jsx';
-import { byOrder } from '../helpers/project-helpers';
+import { byOrder, idbSetRosterScrollPosition, idbGetRosterScrollPosition } from '../helpers/project-helpers';
 
 const Roster = props => {
     const {
@@ -29,8 +29,25 @@ const Roster = props => {
 
     const regionEntries = Object.entries(regions).sort(byOrder);
     const sectionEntries = Object.entries(sections).sort(byOrder);
+    const scrollableContainerRef = useRef(null);
 
-    return <Sidebar {...rest} title='Roster'>
+    useEffect(() => {
+        idbGetRosterScrollPosition().then(currentScroll => {
+            console.log(`Restore roster scroll position: ${currentScroll}`);
+            if (scrollableContainerRef.current) {
+                scrollableContainerRef.current.scrollTo(0, currentScroll)
+            }
+            idbSetRosterScrollPosition(0);
+        })
+    }, []);
+
+    function saveScrollAndSelectMember () {
+        const currentScroll = scrollableContainerRef.current ? scrollableContainerRef.current.scrollTop : 0;
+        idbSetRosterScrollPosition(currentScroll);
+        onRequestSelectMember(...arguments);
+    }
+
+    return <Sidebar {...rest} title='Roster' scrollableContainerRef={scrollableContainerRef}>
         <DragDropContext onDragEnd={onDragEnd}>
             {regionEntries.map(([regionId, currentRegion]) => <RegionListItem
                 key={regionId}
@@ -50,7 +67,7 @@ const Roster = props => {
                 onRequestDeleteRegion={onRequestDeleteRegion}
                 onRequestMoveRegion={onRequestMoveRegion}
 
-                onRequestSelectMember={onRequestSelectMember}
+                onRequestSelectMember={saveScrollAndSelectMember}
                 onRequestDeleteMember={onRequestDeleteMember} />
             )}
         </DragDropContext>

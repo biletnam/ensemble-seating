@@ -5,7 +5,7 @@ import SidebarTitle from './sidebar-title.jsx';
 import SidebarToggleButton from './sidebar-toggle-button.jsx';
 
 const Sidebar = props => {
-    const { title, onToggleSidebar, onClickedBack, onClickedDelete, expanded, children, ...rest } = props;
+    const { title, onToggleSidebar, onClickedBack, onClickedDelete, expanded, children, scrollableContainerRef, ...rest } = props;
     let className = 'sidebar';
 
     if (!expanded)
@@ -17,7 +17,7 @@ const Sidebar = props => {
                 <SidebarTitle onClickedBack={onClickedBack} onClickedDelete={onClickedDelete}>
                     {title || 'Sidebar'}
                 </SidebarTitle>
-                <div className='sidebar__scrollable-container'>
+                <div className='sidebar__scrollable-container' ref={scrollableContainerRef}>
                     {children}
                 </div>
             </div>
