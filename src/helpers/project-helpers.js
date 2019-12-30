@@ -1,7 +1,7 @@
 import {v4 as uuid} from 'uuid';
 import randomColor from 'randomcolor';
 import { openDB } from 'idb';
-import semver from 'semver';
+import semver from 'semver/preload';
 import firebase, { auth, provider } from './firebase-helpers.js';
 import {templates} from '../templates/index.js';
 import { knuthShuffle } from 'knuth-shuffle';

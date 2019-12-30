@@ -4,7 +4,7 @@ import 'regenerator-runtime/runtime';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
-import semver from 'semver';
+import semver from 'semver/preload';
 import debounce from 'lodash.debounce';
 
 import Stage from './components/stage.jsx';
