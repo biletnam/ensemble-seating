@@ -265,24 +265,6 @@ function rotate(cx, cy, x, y, angle) {
     return [nx, ny];
 }
 
-export function getPositionOnCurve (seatNum, rowLength, angle) {
-    const percentOfArc = angle / 180;
-
-    const position = {x: null, y: null};
-    const step = (Math.PI * percentOfArc) / rowLength;
-
-    position.x = Math.cos(step * seatNum);
-    position.y = Math.sin(step * seatNum);
-
-    // If there's an angle, rotate the point
-    const rotationInDegrees = -.5 *  (180 - angle);
-    const [rotatedX, rotatedY] = rotate(0, 0, position.x, position.y, rotationInDegrees);
-    position.x = rotatedX;
-    position.y = rotatedY;
-
-    return position;
-}
-
 /**
  * 
  * @param {Array<Array<SeatData>>} rowData 
@@ -298,18 +280,20 @@ export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
         const firstRowWidth = rows[0].length * options.seatSize * .5;
 
         for (let i=0; i<rows.length; i++) {
-            const count = rows[i].length - 1;
+            const arcRadius = firstRowWidth + (i * increasePerRow);
+            const arcStep = Math.PI / ((rows[i].length - 1) / (angle / 180));
+            for (let k = 0; k < rows[i].length; k++) {
+                let seatX = arcRadius * Math.cos(arcStep*k);
+                let seatY = arcRadius * Math.sin(arcStep*k);
 
-            for (let k=0; k<rows[i].length; k++) {
-                // Get position as a percentage 0.0-1.0
-                const position = getPositionOnCurve(k, count, angle);
+                // Todo: account for angle parameter
+                [seatX, seatY] = rotate(firstRowWidth, 0, seatX, seatY, (angle - 180) * .5);
 
-                // Multiply by the on-screen dimensions of each row to get pixel values
-                // Start at a fixed size for the first row, then increase radius for each row
-                rows[i][k].x = position.x * (firstRowWidth + (i * increasePerRow));
-                rows[i][k].y = position.y * (firstRowWidth + (i * increasePerRow));
-
-                rows[i][k].x -= (.5 * options.seatSize);
+                // The above calculates positions counterclockwise, so assign seats in reverse order
+                const seatIndex = (rows[i].length - 1) - k;
+                rows[i][seatIndex].x = seatX;
+                rows[i][seatIndex].y = seatY;
+                console.log(`Seat: x=${Math.round(seatX)}, y=${Math.round(seatY)}`);
             }
         }
 
@@ -404,10 +388,9 @@ export function seatMembers (membersBySection, rows) {
 /**
  * Gets the dimensions of the chart based on all the available seats
  * @param {Array<SeatData>} positionedSeats 
- * @param {import('./project-helpers.js').ProjectSettings} options 
  * @returns {[number, number]}
  */
-export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
+export function getLayoutDimensions (positionedSeats) {
     let minX = 0, maxX = 0, minY = 0, maxY = 0;
     for (let i=0; i<positionedSeats.length; i++) {
         const currentX = positionedSeats[i].x,
@@ -419,18 +402,7 @@ export function getLayoutDimensions (positionedSeats, options = {seatSize}) {
         if (currentY > maxY) maxY = currentY;
     }
 
-    return adjustDimensionsForSeatSize(maxX - minX, maxY - minY, options);
-}
-
-/**
- * 
- * @param {number} width 
- * @param {number} height 
- * @param {import('./project-helpers.js').ProjectSettings} options 
- * @returns {[number, number]}
- */
-function adjustDimensionsForSeatSize (width, height, options = {seatSize}) {
-    return [width + options.seatSize + 1, height + options.seatSize + 1];
+    return [maxX - minX, maxY - minY];
 }
 
 /**
@@ -562,17 +534,14 @@ export function calculateSeatPositions(regions, sections, members, options) {
 
     // Horizontally center all regions in the layout
     if (seatsByRegion.length > 1) {
-        const [layoutWidth, layoutHeight] = adjustDimensionsForSeatSize(maxSeatX - minSeatX, maxSeatY - minSeatY, options);
+        const layoutWidth = maxSeatX - minSeatX;
+        const layoutHeight = maxSeatY - minSeatY;
         for (let i=0; i<seatsByRegion.length; i++) {
             const region = seatsByRegion[i];
             const dimensions = dimensionsByRegion[i];
     
-            // Get the width of the current region
-            const [regionWidth, regionHeight] = adjustDimensionsForSeatSize(
-                dimensions.xMax - dimensions.xMin,
-                dimensions.yMax - dimensions.yMin,
-                options
-            );
+            const regionWidth = dimensions.xMax - dimensions.xMin;
+            const regionHeight = dimensions.yMax - dimensions.yMin;
     
             const diff = layoutWidth - regionWidth;
             const offset = diff * .5;
@@ -586,49 +555,14 @@ export function calculateSeatPositions(regions, sections, members, options) {
     return seatsByRegion.flat();
 }
 
-function flipStageDirection(positionedSeats, options) {
+export function flipStageDirection(positionedSeats) {
     const seats = JSON.parse(JSON.stringify(positionedSeats));
-    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
+    const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
     for (const seat of seats) {
         seat.x = (seat.x * -1) + layoutWidth;
         seat.y = (seat.y * -1) + layoutHeight;
     }
     return trimOuterSpacing(seats);
-}
-
-/**
- * Divide an entire phrase in an array of phrases, all with the max pixel length given.
- * The words are initially separated by the space char.
- * Adapted from https://stackoverflow.com/a/16599668
- * @param phrase
- * @param length
- * @return
- */
-function getLines(ctx,phrase,maxPxLength,textStyle) {
-    var wa=phrase.split(" "),
-        phraseArray=[],
-        lastPhrase=wa[0],
-        measure=0,
-        splitChar=" ";
-    if (wa.length <= 1) {
-        return wa
-    }
-    ctx.font = textStyle;
-    for (var i=1;i<wa.length;i++) {
-        var w=wa[i];
-        measure=ctx.measureText(lastPhrase+splitChar+w).width;
-        if (measure<maxPxLength) {
-            lastPhrase+=(splitChar+w);
-        } else {
-            phraseArray.push(lastPhrase);
-            lastPhrase=w;
-        }
-        if (i===wa.length-1) {
-            phraseArray.push(lastPhrase);
-            break;
-        }
-    }
-    return phraseArray;
 }
 
 const svgNS = 'http://www.w3.org/2000/svg';
@@ -664,25 +598,34 @@ function wrapAt(text, maxWidth, container) {
     }, []);
 }
 
+/**
+ * 
+ * @param {Object<string, Region>} regions 
+ * @param {Object<string, Section>} sections 
+ * @param {Object<string, Member>} members 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ */
 export function renderSVG (regions, sections, members, options) {
     let seats = calculateSeatPositions(regions, sections, members, options);
     const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
 
-    if (!options.downstageTop)
-        seats = flipStageDirection(seats, options);
+    if (options.downstageTop)
+        seats = flipStageDirection(seats);
 
     const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    svg.setAttribute('xmlns', svgNS);
     svg.style.fontFamily = 'sans-serif';
     svg.style.fontSize = options.seatLabelFontSize;
     svg.style.visibility = 'hidden';
     svg.style.position = 'absolute';
 
-    svg.setAttribute('width', layoutWidth);
-    svg.setAttribute('height', layoutHeight);
-    svg.setAttribute('dominant-baseline', 'hanging');
+    const svgWidth = layoutWidth + options.seatSize + 1;
+    const svgHeight = layoutHeight + options.seatSize + 1;
+    svg.setAttribute('width', svgWidth);
+    svg.setAttribute('height', svgHeight);
+    svg.setAttribute('dominant-baseline', 'text-before-edge');
     svg.setAttribute('text-anchor', 'middle');
-    svg.setAttribute('viewbox', `0 0 ${layoutWidth} ${layoutHeight}`);
+    svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
     document.body.appendChild(svg);
 
     // Render seats
@@ -691,11 +634,11 @@ export function renderSVG (regions, sections, members, options) {
         const rect = document.createElementNS(svgNS, 'rect');
         rect.setAttribute('width', options.seatSize || seatSize);
         rect.setAttribute('height', options.seatSize || seatSize);
-        rect.setAttributeNS(svgNS, 'stroke', 'black');
-        rect.setAttributeNS(svgNS, 'strokeWidth', '1');
-        rect.setAttributeNS(svgNS, 'fill', seat.color);
-        rect.setAttributeNS(svgNS, 'x', seat.x);
-        rect.setAttributeNS(svgNS, 'y', seat.y);
+        rect.setAttribute('stroke', 'black');
+        rect.setAttribute('strokeWidth', '1');
+        rect.setAttribute('fill', seat.color);
+        rect.setAttribute('x', Math.round(seat.x));
+        rect.setAttribute('y', Math.round(layoutHeight - seat.y));
         svg.appendChild(rect);
     }
 
@@ -704,50 +647,58 @@ export function renderSVG (regions, sections, members, options) {
     // Render labels
     for (const seat of seatsToRender) {
         let lines;
-        if (seat.member)
-            lines = wrapAt(options.seatNameLabels === 'initials' ? getInitials(seat.member.name) : seat.member.name, options.seatSize, svg);
-        else
+        if (seat.member) {
+            lines = wrapAt(options.seatNameLabels === 'initials' ? getInitials(members[seat.member].name) : members[seat.member].name, options.seatSize, svg);
+        }
+        else {
             lines = [`${seat.seat + 1}`];
+        }
         
+        // Estimate initial x coordinate
+        const initialLabelX = Math.round(seat.x + seatSizeOffset);
         const labelText = document.createElementNS(svgNS, 'text');
-        labelText.setAttribute('x', seat.x);
+        labelText.setAttribute('x', initialLabelX);
 
         for (let i=0; i<lines.length; i++) {
             const lineText = document.createElementNS(svgNS, 'tspan');
-            lineText.setAttribute('x', seat.x + seatSizeOffset);
-            if (i > 0)
+            lineText.setAttribute('x', initialLabelX);
+            if (i > 0) {
                 lineText.setAttribute('dy', '1em');
+            }
             lineText.textContent = lines[i];
             labelText.appendChild(lineText);
         }
         svg.appendChild(labelText);
 
+        // Get dimensions of text
         const boundingBox = labelText.getBoundingClientRect();
 
-        const seatCenterY = seat.y + seatSizeOffset;
-        let labelCandidateY = seatCenterY - (.5 * boundingBox.height);
-        if (labelCandidateY < 0)
-            labelCandidateY = 0;
-        else if (labelCandidateY + boundingBox.height > layoutHeight)
-            labelCandidateY = layoutHeight - boundingBox.height;
-        labelText.setAttribute('y', labelCandidateY);
-
-        if (boundingBox.x < 0) {
-            const offsetX = .5 * boundingBox.width;
-            labelText.setAttribute('x', offsetX);
+        // Correct x coord if the text is out of bounds
+        const halfTextWidth = .5 * boundingBox.width;
+        if (initialLabelX < halfTextWidth) {
+            labelText.setAttribute('x', halfTextWidth);
             for (const line of labelText.childNodes) {
-                line.setAttribute('x', offsetX);
+                line.setAttribute('x', halfTextWidth);
             }
         }
-        else if (boundingBox.x + boundingBox.width > layoutWidth) {
-            // Bounding box contains actual coordinates from the top left of the element.
-            // However, the element's 'x' proprety is at the center of the element. Make
-            // sure to offset it appropriately!
-            const offsetX = layoutWidth - (.5 * boundingBox.width);
-            labelText.setAttribute('x', offsetX);
-            for (const line of labelText.childNodes)
-            line.setAttribute('x', offsetX);
+        else if (initialLabelX + halfTextWidth > svgWidth) {
+            const replacementX = svgWidth - halfTextWidth;
+            labelText.setAttribute('x', replacementX);
+            for (const line of labelText.childNodes) {
+                line.setAttribute('x', replacementX);
+            }
         }
+
+        // Estimate y coordinate and correct it if out of bounds
+        let labelCandidateY = layoutHeight - Math.floor((seat.y - seatSizeOffset) + (.5 * boundingBox.height));
+        if (labelCandidateY < 0) {
+            labelCandidateY = 0;
+        }
+        else if (labelCandidateY + boundingBox.height > svgHeight) {
+            labelCandidateY = svgHeight - boundingBox.height;
+        }
+            
+        labelText.setAttribute('y', labelCandidateY);
     }
 
     svg.remove();
@@ -756,98 +707,43 @@ export function renderSVG (regions, sections, members, options) {
     return svg;
 }
 
-function scaleForCanvas(value, scale, offset = false) {
-    return Math.floor(value * scale) + (offset ? .5 : 0);
-}
-
+/**
+ * 
+ * @param {Object<string, Region>} regions 
+ * @param {Object<string, Section>} sections 
+ * @param {Object<string, Member>} members 
+ * @param {import('./project-helpers.js').ProjectSettings} options 
+ */
 export function renderImage (regions, sections, members, options) {
     return new Promise((resolve, reject) => {
-        let seats = calculateSeatPositions(regions, sections, members, options);
-        const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
-    
-        if (!options.downstageTop)
-            seats = flipStageDirection(seats, options);
-    
-        const exportWidth = options.width || layoutWidth;
-        const exportHeight = options.height || layoutHeight;
-        const scale = exportWidth / layoutWidth;
-    
+        const svg = renderSVG(regions, sections, members, options);
+        svg.setAttribute('width', options.width);
+        svg.setAttribute('height', options.height);
+
+        const svgString = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        const img = new Image(options.width, options.height);
+
         const canvas = document.createElement('canvas');
-        canvas.width = exportWidth;
-        canvas.height = exportHeight;
-    
+        canvas.width = options.width;
+        canvas.height = options.height;
+
         const ctx = canvas.getContext('2d');
-        
         if (!(options.format === 'png' && options.transparency)) {
             ctx.fillStyle = '#fff';
-            ctx.fillRect(0, 0, exportWidth, exportHeight);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-    
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = Math.max(Math.floor(scale), 1);
-    
-        // Render seats
-        const seatsToRender = seats.filter(seat => !(seat.implicit && !options.implicitSeatsVisible && !seat.member));
-        for (const seat of seatsToRender) {
-            // Render seat
-            ctx.fillStyle = seat.color;
-            const needsOffset = ctx.lineWidth % 2 !== 0;
-            const x = scaleForCanvas(seat.x, scale, needsOffset);
-            const y = scaleForCanvas(seat.y, scale, needsOffset);
-            const width = Math.floor(options.seatSize * scale);
-            const height = width;
-            ctx.fillRect(x, y, width, height);
-            ctx.strokeRect(x, y, width, height);
-        }
-    
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = '#000';
-    
-        const calcFont = `normal ${options.seatLabelFontSize}px sans-serif`;
-        const renderFont = `normal ${options.seatLabelFontSize * scale}px sans-serif`;
-        const seatSizeOffset = .5 * options.seatSize;
-    
-        // Render labels
-        for (const seat of seatsToRender) {
-            let lines;
-            if (seat.member)
-                lines = getLines(ctx, options.seatNameLabels === 'initials' ? getInitials(seat.member.name) : seat.member.name, options.seatSize * scale, ctx.font);
+
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+            URL.revokeObjectURL(blobUrl);
+
+            if (typeof canvas.toBlob === 'function')
+                canvas.toBlob(resolve, `image/${options.format}`, options.quality);
             else
-                lines = [`${seat.seat + 1}`];
-            
-            const textHeight = lines.length * options.seatLabelFontSize;
-            let startingY = seat.y + seatSizeOffset - (.5 * textHeight);
-
-            // Offset startingY if the text would be off the screen
-            if (startingY < 0)
-                startingY = 0;
-            else if (startingY + textHeight > layoutHeight)
-                startingY = layoutHeight - textHeight;
-
-            for (let i=0; i<lines.length; i++) {
-                const text = lines[i];
-                ctx.font = calcFont;
-                const lineWidth = ctx.measureText(text).width;
-                const x = seat.x + seatSizeOffset - (.5 * lineWidth);
-                const y = startingY + (options.seatLabelFontSize * i);
-    
-                let screenOffsetX = 0;
-                
-                // Offset X if the text would be off the screen
-                if (x < 0)
-                    screenOffsetX = -1 * x;
-                else if (x + lineWidth > layoutWidth)
-                    screenOffsetX = layoutWidth - (x + lineWidth);
-    
-                ctx.font = renderFont;
-                ctx.fillText(text, scaleForCanvas(x + screenOffsetX, scale), scaleForCanvas(y, scale));
-            }
+                resolve(canvas[exportFn](`image/${options.format}`, options.quality));
         }
-            
-        if (typeof canvas.toBlob === 'function')
-            canvas.toBlob(resolve, `image/${options.format}`, options.quality);
-        else
-            resolve(canvas[exportFn](`image/${options.format}`, options.quality));
+        img.src = blobUrl;
     });
 }

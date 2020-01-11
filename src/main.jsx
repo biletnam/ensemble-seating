@@ -59,7 +59,7 @@ import {
 } from './helpers/project-helpers.js';
 
 import './main.css';
-import { getLayoutDimensions, calculateSeatPositions } from './helpers/stage-helpers.js';
+import { getLayoutDimensions, calculateSeatPositions, flipStageDirection } from './helpers/stage-helpers.js';
 
 /**
  * A number, or a string containing a number.
@@ -788,11 +788,13 @@ class App extends Component {
     }
 
     render() {
-        const seats = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
-        const [layoutWidth, layoutHeight] = getLayoutDimensions(
-            seats,
-            this.state.project.settings
-        );
+        let seats = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
+        if (this.state.project.settings.downstageTop) {
+            seats = flipStageDirection(seats, this.state.project.settings);
+        }
+
+        const [layoutWidth, layoutHeight] = getLayoutDimensions(seats)
+            .map(dimension => dimension + this.state.project.settings.seatSize);
         return <React.Fragment>
             <Drawer drawerOpen={this.state.drawerOpen}
                 onClose={() => this.setState({ drawerOpen: false })}

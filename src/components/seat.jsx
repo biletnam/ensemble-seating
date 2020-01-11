@@ -40,24 +40,9 @@ class Seat extends PureComponent {
             backgroundColor: selected ? '#fff' : color,
             color: tinycolor(color).isLight() ? '#333' : '#fff',
             visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
-            left: 'unset',
-            top: 'unset',
-            right: 'unset',
-            bottom: 'unset'
+            left: typeof x === 'number' && !isNaN(x) ? Math.round(x) : 'unset',
+            bottom: typeof y === 'number' && !isNaN(y) ? Math.round(y) : 'unset'
         };
-
-        let xStyle, yStyle;
-        if (downstageTop) {
-            xStyle = 'left';
-            yStyle = 'top';
-        }
-        else {
-            xStyle = 'right';
-            yStyle = 'bottom';
-        }
-
-        style[xStyle] = typeof x === 'number' && !isNaN(x) ? x : 'unset';
-        style[yStyle] = typeof y === 'number' && !isNaN(y) ? y : 'unset';
 
         const {memberId, ...rest} = props;
 

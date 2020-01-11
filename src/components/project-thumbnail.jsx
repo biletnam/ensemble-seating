@@ -7,7 +7,8 @@ class ProjectThumbnail extends PureComponent {
         super(props);
 
         const seats = calculateSeatPositions(props.data.regions, props.data.sections, props.data.members);
-        const [layoutWidth, layoutHeight] = getLayoutDimensions(seats);
+        const [layoutWidth, layoutHeight] = getLayoutDimensions(seats)
+            .map(dimension => dimension + props.data.settings.seatSize + 1);
 
         this.state = {
             seats, layoutWidth, layoutHeight
@@ -20,7 +21,7 @@ class ProjectThumbnail extends PureComponent {
             {this.state.seats.filter(seat => !(seat.implicit && !this.props.data.settings.implicitSeatsVisible && !seat.member)).map((seat, index) => (
                 <rect width={seatSize} height={seatSize} stroke="black" strokeWidth="1" fill={seat.color}
                     x={seat.x}
-                    y={seat.y}
+                    y={this.state.layoutHeight - seat.y}
                     key={`seat-${index}`} />
             ))}
         </svg>
