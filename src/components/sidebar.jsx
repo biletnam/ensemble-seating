@@ -21,7 +21,7 @@ const Sidebar = props => {
                     {children}
                 </div>
             </div>
-            <SidebarToggleButton offset={expanded} onClick={onToggleSidebar} />
+            <SidebarToggleButton isOpen={expanded} onClick={onToggleSidebar} />
         </aside>
     );
 }

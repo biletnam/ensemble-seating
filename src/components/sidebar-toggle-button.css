@@ -2,22 +2,31 @@
     --sidebar-toggle-size: 30px;
     position: absolute;
     top: 2rem;
-    right: calc(100% + 2rem);
+    left: calc((-1 * var(--sidebar-toggle-size)) - 1px);
     z-index: 2;
     width: var(--sidebar-toggle-size);
     height: var(--sidebar-toggle-size);
+    border: 1px solid #ccc;
+    border-right-style: none;
+    border-top-left-radius: .5em;
+    border-bottom-left-radius: .5em;
+    background-color: #efefef;
+    outline: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.sidebar-toggle-button > .mdc-fab__icon {
+.sidebar-toggle-button:hover, .sidebar-toggle-button:focus, .sidebar-toggle-button:active {
+    background-color: #fff;
+}
+
+.sidebar-toggle-button > svg {
     --toggle-icon-size: calc(.6 * var(--sidebar-toggle-size));
     width: var(--toggle-icon-size);
     height: var(--toggle-icon-size);
 }
 
-.sidebar-toggle-button > .mdc-fab__icon {
-    transition: none;
-}
-
-.sidebar-toggle-button--offset > .mdc-fab__icon {
+.sidebar-toggle-button--closed > svg {
     transform: rotateZ(180deg);
 }
