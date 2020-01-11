@@ -192,6 +192,16 @@ class App extends Component {
             // Save project to a temporary location to load after refresh
             idbSaveTemporaryProject(this.state.project).then(() => {
                 this.worker.messageSW({ type: 'SKIP_WAITING' });
+            }).catch(error => {
+                console.warn('Unable to save temp project to IDB.');
+                dialogQueue.confirm({
+                    title: 'Unable to save project',
+                    body: `${APP_INFO.NAME} could not save a temporary copy of your project to restore after applying the update. This can sometimes happen if you're using private browsing mode. If you continue, your current project will be lost.`
+                }).then(confirmed => {
+                    if (confirmed) {
+                        this.worker.messageSW({ type: 'SKIP_WAITING' });
+                    }
+                })
             });
         }
     }
@@ -265,6 +275,14 @@ class App extends Component {
                     resetProjectQueryString();
                     hideLoadingScreen();
                 }
+            }).catch(error => {
+                console.warn('Unable to load temp project from IDB.');
+                this.setState({
+                    showFirstLaunch: true,
+                    newProjectDialogOpen: true
+                });
+                resetProjectQueryString();
+                hideLoadingScreen();
             });
         }
 
@@ -277,7 +295,11 @@ class App extends Component {
             else {
                 // First time running
             }
-            idbSetLastAppVersion(APP_INFO.VERSION);
+            idbSetLastAppVersion(APP_INFO.VERSION).catch(error => {
+                console.warn('Unable to set last app version in IDB.');
+            });
+        }).catch(error => {
+            console.warn('Unable to get last app version from IDB.');
         });
     }
 
