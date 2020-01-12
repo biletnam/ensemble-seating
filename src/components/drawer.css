@@ -1,13 +1,15 @@
-.mdc-drawer__content {
-    padding-bottom: 5em;
-}
-
 .mdc-drawer__header:last-child {
     padding-bottom: 1em;
 }
 
-.mdc-drawer__subtitle + .mdc-drawer__subtitle {
+.drawer__app-version-meta-container {
+    display: flex;
+    justify-content: space-between;
     margin-top: 1em;
+}
+
+.drawer__app-version-meta-container::before {
+    content: none;
 }
 
 .mdc-list-item {
