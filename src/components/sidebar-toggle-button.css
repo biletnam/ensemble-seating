@@ -17,7 +17,11 @@
     align-items: center;
 }
 
-.sidebar-toggle-button:hover, .sidebar-toggle-button:focus, .sidebar-toggle-button:active {
+.sidebar-toggle-button:hover, .sidebar-toggle-button:focus {
+    background-color: #f7f7f7;
+}
+
+.sidebar-toggle-button:active {
     background-color: #fff;
 }
 
