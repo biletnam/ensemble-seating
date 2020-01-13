@@ -137,7 +137,7 @@ class MenuDrawer extends PureComponent {
 
                     <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Open&hellip;</ListItem>
                     <ExportActionMenu open={this.state.exportMenuVisible} anchorCorner='topRight' fixed
-                        onClose={() => this.setState({exportMenuVisible: false})}
+                        onClose={() => this.setState({exportMenuVisible: false})} hoistToBody
                         onSelectAction={this.handleSelectExportOption}>
                         <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export&hellip;</ListItem>
                     </ExportActionMenu>
