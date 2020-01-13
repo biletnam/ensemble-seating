@@ -158,18 +158,17 @@ class MenuDrawer extends PureComponent {
             </DrawerContent>
             <DrawerHeader>
                 <DrawerSubtitle>
-                    {!this.props.user && <Button raised onClick={this.props.onRequestLogin}>Sign in with Google</Button>}
                     {this.props.user && <React.Fragment>
                         <UserWidget thumbnail={this.props.user.photoURL}
                             displayName={this.props.user.displayName}
                             email={this.props.user.email} />
-                        
                     </React.Fragment>}
+                    {!this.props.user && <Button raised onClick={this.props.onRequestLogin}>Sign in with Google</Button>}
                 </DrawerSubtitle>
-                <DrawerSubtitle className='drawer__app-version-meta-container'>
-                    <span>
-                        <a target='_blank' rel='noopener' href={`https://github.com/acmertz/ensemble-seating/releases/tag/v${APP_INFO.VERSION}`}>v{APP_INFO.VERSION}</a><br />
-                        "{APP_INFO.CODENAME}"
+                <DrawerSubtitle className='drawer__meta-container'>
+                    <span className='drawer__app-version'>
+                        <a target='_blank' rel='noopener' href={`https://github.com/acmertz/ensemble-seating/releases/tag/v${APP_INFO.VERSION}`}>v{APP_INFO.VERSION}</a>
+                        &nbsp;<span>"{APP_INFO.CODENAME}"</span>
                     </span>
                     {this.props.user && <Button raised dense onClick={this.props.onRequestLogout}>Sign out</Button>}
                 </DrawerSubtitle>

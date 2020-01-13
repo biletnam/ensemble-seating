@@ -2,14 +2,19 @@
     padding-bottom: 1em;
 }
 
-.drawer__app-version-meta-container {
+.drawer__meta-container {
     display: flex;
     justify-content: space-between;
+    align-items: flex-end;
     margin-top: 1em;
 }
 
-.drawer__app-version-meta-container::before {
+.drawer__meta-container::before {
     content: none;
+}
+
+.drawer__app-version {
+    font-size: .8em;
 }
 
 .mdc-list-item {
