@@ -1,37 +1,27 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 
-import { List, ListItem, ListItemPrimaryText, ListItemMeta } from '@rmwc/list';
-import '@material/list/dist/mdc.list.min.css';
+import './member-list-item.css';
 
-import { Draggable } from 'react-beautiful-dnd';
-
-class MemberListItem extends PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.handleClick = this.handleClick.bind(this);
+const MemberListItem = props => {
+    function handleChange(event) {
+        if (props.data && props.onEdit)
+            props.onEdit(props.memberId, Object.assign({}, props.data, {name: event.target.value}));
+        else
+            props.onCreate && props.onCreate(event.target.value);
     }
 
-    handleClick() {
-        if (this.props.onClick)
-            this.props.onClick(this.props.data.id);
+    function handleBlur(event) {
+        if (props.memberId && event.target.value === '') {
+            // Delete the member
+            props.onDelete && props.onDelete(props.memberId);
+        }
     }
 
-    render() {
-        return <Draggable key={this.props.data.id}
-            draggableId={this.props.data.id}
-            index={this.props.index}
-            type='member'>
-                {(provided, snapshot) => (
-                    <div ref={provided.innerRef}
-                        {...provided.draggableProps}>
-                            <ListItem {...provided.dragHandleProps} className='sections-list__section-member' onClick={this.handleClick}>
-                                {this.props.data.name}
-                            </ListItem>
-                        </div>
-                )}
-            </Draggable>
-    }
+    return <input className='plain-input'
+        placeholder='(empty)'
+        value={(props.data && props.data.name) || ''}
+        onChange={handleChange}
+        onBlur={handleBlur} />;
 }
 
 export default MemberListItem;

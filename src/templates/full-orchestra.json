@@ -1,140 +1,140 @@
 {
-    "regions": [
-      {
+    "regions": {
+      "region-1": {
         "name": "Wind and percussion",
-        "id": "region-1",
         "curvedLayout": false,
-        "angle": 180
+        "angle": 180,
+        "order": 0
       },
-      {
+      "region-2": {
         "name": "Strings",
-        "id": "region-2",
         "curvedLayout": true,
-        "angle": 180
+        "angle": 180,
+        "order": 1
       }
-    ],
-    "sections": [
-      {
+    },
+    "sections": {
+      "section-1": {
         "name": "Violin 1",
         "color": "#83d8fc",
-        "id": "section-1",
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 0
       },
-      {
+      "section-2": {
         "name": "Violin 2",
         "color": "#a6fcc6",
-        "id": "section-2",
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 1
       },
-      {
+      "section-3": {
         "name": "Viola",
         "color": "#00d084",
-        "id": "section-3",
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 2
       },
-      {
+      "section-4": {
         "name": "Cello",
         "color": "#7bdcb5",
-        "id": "section-4",
         "region": "region-2",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 3
       },
-      {
+      "section-5": {
         "name": "Bass",
         "color": "#abb8c3",
-        "id": "section-5",
         "region": "region-2",
         "offsetType": "last-row",
         "offsetValue": 0,
-        "rowSettings": [3]
+        "rowSettings": [3],
+        "order": 4
       },
-      {
+      "section-6": {
         "name": "Flute",
         "color": "#7c7ce2",
-        "id": "section-6",
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2]
+        "rowSettings": [2],
+        "order": 5
       },
-      {
+      "section-7": {
         "name": "Oboe",
         "color": "#6fbaf7",
-        "id": "section-7",
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2]
+        "rowSettings": [2],
+        "order": 6
       },
-      {
+      "section-8": {
         "name": "Clarinet",
         "color": "#83efb0",
-        "id": "section-8",
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 2,
-        "rowSettings": [2]
+        "rowSettings": [2],
+        "order": 7
       },
-      {
+      "section-9": {
         "name": "Bassoon",
         "color": "#a1f4fc",
-        "id": "section-9",
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 2,
-        "rowSettings": [2]
+        "rowSettings": [2],
+        "order": 8
       },
-      {
+      "section-10": {
         "name": "Percussion",
         "color": "#83d8fc",
-        "id": "section-10",
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [3]
+        "rowSettings": [3],
+        "order": 9
       },
-      {
+      "section-11": {
         "name": "French Horn",
         "color": "#f9ffad",
-        "id": "section-11",
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [4]
+        "rowSettings": [4],
+        "order": 10
       },
-      {
+      "section-12": {
         "name": "Trumpet",
         "color": "#ffe9c9",
-        "id": "section-12",
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [3]
+        "rowSettings": [3],
+        "order": 11
       },
-      {
+      "section-13": {
         "name": "Trombone",
         "color": "#c7ef8b",
-        "id": "section-13",
         "region": "region-1",
         "offsetType": "custom-row",
         "offsetValue": 3,
-        "rowSettings": [3]
+        "rowSettings": [3],
+        "order": 12
       }
-    ],
-    "members": [],
+    },
+    "members": {},
     "settings": {
-      "seatNameLabels": "initials",
+      "seatNameLabels": "full",
       "downstageTop": false,
       "implicitSeatsVisible": false,
       "seatGap": 1.0,

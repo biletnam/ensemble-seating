@@ -1,62 +1,62 @@
 {
-    "regions": [
-      {
+    "regions": {
+      "region-1": {
         "name": "Strings",
-        "id": "region-1",
         "curvedLayout": true,
-        "angle": 180
+        "angle": 180,
+        "order": 0
       }
-    ],
-    "sections": [
-      {
+    },
+    "sections": {
+      "section-1": {
         "name": "Violin 1",
         "color": "#83d8fc",
-        "id": "section-1",
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 0
       },
-      {
+      "section-2": {
         "name": "Violin 2",
         "color": "#a6fcc6",
-        "id": "section-2",
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 1
       },
-      {
+      "section-3": {
         "name": "Viola",
         "color": "#00d084",
-        "id": "section-3",
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 2
       },
-      {
+      "section-4": {
         "name": "Cello",
         "color": "#7bdcb5",
-        "id": "section-4",
         "region": "region-1",
         "offsetType": "first-row",
         "offsetValue": 0,
-        "rowSettings": [2, 4, 4]
+        "rowSettings": [2, 4, 4],
+        "order": 3
       },
-      {
+      "section-5": {
         "name": "Bass",
         "color": "#abb8c3",
-        "id": "section-5",
         "region": "region-1",
         "offsetType": "last-row",
         "offsetValue": 0,
-        "rowSettings": [3]
+        "rowSettings": [3],
+        "order": 4
       }
-    ],
-    "members": [],
+    },
+    "members": {},
     "settings": {
-      "seatNameLabels": "initials",
+      "seatNameLabels": "full",
       "downstageTop": false,
       "implicitSeatsVisible": false,
       "seatGap": 1.0,

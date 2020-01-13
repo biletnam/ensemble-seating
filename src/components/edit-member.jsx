@@ -19,11 +19,11 @@ class MemberEditor extends PureComponent {
         newData[itemName] = event.target.value;
 
         if (typeof this.props.onRequestEdit === 'function')
-            this.props.onRequestEdit(this.props.data.id, newData);
+            this.props.onRequestEdit(this.props.editorId, newData);
     }
 
     render() {
-        const {data, onRequestEdit, ...rest} = this.props;
+        const {data, onRequestEdit, editorId, ...rest} = this.props;
         return <div {...rest}>
             {data && <React.Fragment>
                 <div>

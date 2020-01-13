@@ -6,6 +6,7 @@
     align-items: center;
     line-height: 3em;
     padding: 0 .5em;
+    font-size: .8em;
 }
 
 .toolbar-link__icon {

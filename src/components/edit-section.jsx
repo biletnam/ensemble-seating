@@ -5,84 +5,55 @@ import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project-helpers.js';
 import { TwitterPicker } from 'react-color';
 
 import { TextField } from '@rmwc/textfield';
-import { Button } from '@rmwc/button';
 import { Radio } from '@rmwc/radio';
 
 import '@material/textfield/dist/mdc.textfield.min.css';
-import '@material/button/dist/mdc.button.min.css';
 import '@material/radio/dist/mdc.radio.min.css';
 import '@material/form-field/dist/mdc.form-field.min.css';
 
 import IntegerInput from './integer-input.jsx';
-
-import './edit-section.css';
-
-import ClearIcon from '../icons/clear-24px.svg';
+import SectionLayoutEditor from './section-layout-editor.jsx';
 
 class SectionEditor extends PureComponent {
     constructor(props) {
         super(props);
 
         this.handleColorChange = this.handleColorChange.bind(this);
-        this.handleClickedAddRow = this.handleClickedAddRow.bind(this);
-        this.handleClickedRemoveRow = this.handleClickedRemoveRow.bind(this);
+        this.handleRowUpdate = this.handleRowUpdate.bind(this);
     }
 
     updateSectionName(newName) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {name: newName});
+            this.props.onRequestEdit(this.props.editorId, {name: newName});
     }
 
     updateSectionColor(newColor) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {color: newColor});
+            this.props.onRequestEdit(this.props.editorId, {color: newColor});
     }
 
     updateSectionOffsetType(newType) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {offsetType: newType});
+            this.props.onRequestEdit(this.props.editorId, {offsetType: newType});
     }
 
     updateSectionOffsetValue(newValue) {
         if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, {offsetValue: newValue});
-    }
-
-    updateRowSetting(row, value) {
-        const saveData = {};
-        saveData.rowSettings = this.props.data.rowSettings.slice();
-        saveData.rowSettings[row] = value;
-
-        if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, saveData);
+            this.props.onRequestEdit(this.props.editorId, {offsetValue: newValue});
     }
 
     handleColorChange(color, event) {
         this.updateSectionColor(color.hex);
     }
 
-    handleClickedAddRow(event) {
-        const saveData = {};
-        saveData['rowSettings'] = this.props.data['rowSettings'].slice();
-        saveData['rowSettings'].push(DEFAULT_SECTION_ROW_LENGTH)
-
-        if (this.props.onRequestEdit)
-            this.props.onRequestEdit(this.props.data.id, saveData);
-    }
-
-    handleClickedRemoveRow(row) {
-        if (this.props.data.rowSettings.length > 1) {
-            const saveData = {};
-            saveData.rowSettings = this.props.data.rowSettings.slice();
-            saveData.rowSettings.splice(row, 1);
-
-            if (this.props.onRequestEdit)
-                this.props.onRequestEdit(this.props.data.id, saveData);
-        }
+    handleRowUpdate (rowSettings) {
+        const data = JSON.parse(JSON.stringify(this.props.data));
+        data.rowSettings = rowSettings;
+        this.props.onRequestEdit && this.props.onRequestEdit(this.props.editorId, data);
     }
 
     render() {
-        const {data, onRequestEdit, ...rest} = this.props;
+        const {data, onRequestEdit, editorId, downstageTop, ...rest} = this.props;
         return <div {...rest}>
             {data && <>
                 <div>
@@ -95,13 +66,10 @@ class SectionEditor extends PureComponent {
                 </div>
                 
                 <div>
-                    <h2>Performers per row</h2>
+                    <h2>Layout</h2>
                     <p>Pick how many performers may be seated within each row of this section.</p>
-                    {data.rowSettings.map((current, index) => <div key={index + '-rowSettings'} className='section-editor__row-setting-container'>
-                        <IntegerInput label={`Row ${index + 1}`} min={0} value={current} onChange={value => {this.updateRowSetting(index, value)}} />
-                        <Button className='text-input-wrapper' label='Remove row' icon={<ClearIcon />} onClick={() => this.handleClickedRemoveRow(index)} />
-                    </div>)}
-                    <Button outlined onClick={this.handleClickedAddRow} raised>Add row</Button>
+                    <SectionLayoutEditor onRowUpdate={this.handleRowUpdate}
+                        rowSettings={data.rowSettings} downstageTop={downstageTop} />
                 </div>
 
                 <div>

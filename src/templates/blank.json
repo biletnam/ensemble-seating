@@ -1,16 +1,16 @@
 {
-    "regions": [
-      {
+    "regions": {
+      "region-1": {
         "name": "Untitled region",
-        "id": "region-1",
         "curvedLayout": true,
-        "angle": 180
+        "angle": 180,
+        "order": 0
       }
-    ],
-    "sections": [],
-    "members": [],
+    },
+    "sections": {},
+    "members": {},
     "settings": {
-      "seatNameLabels": "initials",
+      "seatNameLabels": "full",
       "downstageTop": false,
       "implicitSeatsVisible": false,
       "seatGap": 1.0,

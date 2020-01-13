@@ -23,6 +23,7 @@ import CopyIcon from '../icons/file_copy-24px.svg';
 import FolderOpenIcon from '../icons/folder_open-24px.svg';
 import SaveAltIcon from '../icons/save_alt-24px.svg';
 import FeedbackIcon from '../icons/feedback-24px.svg';
+import CardGiftcardIcon from '../icons/card_giftcard-24px.svg';
 import InfoIcon from '../icons/info-24px.svg';
 
 import { browseForFile } from '../helpers/project-helpers.js';
@@ -136,8 +137,9 @@ class MenuDrawer extends PureComponent {
                     <ListDivider />
 
                     <ListItem data-name='recent-projects' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<FolderOpenIcon />} />Open&hellip;</ListItem>
-                    <ExportActionMenu open={this.state.exportMenuVisible} anchorCorner='topRight' fixed
-                        onClose={() => this.setState({exportMenuVisible: false})} hoistToBody
+                    <ExportActionMenu open={this.state.exportMenuVisible}
+                        anchorCorner='topRight' fixed hoistToBody
+                        onClose={() => this.setState({exportMenuVisible: false})}
                         onSelectAction={this.handleSelectExportOption}>
                         <ListItem data-name='export' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<SaveAltIcon />} />Export&hellip;</ListItem>
                     </ExportActionMenu>
@@ -150,6 +152,7 @@ class MenuDrawer extends PureComponent {
                     <ListDivider />
 
                     <ListItem data-name='feedback' tag='a' href={APP_INFO.FEEDBACK} target='_blank' rel='noopener'><ListItemGraphic icon={<FeedbackIcon />} />Feedback</ListItem>
+                    <ListItem data-name='donate' tag='a' href='https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=923ZGVPPGMPEA&item_name=development+and+upkeep+of+Ensemble+Seating+web+app&currency_code=USD&source=url' target='_blank' rel='noopener'><ListItemGraphic icon={<CardGiftcardIcon />} />Donate</ListItem>
                     <ListItem data-name='about' onClick={this.handleMenuButtonClick}><ListItemGraphic icon={<InfoIcon />} />About</ListItem>
                 </List>
             </DrawerContent>
@@ -160,12 +163,15 @@ class MenuDrawer extends PureComponent {
                         <UserWidget thumbnail={this.props.user.photoURL}
                             displayName={this.props.user.displayName}
                             email={this.props.user.email} />
-                        <Button raised onClick={this.props.onRequestLogout}>Sign out</Button>
+                        
                     </React.Fragment>}
                 </DrawerSubtitle>
-                <DrawerSubtitle>
-                    <a target='_blank' rel='noopener' href={`https://github.com/acmertz/ensemble-seating/releases/tag/v${APP_INFO.VERSION}`}>v{APP_INFO.VERSION}</a><br />
-                    "{APP_INFO.CODENAME}"
+                <DrawerSubtitle className='drawer__app-version-meta-container'>
+                    <span>
+                        <a target='_blank' rel='noopener' href={`https://github.com/acmertz/ensemble-seating/releases/tag/v${APP_INFO.VERSION}`}>v{APP_INFO.VERSION}</a><br />
+                        "{APP_INFO.CODENAME}"
+                    </span>
+                    {this.props.user && <Button raised dense onClick={this.props.onRequestLogout}>Sign out</Button>}
                 </DrawerSubtitle>
             </DrawerHeader>
         </Drawer>

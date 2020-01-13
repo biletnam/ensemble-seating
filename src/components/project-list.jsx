@@ -16,7 +16,7 @@ import '@material/icon-button/dist/mdc.icon-button.css';
 
 import MoreIcon from '../icons/more_vert-24px.svg';
 
-import { listProjects, renameProject, loadProject, saveDiff, duplicateProject, deleteProject } from '../helpers/project-helpers.js';
+import { listProjects, renameProject, loadProject, saveDiff, deleteProject, Project } from '../helpers/project-helpers.js';
 import './project-list.css';
 
 import { queue as dialogQueue } from './dialog-queue.jsx';
@@ -148,7 +148,7 @@ const ProjectList = props => {
                                 else {
                                     // Duplicate project and save with new name
                                     loadProject(props.user, projectName).then(loadedProject => {
-                                        const duplicatedProject = duplicateProject(loadedProject);
+                                        const duplicatedProject = Project.clone(loadedProject);
                                         saveDiff(props.user, {}, duplicatedProject, value).then(() => {
                                             snackbarQueue.notify({
                                                 title: `Saved a copy of "${projectName}" as "${value}"`

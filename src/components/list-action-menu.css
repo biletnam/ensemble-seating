@@ -1,3 +1,7 @@
 .list-action-menu__item {
     white-space: nowrap;
 }
+
+.list-action-menu__item.mdc-list-item--disabled {
+    pointer-events: none;
+}

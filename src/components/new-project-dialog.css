@@ -10,5 +10,5 @@
 }
 
 .new-project-dialog .mdc-dialog__surface {
-    width: 560px;
+    width: var(--dialog-width);
 }

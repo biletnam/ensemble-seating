@@ -18,7 +18,7 @@ class Seat extends PureComponent {
 
     handleClick() {
         if (this.props.member && typeof this.props.onRequestSelectMember === 'function') {
-            this.props.onRequestSelectMember(this.props.member.id);
+            this.props.onRequestSelectMember(this.props.memberId);
         }
     }
 
@@ -40,26 +40,13 @@ class Seat extends PureComponent {
             backgroundColor: selected ? '#fff' : color,
             color: tinycolor(color).isLight() ? '#333' : '#fff',
             visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
-            left: 'unset',
-            top: 'unset',
-            right: 'unset',
-            bottom: 'unset'
+            left: typeof x === 'number' && !isNaN(x) ? Math.round(x) : 'unset',
+            bottom: typeof y === 'number' && !isNaN(y) ? Math.round(y) : 'unset'
         };
 
-        let xStyle, yStyle;
-        if (downstageTop) {
-            xStyle = 'left';
-            yStyle = 'top';
-        }
-        else {
-            xStyle = 'right';
-            yStyle = 'bottom';
-        }
+        const {memberId, ...rest} = props;
 
-        style[xStyle] = typeof x === 'number' && !isNaN(x) ? x : 'unset';
-        style[yStyle] = typeof y === 'number' && !isNaN(y) ? y : 'unset';
-
-        return <span {...props} className={`seat${implicit ? ' seat--implicit' : ''}${member ? ' seat--occupied' : ''}`}
+        return <span {...rest} className={`seat${implicit ? ' seat--implicit' : ''}${member ? ' seat--occupied' : ''}`}
             title={member ? member.name : '' } 
             data-seat-number={seatNumber + 1}
             style={style} >
