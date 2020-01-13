@@ -21,6 +21,7 @@
 
 .project-tile > span {
     display: block;
+    font-size: .9em;
 }
 
 .project-tile > svg {
