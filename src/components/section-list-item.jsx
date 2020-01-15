@@ -100,7 +100,7 @@ const SectionListItem = props => {
 
                         <CardActions>
                             <CardActionIcons>
-                                <CardActionIcon onClick={handleClickedBatchAddMembers} icon={<GroupAddIcon />} aria-label='Add group' />
+                                <CardActionIcon onClick={handleClickedBatchAddMembers} icon={<GroupAddIcon />} title='Add multiple people' aria-label='Add multiple people' />
                                 
                                 <ListActionMenu
                                     shuffle='section members'
@@ -109,7 +109,7 @@ const SectionListItem = props => {
                                     onSelectAction={handleSelectedMenuItem}
                                     open={menuOpen}
                                     onClose={() => setMenuOpen(false)}>
-                                    <CardActionIcon icon={<MoreIcon />} label='Edit section' onClick={() => setMenuOpen(true)} />
+                                    <CardActionIcon icon={<MoreIcon />} onClick={() => setMenuOpen(true)} />
                                 </ListActionMenu>
                             </CardActionIcons>
                         </CardActions>

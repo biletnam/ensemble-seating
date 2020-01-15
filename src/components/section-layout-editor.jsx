@@ -68,7 +68,7 @@ const SectionLayoutEditor = props => {
             thisRow.push(<div className='section-layout-item' key={`row-${i}-item-${k}`}
                 draggable='true' data-row={i}
                 onDragStart={handleDragStart}>
-                    <button onClick={() => handleCLickedDeleteSeat(i)} className='section-layout-item__delete-button'>&times;</button>
+                    <button title='Remove seat' onClick={() => handleCLickedDeleteSeat(i)} className='section-layout-item__delete-button'>&times;</button>
                 </div>);
         }
 
@@ -76,10 +76,10 @@ const SectionLayoutEditor = props => {
             onDragOver={handleDragOver} onDrop={handleDrop} onDragEnter={() => setDraggingOver(i)}
             data-row={i}>
                 {thisRow}
-                <button onClick={() => handleClickedNewSeat(i)} className='section-layout-item section-layout-item--placeholder'>+</button>
+                <button title='Add seat' onClick={() => handleClickedNewSeat(i)} className='section-layout-item section-layout-item--placeholder'>+</button>
                 <div className='section-layout-row__meta-and-settings'>
                     <span>{props.rowSettings[i]} seats</span>
-                    {props.rowSettings.length > 1 && <Button dense onClick={() => handleClickedRemoveRow(i)} icon={<ClearIcon />}>Remove</Button>}
+                    {props.rowSettings.length > 1 && <Button dense title='Remove row' onClick={() => handleClickedRemoveRow(i)} icon={<ClearIcon />}>Remove</Button>}
                 </div>
             </li>);
     }
