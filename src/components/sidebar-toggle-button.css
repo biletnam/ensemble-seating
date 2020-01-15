@@ -1,7 +1,7 @@
 .sidebar-toggle-button {
     --sidebar-toggle-size: 30px;
     position: absolute;
-    top: 2rem;
+    top: calc(var(--sidebar-titlebar-height) - (.5 * var(--sidebar-toggle-size)));
     left: calc((-1 * var(--sidebar-toggle-size)) - 1px);
     z-index: 2;
     width: var(--sidebar-toggle-size);
