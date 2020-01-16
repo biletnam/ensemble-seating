@@ -23,8 +23,8 @@ class MemberEditor extends PureComponent {
     }
 
     render() {
-        const {data, onRequestEdit, editorId, ...rest} = this.props;
-        return <div {...rest}>
+        const {data, onRequestEdit, editorId, className='', id='', ...rest} = this.props;
+        return <div className={className} id={id}>
             {data && <React.Fragment>
                 <div>
                     <TextField label='Name' name='name' value={data.name} onChange={this.handleChange} />

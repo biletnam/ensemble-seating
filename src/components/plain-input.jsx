@@ -6,7 +6,7 @@ const PlainInput = props => {
     const {actions = [], ...rest} = props;
     return <div className='plain-input-container'>
         <input className='plain-input' {...rest} />
-        {actions}
+        {actions.map((el, index) => React.cloneElement(el, { key: `input-action-${index}` }))}
     </div>
 };
 
