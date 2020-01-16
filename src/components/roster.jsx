@@ -33,7 +33,6 @@ const Roster = props => {
 
     useEffect(() => {
         idbGetRosterScrollPosition().then(currentScroll => {
-            console.log(`Restore roster scroll position: ${currentScroll}`);
             if (scrollableContainerRef.current) {
                 scrollableContainerRef.current.scrollTo(0, currentScroll)
             }

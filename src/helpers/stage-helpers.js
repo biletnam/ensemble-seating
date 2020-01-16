@@ -293,7 +293,6 @@ export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
                 const seatIndex = (rows[i].length - 1) - k;
                 rows[i][seatIndex].x = seatX;
                 rows[i][seatIndex].y = seatY;
-                console.log(`Seat: x=${Math.round(seatX)}, y=${Math.round(seatY)}`);
             }
         }
 
