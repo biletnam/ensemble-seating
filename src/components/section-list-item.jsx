@@ -66,7 +66,8 @@ const SectionListItem = props => {
                     <MemberListItem data={memberData} memberId={memberId}
                         onCreate={name => handleCreatedMemberListItem(name, thisSeat)}
                         onEdit={handleEditedMemberListItem}
-                        onDelete={props.onRequestDeleteMember} />
+                        onDelete={props.onRequestDeleteMember}
+                        onSelect={() => props.onRequestSelectMember && props.onRequestSelectMember(memberId)} />
                 </SeatListItem>
             );
         }

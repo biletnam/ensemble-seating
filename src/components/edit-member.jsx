@@ -31,7 +31,7 @@ class MemberEditor extends PureComponent {
                 </div>
                 <br />
                 <div>
-                    <TextField textarea label='Notes' name='notes' value={data.notes} onChange={this.handleChange} />
+                    <TextField textarea outlined fullwidth label='Notes' name='notes' value={data.notes} onChange={this.handleChange} />
                 </div>
             </React.Fragment>}
         </div>

@@ -1,5 +1,9 @@
 import React from 'react';
 
+import PlainInput from './plain-input.jsx';
+import PlainInputAction from './plain-input-action.jsx';
+import DescriptionIcon from '../icons/description-24px.svg';
+
 import './member-list-item.css';
 
 const MemberListItem = props => {
@@ -17,11 +21,15 @@ const MemberListItem = props => {
         }
     }
 
-    return <input className='plain-input'
-        placeholder='(empty)'
+    return <PlainInput placeholder='(empty)'
         value={(props.data && props.data.name) || ''}
         onChange={handleChange}
-        onBlur={handleBlur} />;
+        onBlur={handleBlur}
+        actions={props.data && props.onEdit ? [
+            <PlainInputAction label='Add/edit notes'
+                icon={<DescriptionIcon />}
+                onClick={() => props.onSelect && props.onSelect()} />
+        ] : []} />;
 }
 
 export default MemberListItem;
