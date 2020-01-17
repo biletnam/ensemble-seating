@@ -79,7 +79,7 @@ const SectionLayoutEditor = props => {
                 <button title='Add seat' onClick={() => handleClickedNewSeat(i)} className='section-layout-item section-layout-item--placeholder'>+</button>
                 <div className='section-layout-row__meta-and-settings'>
                     <span>{props.rowSettings[i]} seats</span>
-                    {props.rowSettings.length > 1 && <Button dense title='Remove row' onClick={() => handleClickedRemoveRow(i)} icon={<ClearIcon />}>Remove</Button>}
+                    {props.rowSettings.length > 1 && <Button dense title='Remove row' onClick={() => handleClickedRemoveRow(i)} icon={<ClearIcon />}>Remove row</Button>}
                 </div>
             </li>);
     }
