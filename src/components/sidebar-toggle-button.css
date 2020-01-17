@@ -6,7 +6,7 @@
     z-index: 2;
     width: var(--sidebar-toggle-size);
     height: var(--sidebar-toggle-size);
-    border: 1px solid #ccc;
+    border: 1px solid #aaa;
     border-right-style: none;
     border-top-left-radius: .5em;
     border-bottom-left-radius: .5em;
