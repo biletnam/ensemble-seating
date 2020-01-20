@@ -625,6 +625,11 @@ export class Project {
         );
     }
 
+    /**
+     * Upgrades the given project object to the latest Project version.
+     * @param {Object} project 
+     * @returns {Project}
+     */
     static upgrade (project) {
         // Parse as a plain object first since it might not be in the appropriate Project format
         let finalProject = JSON.parse(JSON.stringify(project));
@@ -681,15 +686,21 @@ export class Project {
                 return regions;
             }, {});
 
-            finalProject.sections = finalProject.sections.reduce((sections, curr, index) => {
+            const sectionMappings = {};
+            finalProject.sections = finalProject.sections.reduce((sections, curr) => {
                 const {id, ...rest} = curr;
-                sections[id] = Section.fromObject({ ...rest, order: index });
+                sectionMappings[rest.region] = sectionMappings[rest.region] || 0;
+                sections[id] = Section.fromObject({ ...rest, order: sectionMappings[rest.region] });
+                sectionMappings[rest.region]++;
                 return sections;
             }, {});
 
+            const memberMappings = {};
             finalProject.members = finalProject.members.reduce((members, curr, index) => {
                 const {id, ...rest} = curr;
-                members[id] = Member.fromObject({ ...rest, order: index });
+                memberMappings[rest.section] = memberMappings[rest.section] || 0;
+                members[id] = Member.fromObject({ ...rest, order: memberMappings[rest.section] });
+                memberMappings[rest.section]++;
                 return members;
             }, {});
         }
@@ -698,6 +709,7 @@ export class Project {
     }
     
     /**
+     * Generates a Project object from the given JavaScript object, maintaining entity IDs in the process.
      * @param {Object} obj
      * @returns {Project}
      */

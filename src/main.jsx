@@ -659,9 +659,14 @@ class App extends Component {
         });
     }
 
+    /**
+     * Imports the given project object into the app, saving it in the user's cloud storage if they are logged in.
+     * @param {Project} project 
+     * @param {string} name 
+     */
     handleRequestImportProject(project, name) {
         try {
-            const newProject = Project.clone(project);
+            const newProject = Project.clone(Project.upgrade(project));
             const newState = Object.assign({},
                 createFreshState(this.state.user),
                 {
@@ -694,6 +699,10 @@ class App extends Component {
         }
     }
 
+    /**
+     * Loads the project with the given name from cloud storage.
+     * @param {string} projectName 
+     */
     handleRequestOpenProject(projectName) {
         loadProject(this.state.user, projectName).then(savedProject => {
             const newState = createFreshState(this.state.user);
