@@ -5,16 +5,12 @@ import './project-tile.css';
 
 class ProjectTile extends PureComponent {
     render() {
-        const regionData = JSON.parse(JSON.stringify(this.props.data.regions));
-      
-        const regionEntries = Object.entries(regionData);
-        if (this.props.data.settings.downstageTop)
-            regionEntries.reverse();
+        const {title, data, ...rest} = this.props;
         
-        return <button type='button' {...this.props}
+        return <button type='button' {...rest}
             className='project-tile'>
-            <ProjectThumbnail data={Object.assign({}, this.props.data, {regions: Object.fromEntries(regionEntries)})} />
-            <span>{this.props.title}</span>
+            <ProjectThumbnail data={data} />
+            <span>{title}</span>
         </button>;
     }
 }

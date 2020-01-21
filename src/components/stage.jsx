@@ -22,7 +22,6 @@ class Stage extends PureComponent {
 
         const regionEntries = Object.entries(this.props.regions);
         const sectionEntries = Object.entries(this.props.sections);
-        const memberEntries = Object.entries(this.props.sections);
 
         for (let i=0; i<regionEntries.length; i++) {
             const [currentId, currentRegion] = regionEntries[i];
@@ -42,7 +41,7 @@ class Stage extends PureComponent {
             );
         }
 
-        if (this.props.settings.downstageTop)
+        if (!this.props.settings.downstageTop)
             regionsToRender.reverse();
 
         let className = '';

@@ -680,7 +680,9 @@ export class Project {
         }
         if (semver.lt(finalProject.appVersion, '0.16.0')) {
             finalProject.appVersion = '0.16.0';
-            finalProject.regions = finalProject.regions.reduce((regions, curr, index) => {
+            // Previous versions of the app ordered regions from back to front;
+            // starting at v0.16.0, they are ordered front to back
+            finalProject.regions = finalProject.regions.slice().reverse().reduce((regions, curr, index) => {
                 const {id, ...rest} = curr;
                 regions[id] = Region.fromObject({ ...rest, order: index });
                 return regions;
