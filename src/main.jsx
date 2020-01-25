@@ -18,7 +18,7 @@ import ProjectSettingsDialog from './components/project-settings-dialog.jsx';
 import OpenProjectDialog from './components/open-project-dialog.jsx';
 import { queue as dialogQueue } from './components/dialog-queue.jsx';
 import { queue as snackbarQueue } from './components/snackbar-queue.jsx';
-import firebase, { auth, provider } from './helpers/firebase-helpers.js';
+import { auth, provider } from './helpers/firebase.js';
 
 import { DialogQueue } from '@rmwc/dialog';
 import { Snackbar, SnackbarAction, SnackbarQueue } from '@rmwc/snackbar';
@@ -27,19 +27,6 @@ import '@material/dialog/dist/mdc.dialog.min.css';
 import '@material/snackbar/dist/mdc.snackbar.min.css';
 
 import {
-    saveDiff,
-    loadProject,
-    deleteProject,
-    updateProjectQueryString,
-    resetProjectQueryString,
-    getUnusedProjectName,
-    renameProject,
-    listProjects,
-    idbGetLastAppVersion,
-    idbSetLastAppVersion,
-    idbSaveTemporaryProject,
-    idbLoadTemporaryProject,
-    idbDeleteTemporaryProject,
     deleteRegion,
     deleteSection,
     deleteMember,
@@ -52,14 +39,32 @@ import {
     applyRegionEdits,
     applySectionEdits,
     applyMemberEdits,
-    shuffleSection,
-    exportProjectFile,
-    projectExists,
-    Project
-} from './helpers/project-helpers.js';
+    shuffleSection
+} from './helpers/project.js';
 
+import {
+    idbGetLastAppVersion,
+    idbSetLastAppVersion,
+    idbSaveTemporaryProject,
+    idbLoadTemporaryProject,
+    idbDeleteTemporaryProject
+} from './helpers/idb.js';
+
+import {
+    saveDiff,
+    loadProject,
+    deleteProject,
+    getUnusedProjectName,
+    renameProject,
+    listProjects,
+    projectExists
+} from './helpers/firebase.js';
+
+import { hideLoadingScreen, updateProjectQueryString, resetProjectQueryString } from './helpers/window.js';
+import { exportProjectFile } from './helpers/io.js';
+import { Project } from './types';
+import { getLayoutDimensions, calculateSeatPositions, flipStageDirection } from './helpers/stage.js';
 import './main.css';
-import { getLayoutDimensions, calculateSeatPositions, flipStageDirection } from './helpers/stage-helpers.js';
 
 /**
  * A number, or a string containing a number.
@@ -111,10 +116,6 @@ function createFreshState(user) {
         updateAvailable: false,
         user
     }
-}
-
-function hideLoadingScreen() {
-    document.querySelector("#loading-cover").hidden = true;
 }
 
 class App extends Component {

@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react';
 
-import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project-helpers.js';
-
 import { TwitterPicker } from 'react-color';
 
 import { TextField } from '@rmwc/textfield';

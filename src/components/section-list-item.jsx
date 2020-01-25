@@ -15,7 +15,7 @@ import './section-list-item.css';
 
 import GroupAddIcon from '../icons/group_add-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
-import { byOrder, Member } from '../helpers/project-helpers.js';
+import { sortByOrder, Member } from '../helpers/project.js';
 
 const SectionListItem = props => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -54,7 +54,7 @@ const SectionListItem = props => {
     }
 
     /** @type {Array<[string, Member]>} */
-    const memberEntries = Object.entries(props.members).sort(byOrder);
+    const memberEntries = Object.entries(props.members).sort(sortByOrder);
 
     const seatList = [];
     for (let i=0; i<props.data.rowSettings.length; i++) {

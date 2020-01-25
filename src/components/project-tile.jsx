@@ -5,10 +5,10 @@ import './project-tile.css';
 
 class ProjectTile extends PureComponent {
     render() {
-        const {title, data, ...rest} = this.props;
+        const {title, id, data, onClick, ...rest} = this.props;
         
         return <button type='button' {...rest}
-            className='project-tile'>
+            className='project-tile' onClick={() => onClick(id)}>
             <ProjectThumbnail data={data} />
             <span>{title}</span>
         </button>;

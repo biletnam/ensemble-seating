@@ -26,7 +26,7 @@ import FeedbackIcon from '../icons/feedback-24px.svg';
 import CardGiftcardIcon from '../icons/card_giftcard-24px.svg';
 import InfoIcon from '../icons/info-24px.svg';
 
-import { browseForFile } from '../helpers/project-helpers.js';
+import { browseForFile } from '../helpers/io.js';
 import { queue as dialogQueue } from './dialog-queue.jsx';
 
 class MenuDrawer extends PureComponent {

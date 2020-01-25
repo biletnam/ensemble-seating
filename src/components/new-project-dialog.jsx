@@ -1,7 +1,7 @@
 import React, {PureComponent, useState, useEffect} from 'react';
 
 import './new-project-dialog.css';
-import {templates} from '../templates/index.js';
+import * as templates from '../templates';
 
 import {SimpleDialog} from '@rmwc/dialog';
 import '@material/dialog/dist/mdc.dialog.min.css';
@@ -13,7 +13,7 @@ import { ListItem, ListGroup } from '@rmwc/list';
 import '@material/list/dist/mdc.list.min.css';
 
 import ProjectTile from './project-tile.jsx';
-import { listProjects } from '../helpers/project-helpers.js';
+import { listProjects } from '../helpers/firebase.js';
 import { mapProjects, sortProjects } from './project-list.jsx';
 
 const LIST_ITEM_HEIGHT = 48;
@@ -30,11 +30,6 @@ const NewProjectDialog = props => {
         }
     }, [props.open, props.user]);
 
-    function handleClick (event) {
-        if (typeof props.onSelectTemplate === 'function')
-            props.onSelectTemplate(event.target.name);
-    }
-
     function handleBrowse () {
         if (props.user) {
             // Switch to the "Open project" dialog to show all projects
@@ -50,10 +45,9 @@ const NewProjectDialog = props => {
         cancelLabel={props.showFirstLaunch ? null : undefined}
         body={<>
             <div className='project-template-grid'>
-                {templates.map(template => (
-                    <ProjectTile key={template.id}
-                        name={template.id}
-                        onClick={evt => handleClick(evt)}
+                {Object.entries(templates).map(([id, template]) => (
+                    <ProjectTile key={id} id={id}
+                        onClick={props.onSelectTemplate}
                         title={template.name}
                         data={JSON.parse(JSON.stringify(template.data))} />
                 ))}

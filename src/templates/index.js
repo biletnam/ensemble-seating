@@ -1,35 +1,52 @@
-import blank from './blank.json';
-import stringOrchestra from './string-orchestra.json';
-import fullOrchestra from './full-orchestra.json';
-import windEnsemble from './wind-ensemble.json';
-import concertChoir from './concert-choir.json';
+import blankTemplate from './blank.json';
+import stringOrchestraTemplate from './string-orchestra.json';
+import fullOrchestraTemplate from './full-orchestra.json';
+import windEnsembleTemplate from './wind-ensemble.json';
+import concertChoirTemplate from './concert-choir.json';
+import { Project } from '../types';
 
-const templates = [
-    {
-        name: 'Blank',
-        id: 'blank',
-        data: blank
-    },
-    {
-        name: 'String orchestra',
-        id: 'string-orchestra',
-        data: stringOrchestra
-    },
-    {
-        name: 'Full orchestra',
-        id: 'full-orchestra',
-        data: fullOrchestra
-    },
-    {
-        name: 'Wind ensemble',
-        id: 'wind-ensemble',
-        data: windEnsemble
-    },
-    {
-        name: 'Concert choir',
-        id: 'concert-choir',
-        data: concertChoir
-    }
-]
+/**
+ * @typedef {Object} ProjectTemplate
+ * @property {string} name
+ * @property {Project} data
+ */
 
-export { templates };
+/**
+ * @type {ProjectTemplate}
+ */
+export const blank = {
+    name: 'Blank',
+    data: blankTemplate
+};
+
+/**
+ * @type {ProjectTemplate}
+ */
+export const stringOrchestra = {
+    name: 'String orchestra',
+    data: stringOrchestraTemplate
+};
+
+/**
+ * @type {ProjectTemplate}
+ */
+export const fullOrchestra = {
+    name: 'Full orchestra',
+    data: fullOrchestraTemplate
+};
+
+/**
+ * @type {ProjectTemplate}
+ */
+export const windEnsemble = {
+    name: 'Wind ensemble',
+    data: windEnsembleTemplate
+};
+
+/**
+ * @type {ProjectTemplate}
+ */
+export const concertChoir = {
+    name: 'Concert choir',
+    data: concertChoirTemplate
+};

@@ -1,12 +1,12 @@
 import React, { useRef, useEffect } from 'react';
-
-import './roster.css';
-
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import Sidebar from './sidebar.jsx';
 import RegionListItem from './region-list-item.jsx';
-import { byOrder, idbSetRosterScrollPosition, idbGetRosterScrollPosition } from '../helpers/project-helpers';
+import { sortByOrder } from '../helpers/project.js';
+import { idbSetRosterScrollPosition, idbGetRosterScrollPosition } from '../helpers/idb.js';
+
+import './roster.css';
 
 const Roster = props => {
     const {
@@ -27,8 +27,8 @@ const Roster = props => {
         ...rest
     } = props;
 
-    const regionEntries = Object.entries(regions).sort(byOrder);
-    const sectionEntries = Object.entries(sections).sort(byOrder);
+    const regionEntries = Object.entries(regions).sort(sortByOrder);
+    const sectionEntries = Object.entries(sections).sort(sortByOrder);
     const scrollableContainerRef = useRef(null);
 
     useEffect(() => {

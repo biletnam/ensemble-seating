@@ -24,7 +24,7 @@ This will install all dependencies and begin serving the application at http://l
 New versions of the application follow [semantic versioning](https://semver.org/)&mdash;see the Releases tab for notable changes.
 
 ### The algorithm
-Layout generation is split into a number of helper functions in `src/helpers/stage-helpers.js` in order to make the code more reusable between different modules within the app.
+Layout generation is split into a number of helper functions in `src/helpers/stage.js` in order to make the code more reusable between different modules within the app.
 
 #### Regions
 Regions are used to group multiple disparate layouts and display them in the same chart. For example, an orchestra would need to layout seats in concentric arcs, but might also contain several straight rows of wind or percussion instruments at the back of the ensemble.

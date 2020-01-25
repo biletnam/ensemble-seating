@@ -16,7 +16,8 @@ import '@material/icon-button/dist/mdc.icon-button.css';
 
 import MoreIcon from '../icons/more_vert-24px.svg';
 
-import { listProjects, renameProject, loadProject, saveDiff, deleteProject, Project } from '../helpers/project-helpers.js';
+import { Project } from '../types';
+import { listProjects, renameProject, loadProject, saveDiff, deleteProject } from '../helpers/firebase.js';
 import './project-list.css';
 
 import { queue as dialogQueue } from './dialog-queue.jsx';

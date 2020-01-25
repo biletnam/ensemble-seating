@@ -7,7 +7,7 @@ import Seat from './seat.jsx';
 import { Button } from '@rmwc/button';
 import '@material/button/dist/mdc.button.min.css';
 
-import { getLayoutDimensions } from '../helpers/stage-helpers.js';
+import { getLayoutDimensions } from '../helpers/stage.js';
 
 class Region extends PureComponent {
     constructor(props) {

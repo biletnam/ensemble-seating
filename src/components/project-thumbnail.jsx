@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import './project-thumbnail.css';
-import {calculateSeatPositions, getLayoutDimensions, seatSize} from '../helpers/stage-helpers.js';
+import {calculateSeatPositions, getLayoutDimensions, seatSize} from '../helpers/stage.js';
 
 class ProjectThumbnail extends PureComponent {
     constructor(props) {

@@ -4,7 +4,7 @@ import RegionEditor from './edit-region.jsx';
 import SectionEditor from './edit-section.jsx';
 import MemberEditor from './edit-member.jsx';
 import Sidebar from './sidebar.jsx';
-import { Region, Section, Member } from '../helpers/project-helpers';
+import { Region, Section, Member } from '../types';
 
 import './editor.css';
 

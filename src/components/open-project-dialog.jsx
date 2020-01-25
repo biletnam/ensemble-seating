@@ -4,7 +4,7 @@ import ProjectList from './project-list.jsx';
 
 import { Dialog, DialogTitle, DialogContent, DialogActions, DialogButton } from '@rmwc/dialog';
 import '@material/dialog/dist/mdc.dialog.min.css';
-import { browseForFile } from '../helpers/project-helpers.js';
+import { browseForFile } from '../helpers/io.js';
 
 class OpenProjectDialog extends PureComponent {
     constructor (props) {

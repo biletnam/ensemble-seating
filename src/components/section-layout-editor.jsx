@@ -7,8 +7,8 @@ import ClearIcon from '../icons/clear-24px.svg';
 
 import './section-layout-editor.css';
 
-import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project-helpers.js';
-import { sumRows } from '../helpers/stage-helpers.js';
+import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project.js';
+import { sumRows } from '../helpers/stage.js';
 
 const SectionLayoutEditor = props => {
     const [draggingOver, setDraggingOver] = useState(null);

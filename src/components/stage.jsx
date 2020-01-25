@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import './stage.css';
 
 import Region from './region.jsx';
-import { trimOuterSpacing } from '../helpers/stage-helpers.js';
+import { trimOuterSpacing } from '../helpers/stage.js';
 
 class Stage extends PureComponent {
     constructor(props) {

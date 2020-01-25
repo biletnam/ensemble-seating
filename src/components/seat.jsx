@@ -7,7 +7,7 @@ import { Ripple } from '@rmwc/ripple';
 
 import '@material/ripple/dist/mdc.ripple.min.css';
 
-import {getInitials} from '../helpers/stage-helpers.js';
+import {getInitials} from '../helpers/stage.js';
 
 class Seat extends PureComponent {
     constructor(props) {
