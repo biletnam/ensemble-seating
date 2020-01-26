@@ -260,7 +260,7 @@ class App extends Component {
             idbLoadTemporaryProject().then(idbProject => {
                 if (idbProject) {
                     this.setState({
-                        project: Project.fromObject(idbProject)
+                        project: Project.fromObject(Project.upgrade(idbProject))
                     }, () => {
                         resetProjectQueryString();
                         hideLoadingScreen();
