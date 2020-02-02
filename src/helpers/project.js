@@ -248,62 +248,10 @@ function removeEmpties (val) {
  * @param {Project} project 
  */
 export function moveMemberToSection(memberId, sectionId, index, project) {
-    const startSection = project.members[memberId].section;
-    const startOrder = project.members[memberId].order;
-
-    const memberEntries = Object.entries(project.members).sort(sortByOrder);
-    const entriesInStartSection = memberEntries.filter(([id, data]) => data.section === startSection)
-        .reduce(padSectionWithEmptySeats, []);
-    const entriesInDestinationSection = memberEntries.filter(([id, data]) => data.section === sectionId)
-        .reduce(padSectionWithEmptySeats, []);
-
-    const [removed] = entriesInStartSection.splice(startOrder, 1);
-
-    if (startSection === sectionId) {
-        // Moving within the same section
-        entriesInStartSection.splice(index, 0, removed);
-        for (let i=0; i<entriesInStartSection.length; i++) {
-            if (entriesInStartSection[i] != undefined) {
-                entriesInStartSection[i][1] = Member.fromObject(
-                    Object.assign({}, entriesInStartSection[i][1], { 
-                        order: entriesInStartSection[i][0] == memberId ? index : i
-                    })
-                );
-            }
-        }
-    }
-    else {
-        entriesInDestinationSection.splice(index, 0, removed);
-
-        for (let i=0; i<entriesInStartSection.length; i++) {
-            if (entriesInStartSection[i] != undefined) {
-                entriesInStartSection[i][1] = Member.fromObject(
-                    Object.assign({}, entriesInStartSection[i][1], { 
-                        order: entriesInStartSection[i][0] == memberId ? index : i
-                    })
-                );
-            }
-        }
-
-        for (let i=0; i<entriesInDestinationSection.length; i++) {
-            if (entriesInDestinationSection[i] != undefined) {
-                entriesInDestinationSection[i][1] = Member.fromObject(
-                    Object.assign({}, entriesInDestinationSection[i][1], { 
-                        order: entriesInDestinationSection[i][0] == memberId ? index : i,
-                        section: sectionId 
-                    })
-                );
-            }
-        }
-    }
-
-    const updatedMembers = Object.assign(
-        {},
-        project.members,
-        Object.fromEntries(entriesInStartSection.filter(removeEmpties)),
-        Object.fromEntries(entriesInDestinationSection.filter(removeEmpties))
-    );
-
+    const oldMember = project.members[memberId];
+    const newMember = Object.assign({}, oldMember, { section: sectionId, order: index });
+    const updatedMembers = JSON.parse(JSON.stringify(project.members));
+    updatedMembers[memberId] = newMember;
     return Project.fromObject(Object.assign({}, project, { members: updatedMembers }));
 }
 

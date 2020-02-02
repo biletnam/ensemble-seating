@@ -62,7 +62,8 @@ const SectionListItem = props => {
             const thisSeat = seatList.length;
             const [memberId, memberData] = memberEntries.find(([id, data]) => data.order === thisSeat) || [];
             const seatKey = `section-${props.data.name}-seat-${thisSeat}`;
-            seatList.push(<SeatListItem draggable={memberData != null} seatKey={seatKey} key={seatKey} index={thisSeat}>
+            seatList.push(<SeatListItem droppable={!memberId} key={seatKey}
+                onDrop={droppedMember => props.onRequestMoveMember(droppedMember, props.sectionId, thisSeat)}>
                     <MemberListItem data={memberData} memberId={memberId}
                         onCreate={name => handleCreatedMemberListItem(name, thisSeat)}
                         onEdit={handleEditedMemberListItem}

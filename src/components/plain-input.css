@@ -1,11 +1,4 @@
-.plain-input-container {
-    display: flex;
-    flex-basis: 0;
-    flex-grow: 1;
-}
-
 .plain-input {
-    width: 100%;
     height: 100%;
     padding: calc(.5 * var(--sidebar-padding));
     border: none;

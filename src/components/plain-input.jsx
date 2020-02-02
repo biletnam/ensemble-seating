@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import './plain-input.css';
 
-const PlainInput = props => {
-    const {actions = [], ...rest} = props;
-    return <div className='plain-input-container'>
-        <input className='plain-input' {...rest} />
-        {actions.map((el, index) => React.cloneElement(el, { key: `input-action-${index}` }))}
-    </div>
-};
+const PlainInput = React.forwardRef((props, ref) => (
+    <input className='plain-input' {...props} ref={ref} />
+));
 
 export default PlainInput;

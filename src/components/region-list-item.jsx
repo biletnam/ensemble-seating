@@ -93,6 +93,7 @@ class RegionListItem extends PureComponent {
                             onRequestDelete={this.props.onRequestDeleteSection}
                             onRequestShuffle={this.props.onRequestShuffleSection}
                             onRequestSelectMember={this.props.onRequestSelectMember}
+                            onRequestMoveMember={this.props.onRequestMoveMember}
                             onRequestDeleteMember={this.props.onRequestDeleteMember} />
                     })}
                     

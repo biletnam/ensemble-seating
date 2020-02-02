@@ -6,6 +6,8 @@ import ReactDOM from 'react-dom';
 import { Workbox } from 'workbox-window';
 import semver from 'semver/preload';
 import debounce from 'lodash.debounce';
+import { DndProvider } from 'react-dnd';
+import Backend from 'react-dnd-html5-backend';
 
 import Stage from './components/stage.jsx';
 import Drawer from './components/drawer.jsx';
@@ -827,7 +829,7 @@ class App extends Component {
 
         const [layoutWidth, layoutHeight] = getLayoutDimensions(seats)
             .map(dimension => dimension + this.state.project.settings.seatSize);
-        return <React.Fragment>
+        return <DndProvider backend={Backend}>
             <Drawer drawerOpen={this.state.drawerOpen}
                 onClose={() => this.setState({ drawerOpen: false })}
                 onRequestPrintProject={() => window.print()}
@@ -864,7 +866,8 @@ class App extends Component {
                 editorId={this.state.editorId}
                 expanded={!this.state.rosterOpen}
                 onRequestSelectMember={this.handleRequestedSelectMember}
-                onRequestNewSection={this.handleClickedNewSectionButton} />
+                onRequestNewSection={this.handleClickedNewSectionButton}
+                onRequestMoveMember={(memberId, sectionId, index) => this.moveMemberToSection(memberId, sectionId, index)} />
 
             {this.state.editorId && <Editor expanded={this.state.rosterOpen}
                 data={this.state.project.regions[this.state.editorId] || this.state.project.sections[this.state.editorId] || this.state.project.members[this.state.editorId]}
@@ -895,6 +898,7 @@ class App extends Component {
                 onRequestDeleteRegion={this.handleRequestedDeleteRegion}
 
                 onRequestSelectMember={this.handleRequestedSelectMember}
+                onRequestMoveMember={(memberId, sectionId, index) => this.moveMemberToSection(memberId, sectionId, index)}
                 onRequestDeleteMember={this.handleRequestedDeleteMember}
                 onToggleSidebar={() => this.setState({rosterOpen: !this.state.rosterOpen})} />}
 
@@ -935,7 +939,7 @@ class App extends Component {
             <Snackbar open={this.state.updateAvailable} onClose={event => this.setState({updateAvailable: false})}
                 message={`A new version of ${APP_INFO.NAME} is available`} timeout={24 * 60 * 60 * 1000}
                 action={<SnackbarAction label='Reload' onClick={this.handleUserTriggeredUpdate} />} />
-        </React.Fragment>
+        </DndProvider>
     }
 }
 

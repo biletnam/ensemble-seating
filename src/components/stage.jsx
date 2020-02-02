@@ -37,7 +37,8 @@ class Stage extends PureComponent {
                     settings={this.props.settings}
                     editorId={this.props.editorId}
                     onRequestSelectMember={this.props.onRequestSelectMember}
-                    onRequestNewSection={this.props.onRequestNewSection} />
+                    onRequestNewSection={this.props.onRequestNewSection}
+                    onRequestMoveMember={this.props.onRequestMoveMember} />
             );
         }
 
@@ -49,9 +50,9 @@ class Stage extends PureComponent {
             className = `${this.props.id}--expanded`
 
         return <div id={this.props.id} className={className} style={{
-            '--seat-size': `${this.props.settings.seatSize}px`,
-            '--seat-label-font-size': `${this.props.settings.seatLabelFontSize}px`
-        }}>{regionsToRender}</div>;
+                '--seat-size': `${this.props.settings.seatSize}px`,
+                '--seat-label-font-size': `${this.props.settings.seatLabelFontSize}px`
+            }}>{regionsToRender}</div>;
     }
 }
 

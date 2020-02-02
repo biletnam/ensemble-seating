@@ -23,6 +23,7 @@ const Roster = props => {
         onRequestDeleteRegion,
         onRequestMoveRegion,
         onRequestSelectMember,
+        onRequestMoveMember,
         onRequestDeleteMember,
         ...rest
     } = props;
@@ -67,6 +68,7 @@ const Roster = props => {
                 onRequestMoveRegion={onRequestMoveRegion}
 
                 onRequestSelectMember={saveScrollAndSelectMember}
+                onRequestMoveMember={onRequestMoveMember}
                 onRequestDeleteMember={onRequestDeleteMember} />
             )}
         </DragDropContext>

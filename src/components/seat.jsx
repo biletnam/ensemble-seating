@@ -1,59 +1,73 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import tinycolor from 'tinycolor2';
+import { useDrag, useDrop } from 'react-dnd';
+
+import {getInitials} from '../helpers/stage.js';
+import { Drag as DragTypes } from '../types';
 
 import './seat.css';
 
-import { Ripple } from '@rmwc/ripple';
+const Seat = props => {
+    const [{isDragging}, dragRef] = useDrag({
+        item: { type: DragTypes.SEAT, id: props.memberId },
+        collect: monitor => ({
+            isDragging: !!monitor.isDragging(),
+        }),
+    });
 
-import '@material/ripple/dist/mdc.ripple.min.css';
+    const [{ isOver, dragInProgress }, dropRef] = useDrop({
+		accept: DragTypes.SEAT,
+		drop: (item, monitor) => props.onDropMember(item.id),
+		collect: monitor => ({
+            isOver: !!monitor.isOver(),
+            dragInProgress: monitor.getItem() && (monitor.getItemType() === DragTypes.SEAT)
+		}),
+    });
 
-import {getInitials} from '../helpers/stage.js';
-
-class Seat extends PureComponent {
-    constructor(props) {
-        super(props);
-
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick() {
-        if (this.props.member && typeof this.props.onRequestSelectMember === 'function') {
-            this.props.onRequestSelectMember(this.props.memberId);
+    function handleClick() {
+        if (props.member && typeof props.onRequestSelectMember === 'function') {
+            props.onRequestSelectMember(props.memberId);
         }
     }
 
-    render() {
-        const { implicit, implicitSeatsVisible, seatNameLabels, member, seatNumber, color, selected, onRequestSelectMember, x, y, downstageTop, ...props } = this.props;
-        let displayText = null;
-        if (member) {
-            switch (seatNameLabels) {
-                case 'initials':
-                    displayText = getInitials(member.name);
-                    break;
-                case 'full':
-                    displayText = member.name;
-                    break;
-            }
+    let displayText = null;
+    if (props.member) {
+        switch (props.seatNameLabels) {
+            case 'initials':
+                displayText = getInitials(props.member.name);
+                break;
+            case 'full':
+                displayText = props.member.name;
+                break;
         }
-
-        const style = {
-            backgroundColor: selected ? '#fff' : color,
-            color: tinycolor(color).isLight() ? '#333' : '#fff',
-            visibility: implicit && !implicitSeatsVisible && !member ? 'hidden' : '',
-            left: typeof x === 'number' && !isNaN(x) ? Math.round(x) : 'unset',
-            bottom: typeof y === 'number' && !isNaN(y) ? Math.round(y) : 'unset'
-        };
-
-        const {memberId, ...rest} = props;
-
-        return <span {...rest} className={`seat${implicit ? ' seat--implicit' : ''}${member ? ' seat--occupied' : ''}`}
-            title={member ? member.name : '' } 
-            data-seat-number={seatNumber + 1}
-            style={style} >
-            {displayText ? displayText : seatNumber}
-            <Ripple><span className='seat__click-surface' onClick={this.handleClick} /></Ripple>
-        </span>
     }
+
+    const style = {
+        backgroundColor: props.selected ? '#fff' : props.color,
+        color: tinycolor(props.color).isLight() ? '#333' : '#fff',
+        visibility: props.implicit && !props.implicitSeatsVisible && !props.member ? 'hidden' : '',
+        left: typeof props.x === 'number' && !isNaN(props.x) ? Math.round(props.x) : 'unset',
+        bottom: typeof props.y === 'number' && !isNaN(props.y) ? Math.round(props.y) : 'unset'
+    };
+
+    let className = 'seat';
+    if (props.implicit) {
+        className += ' seat--implicit';
+    }
+    if (props.member) {
+        className += ' seat--occupied';
+    }
+    else if (isOver && dragInProgress) {
+        className += ' seat--drop-hover';
+    }
+
+    return <span className={className}
+        ref={props.member ? dragRef : dropRef}
+        title={props.member ? props.member.name : '' }
+        data-seat-number={props.seatNumber + 1}
+        style={style} onClick={handleClick} >
+        {displayText}
+    </span>
 }
 
 export default Seat;

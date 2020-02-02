@@ -1,3 +1,35 @@
 .member-list-item {
     flex-grow: 1;
+    display: flex;
+}
+
+.member-list-item__action {
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    color: #ccc;
+    fill: #ccc;
+    padding: 0 .25em;
+}
+
+.member-list-item__action:hover, .member-list-item__action:focus {
+    color: inherit;
+    fill: currentColor;
+}
+
+.member-list-item__action > svg, .member-list-item__handle > svg {
+    width: 1em;
+    height: 1em;
+}
+
+.member-list-item__handle {
+    cursor: grab;
+    padding: 0 .25em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: currentColor;
+    fill: currentColor;
 }

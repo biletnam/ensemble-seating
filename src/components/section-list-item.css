@@ -6,6 +6,7 @@
 .section-list-item__titlebar {
     padding: var(--sidebar-padding);
     font-size: .9rem;
+    border-bottom: 1px solid #ccc;
 }
   
 .section-list-item__seat {
