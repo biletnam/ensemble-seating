@@ -263,7 +263,7 @@ class App extends Component {
             idbLoadTemporaryProject().then(idbProject => {
                 if (idbProject) {
                     this.setState({
-                        project: Project.fromObject(idbProject)
+                        project: Project.fromObject(Project.upgrade(idbProject))
                     }, () => {
                         resetProjectQueryString();
                         hideLoadingScreen();
@@ -786,8 +786,8 @@ class App extends Component {
                     // Project with that name does not exist. Keep the new name, and do a full save.
                     this.setState({ projectName: newName, saving: false });
                 }
-                else if (err.name == 'NameCollisionError') {
-                    // Project with that name already exists.
+                else if (err.name == 'NameCollisionError' || err.name == 'InvalidCharacterError') {
+                    // Project name already exists or includes invalid characters.
                     // Temporary logic: reset back to the original name
                     // Todo: resolve collision (notify user and/or generate unique name)
                     this.setState({projectName: newName}, () => {

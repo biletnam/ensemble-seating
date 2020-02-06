@@ -112,12 +112,9 @@ const ProjectList = props => {
                                 });
                                 updateProjectList();
                             }).catch(error => {
-                                if (error.name === 'NameCollisionError') {
-                                    // Project already exists with the new name
-                                    snackbarQueue.notify({
-                                        title: `A project by the name of "${value}" already exists.`
-                                    });
-                                }
+                                snackbarQueue.notify({
+                                    title: error.message
+                                });
                             })
                         }
                         else {
