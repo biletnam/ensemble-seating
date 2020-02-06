@@ -268,39 +268,50 @@ export function projectExists(user, projectName) {
     });
 }
 
+const invalidChars = /\.|\$|#|\[|\]|\//;
 export function renameProject(user, oldName, newName) {
     return new Promise((resolve, reject) => {
-        Promise.all([loadProject(user, oldName), loadProject(user, newName)])
-            .then(result => {
-                const [existingProject, newLocation] = result;
-                if (existingProject && !newLocation) {
-                    const projectToSave = Project.fromObject(existingProject);
+        const matchedChars = newName.match(invalidChars);
+        if (matchedChars && matchedChars.length > 0) {
+            const err = new Error();
+            err.name = 'InvalidCharacterError';
+            err.message = `Unable to rename project: character "${matchedChars[0]}" is not allowed`;
+            reject(err);
+        }
+        else {
+            Promise.all([loadProject(user, oldName), loadProject(user, newName)])
+                .then(result => {
+                    const [existingProject, newLocation] = result;
+                    if (existingProject && !newLocation) {
+                        const projectToSave = Project.fromObject(existingProject);
 
-                    
-                    saveDiff(user, {}, projectToSave, newName).then(saveTime => {
-                        deleteProject(user, oldName).then(() => {
-                            resolve(saveTime);
+                        
+                        saveDiff(user, {}, projectToSave, newName).then(saveTime => {
+                            deleteProject(user, oldName).then(() => {
+                                resolve(saveTime);
+                            });
                         });
-                    });
-                }
-                else {
-                    const errorObj = new Error();
-                    if (!user) {
-                        errorObj.name = 'NotAuthenticatedError';
-                        errorObj.message = 'Unable to rename project: user is not authenticated';
                     }
-                    else if (!existingProject) {
-                        errorObj.name = 'NotFoundError';
-                        errorObj.message = `Unable to rename project: original project "${oldName}" does not exist`;
-                    }
-                    else if (newLocation) {
-                        errorObj.name = 'NameCollisionError';
-                        errorObj.message = `Unable to rename project: a project by the name of "${newName}" already exists.`;
-                    }
+                    else {
+                        const errorObj = new Error();
+                        if (!user) {
+                            errorObj.name = 'NotAuthenticatedError';
+                            errorObj.message = 'Unable to rename project: user is not authenticated';
+                        }
+                        else if (!existingProject) {
+                            errorObj.name = 'NotFoundError';
+                            errorObj.message = `Unable to rename project: original project "${oldName}" does not exist`;
+                        }
+                        else if (newLocation) {
+                            errorObj.name = 'NameCollisionError';
+                            errorObj.message = `Unable to rename project: a project by the name of "${newName}" already exists.`;
+                        }
 
-                    reject(errorObj);
+                        reject(errorObj);
+                    }
                 }
-            });
+            );
+        }
     });
 }
 
