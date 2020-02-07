@@ -32,4 +32,14 @@
     align-items: center;
     color: currentColor;
     fill: currentColor;
+    position: relative;
+}
+
+.member-list-item__handle::after {
+    content: "";
+    width: 3em;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 100%;
 }

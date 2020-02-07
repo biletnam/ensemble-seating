@@ -31,5 +31,7 @@
 }
 
 .seat-list-item--drop-hover {
-    box-shadow: 0 0 5px #ccc inset;
+    outline: 1px solid currentColor;
+    z-index: 1;
+    border-bottom-color: transparent;
 }
