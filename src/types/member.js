@@ -18,6 +18,16 @@ export class Member {
         /**
          * @type {number}
          */
+        this.x = 0;
+
+        /**
+         * @type {number}
+         */
+        this.y = 0;
+
+        /**
+         * @type {number}
+         */
         this.order = -1;
     }
 

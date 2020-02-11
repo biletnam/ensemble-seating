@@ -128,7 +128,7 @@ export async function exportProjectFile(projectName = 'Untitled project', projec
  * @param {import('../types/project.js').ProjectSettings} options 
  */
 function renderSVG (regions, sections, members, options) {
-    let seats = calculateSeatPositions(regions, sections, members, options);
+    let {seats, origin} = calculateSeatPositions(regions, sections, members, options);
     const [layoutWidth, layoutHeight] = getLayoutDimensions(seats, options);
 
     if (options.downstageTop)

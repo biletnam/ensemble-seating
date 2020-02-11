@@ -7,6 +7,12 @@
     overflow: auto;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#stage__inner {
+    position: relative;
 }
 
 @media screen and (min-width: 800px) {

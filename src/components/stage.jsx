@@ -1,59 +1,112 @@
-import React, { PureComponent } from 'react';
+import React, { useRef } from 'react';
+import { useDrop } from 'react-dnd';
+
+import Seat from './seat.jsx';
+import { getInitials } from '../helpers/stage.js';
+import { Drag as DragTypes, Member } from '../types';
 
 import './stage.css';
 
-import Region from './region.jsx';
-import { trimOuterSpacing } from '../helpers/stage.js';
+const Stage = props => {
+    const [{ isOver }, dropRef] = useDrop({
+        accept: DragTypes.SEAT,
+        drop: (item, monitor) => {
+            if (monitor.isOver() && monitor.isOver({ shallow: false })) {
+                const dropOffset = monitor.getClientOffset();
+                const initialSourceClientOffset = monitor.getInitialSourceClientOffset();
+                const initialClientOffset = monitor.getInitialClientOffset();
 
-class Stage extends PureComponent {
-    constructor(props) {
-        super(props);
+                const xOffset = initialClientOffset.x - initialSourceClientOffset.x;
+                const yOffset = initialClientOffset.y - initialSourceClientOffset.y;
 
-        this.handleMemberSelected = this.handleMemberSelected.bind(this);
+                const originRect = innerRef.current.getBoundingClientRect();
+                const modifier = props.settings.downstageTop ? -1 : 1;
+                const innerCenterX = originRect.left + (props.origin.x);
+                const innerBottomY = originRect.top + (props.settings.downstageTop ? 0 : originRect.height);
+                const relativeX = Math.round((dropOffset.x - innerCenterX) * modifier) - xOffset;
+                const relativeY = Math.round((innerBottomY - dropOffset.y) * modifier) - yOffset;
+                console.log(`${relativeX}, ${relativeY}`);
+                if (props.onRequestMoveMemberToCoordinates) {
+                    props.onRequestMoveMemberToCoordinates(item.id, relativeX, relativeY);
+                }
+            }
+        },
+        collect: monitor => ({
+            isOver: monitor.isOver() && monitor.isOver({ shallow: true })
+        })
+    });
+
+    const innerRef = useRef(null);
+
+    function handleMemberSelected(memberId) {
+        if (typeof props.onRequestSelectMember === 'function')
+            props.onRequestSelectMember(memberId);
     }
 
-    handleMemberSelected(memberId) {
-        if (typeof this.props.onRequestSelectMember === 'function')
-            this.props.onRequestSelectMember(memberId);
+    function handleDroppedMemberOnSeat(memberId, sectionId, index) {
+        props.onRequestMoveMember && props.onRequestMoveMember(memberId, sectionId, index);
     }
 
-    render() {
-        const regionsToRender = [];
+    const seatElements = props.seats.map(seat => {
+        /** @type {Member} */
+        let memberId = seat.member,
+            memberData = props.members[memberId];
 
-        const regionEntries = Object.entries(this.props.regions);
-        const sectionEntries = Object.entries(this.props.sections);
-
-        for (let i=0; i<regionEntries.length; i++) {
-            const [currentId, currentRegion] = regionEntries[i];
-            const currentSections = sectionEntries.filter(([, section]) => section.region === currentId);
-            const currentSeats = this.props.seats.filter(seat => currentSections.some(([sectionId, sectionData]) => sectionId === seat.section));
-            const trimmedSeats = trimOuterSpacing(currentSeats);
-
-            regionsToRender.push(
-                <Region key={currentId}
-                    seats={trimmedSeats}
-                    members={this.props.members}
-                    regionId={currentId}
-                    settings={this.props.settings}
-                    editorId={this.props.editorId}
-                    onRequestSelectMember={this.props.onRequestSelectMember}
-                    onRequestNewSection={this.props.onRequestNewSection}
-                    onRequestMoveMember={this.props.onRequestMoveMember} />
-            );
+        if (!(memberId && memberData)) {
+            [memberId, memberData] = Object.entries(props.members)
+                .find(([id, data]) => {
+                    return (data.order === seat.seat) && (data.section === seat.section)
+                }) || [];
+        }
+        
+        let label = '';
+        if (memberData) {
+            switch (props.settings.seatNameLabels) {
+                case 'initials':
+                    label = getInitials(memberData.name);
+                    break;
+                case 'full':
+                    label = memberData.name;
+                    break;
+            }
         }
 
-        if (!this.props.settings.downstageTop)
-            regionsToRender.reverse();
+        const key = `${seat.section}-seat-${seat.seat === -1 ? seat.member : seat.seat}`
 
-        let className = '';
-        if (this.props.expanded)
-            className = `${this.props.id}--expanded`
+        return <Seat key={key}
+            implicit={seat.implicit}
+            visible={(memberId || !seat.implicit) || props.settings.implicitSeatsVisible}
+            seatNumber={seat.seat}
+            color={seat.color}
+            x={seat.x}
+            y={seat.y}
+            memberId={memberId}
+            onClick={() => handleMemberSelected(memberId)}
+            onDropMember={droppedId => handleDroppedMemberOnSeat(droppedId, seat.section, seat.seat)}>
+                {memberData && label}
+            </Seat>
+    });
 
-        return <div id={this.props.id} className={className} style={{
-                '--seat-size': `${this.props.settings.seatSize}px`,
-                '--seat-label-font-size': `${this.props.settings.seatLabelFontSize}px`
-            }}>{regionsToRender}</div>;
+    let className = '';
+    if (props.expanded) {
+        className = `${props.id}--expanded`
     }
+
+    const style = {
+        '--seat-size': `${props.settings.seatSize}px`,
+        '--seat-label-font-size': `${props.settings.seatLabelFontSize}px`
+    };
+
+    const innerStyle = {
+        width: `${props.width}px`,
+        height: `${props.height}px`
+    };
+
+    return <div id={props.id} className={className} style={style} ref={dropRef}>
+        <div id='stage__inner' style={innerStyle} ref={innerRef}>
+            {seatElements}
+        </div>
+    </div>;
 }
 
 export default Stage;

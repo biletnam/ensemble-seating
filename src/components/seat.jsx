@@ -2,7 +2,6 @@ import React from 'react';
 import tinycolor from 'tinycolor2';
 import { useDrag, useDrop } from 'react-dnd';
 
-import {getInitials} from '../helpers/stage.js';
 import { Drag as DragTypes } from '../types';
 
 import './seat.css';
@@ -24,28 +23,12 @@ const Seat = props => {
 		}),
     });
 
-    function handleClick() {
-        if (props.member && typeof props.onRequestSelectMember === 'function') {
-            props.onRequestSelectMember(props.memberId);
-        }
-    }
-
-    let displayText = null;
-    if (props.member) {
-        switch (props.seatNameLabels) {
-            case 'initials':
-                displayText = getInitials(props.member.name);
-                break;
-            case 'full':
-                displayText = props.member.name;
-                break;
-        }
-    }
+    const isOccupied = props.children && props.children.length > 0;
 
     const style = {
         backgroundColor: props.selected ? '#fff' : props.color,
         color: tinycolor(props.color).isLight() ? '#333' : '#fff',
-        visibility: props.implicit && !props.implicitSeatsVisible && !props.member ? 'hidden' : '',
+        visibility: props.visible ? '' : 'hidden',
         left: typeof props.x === 'number' && !isNaN(props.x) ? Math.round(props.x) : 'unset',
         bottom: typeof props.y === 'number' && !isNaN(props.y) ? Math.round(props.y) : 'unset'
     };
@@ -54,19 +37,20 @@ const Seat = props => {
     if (props.implicit) {
         className += ' seat--implicit';
     }
-    if (props.member) {
+    if (isOccupied) {
         className += ' seat--occupied';
     }
     else if (isOver && dragInProgress) {
         className += ' seat--drop-hover';
     }
 
+    const seatNumberDisplay = props.seatNumber > -1 ? props.seatNumber + 1 : null;
+
     return <span className={className}
-        ref={props.member ? dragRef : dropRef}
-        title={props.member ? props.member.name : '' }
-        data-seat-number={props.seatNumber + 1}
-        style={style} onClick={handleClick} >
-        {displayText}
+        ref={isOccupied ? dragRef : dropRef}
+        data-seat-number={seatNumberDisplay}
+        style={style} onClick={props.onClick}>
+        {props.children}
     </span>
 }
 

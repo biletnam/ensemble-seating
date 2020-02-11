@@ -41,7 +41,8 @@ import {
     applyRegionEdits,
     applySectionEdits,
     applyMemberEdits,
-    shuffleSection
+    shuffleSection,
+    moveMemberToCoordinates
 } from './helpers/project.js';
 
 import {
@@ -409,6 +410,14 @@ class App extends Component {
 
     moveMemberToSection(memberId, sectionId, index) {
         const newProject = moveMemberToSection(memberId, sectionId, index, this.state.project);
+        this.saveSession(this.state.project, newProject);
+        this.setState({
+            project: newProject
+        });
+    }
+
+    moveMemberToCoordinates(memberId, x, y) {
+        const newProject = moveMemberToCoordinates(memberId, x, y, this.state.project);
         this.saveSession(this.state.project, newProject);
         this.setState({
             project: newProject
@@ -822,7 +831,7 @@ class App extends Component {
     }
 
     render() {
-        let seats = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
+        let {seats, origin} = calculateSeatPositions(this.state.project.regions, this.state.project.sections, this.state.project.members, this.state.project.settings);
         if (this.state.project.settings.downstageTop) {
             seats = flipStageDirection(seats, this.state.project.settings);
         }
@@ -858,6 +867,7 @@ class App extends Component {
 
             <Stage id='stage'
                 seats={seats}
+                origin={origin}
                 project={this.state.project}
                 regions={this.state.project.regions}
                 sections={this.state.project.sections}
@@ -865,9 +875,12 @@ class App extends Component {
                 settings={this.state.project.settings}
                 editorId={this.state.editorId}
                 expanded={!this.state.rosterOpen}
+                width={layoutWidth}
+                height={layoutHeight}
                 onRequestSelectMember={this.handleRequestedSelectMember}
                 onRequestNewSection={this.handleClickedNewSectionButton}
-                onRequestMoveMember={(memberId, sectionId, index) => this.moveMemberToSection(memberId, sectionId, index)} />
+                onRequestMoveMember={(memberId, sectionId, index) => this.moveMemberToSection(memberId, sectionId, index)}
+                onRequestMoveMemberToCoordinates={(memberId, x, y) => this.moveMemberToCoordinates(memberId, x, y)} />
 
             {this.state.editorId && <Editor expanded={this.state.rosterOpen}
                 data={this.state.project.regions[this.state.editorId] || this.state.project.sections[this.state.editorId] || this.state.project.members[this.state.editorId]}

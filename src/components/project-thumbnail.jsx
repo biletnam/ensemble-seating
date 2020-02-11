@@ -6,7 +6,7 @@ class ProjectThumbnail extends PureComponent {
     constructor(props) {
         super(props);
 
-        const seats = calculateSeatPositions(props.data.regions, props.data.sections, props.data.members);
+        const {seats, origin} = calculateSeatPositions(props.data.regions, props.data.sections);
         const [layoutWidth, layoutHeight] = getLayoutDimensions(seats)
             .map(dimension => dimension + props.data.settings.seatSize + 1);
 

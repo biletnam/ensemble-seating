@@ -1,5 +1,6 @@
 import { DEFAULT_SECTION_ROW_LENGTH } from '../helpers/project.js';
 import { Region, Section, Member } from '../types';
+import { Seat } from '../types/seat.js';
 
 export const seatSize = 32;
 export const seatGap = 1;
@@ -25,18 +26,6 @@ export function getInitials(name) {
     }
     return initials;
 }
-
-/**
- * @typedef {Object} SeatData
- * @property {string} id
- * @property {string} section
- * @property {number} seat
- * @property {string} member
- * @property {boolean} implicit
- * @property {string} color
- * @property {number} x
- * @property {number} y
- */
 
 /**
  * 
@@ -69,7 +58,7 @@ function getNumberOfRows (sectionEntries) {
  /**
   * 
   * @param {Object<string, Section>} sectionData 
-  * @return {Array<Array<SeatData>>}
+  * @return {Array<Array<Seat>>}
   */
 export function generateRows(sectionData) {
     let sectionEntries = Object.entries(sectionData).sort(byEntryOrder);
@@ -123,7 +112,7 @@ export function generateRows(sectionData) {
     }
 
     /**
-     * @type {Array<Array<SeatData>>}
+     * @type {Array<Array<Seat>>}
      */
     const rows = [];
     
@@ -164,16 +153,14 @@ export function generateRows(sectionData) {
 
             for (let k=0; k<currentRowLength; k++) {
                 // Create a seat and add it to the current row
-                currentRow.push({
-                    id: `${sectionId}-[${i},${k}]`,
-                    section: sectionId,
-                    seat: sumRows(currentSection.rowSettings.slice(0, i)) + k,
-                    member: null,
-                    implicit,
-                    color: currentSection.color,
-                    x: 0,
-                    y: 0
-                });
+                const seat = new Seat();
+                seat.id = `${sectionId}-[${i},${k}]`;
+                seat.section = sectionId;
+                seat.seat = sumRows(currentSection.rowSettings.slice(0, i)) + k;
+                seat.implicit = implicit;
+                seat.color = currentSection.color;
+
+                currentRow.push(seat);
             }
         }
 
@@ -268,12 +255,12 @@ function rotate(cx, cy, x, y, angle) {
 
 /**
  * 
- * @param {Array<Array<SeatData>>} rowData 
+ * @param {Array<Array<Seat>>} rowData 
  * @param {number} angle 
  * @param {import('./project.js').ProjectSettings} options 
  */
 export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
-    /** @type {Array<Array<SeatData>>} */
+    /** @type {Array<Array<Seat>>} */
     const rows = JSON.parse(JSON.stringify(rowData));
     const increasePerRow = options.seatSize * (options.seatGap + 1);
 
@@ -311,10 +298,11 @@ export function curveRows(rowData, angle, options = {seatSize, seatGap}) {
 
 /**
  * 
- * @param {Array<Array<SeatData>>} rowData 
+ * @param {Array<Array<Seat>>} rowData 
  * @param {import('./project.js').ProjectSettings} options 
  */
 export function straightenRows(rowData, options = {seatSize, seatGap}) {
+    /** @type {Array<Array<Seat>>} */
     const rows = JSON.parse(JSON.stringify(rowData));
 
     if (Array.isArray(rows) && rows.length > 0) {
@@ -350,12 +338,12 @@ export function straightenRows(rowData, options = {seatSize, seatGap}) {
 }
 
 /**
- * Trims the dimensions of the chart to fit the seats
- * @param {Array<SeatData>} seats 
- * @returns {Array<SeatData>}
+ * Normalizes the seat coordinates so all seats are in a positive coordinate space
+ * @param {Array<Seat>} seats 
+ * @returns {StageData}
  */
-export function trimOuterSpacing (seats) {
-    /** @type {Array<SeatData>} */
+function normalizeSeatCoordinates (seats, origin) {
+    /** @type {Array<Seat>} */
     const result = JSON.parse(JSON.stringify(seats));
     const minX = Math.min(...result.map(seat => seat.x));
     const minY = Math.min(...result.map(seat => seat.y));
@@ -365,17 +353,25 @@ export function trimOuterSpacing (seats) {
         result[i].y -= minY;
     }
 
-    return result;
+    const newOrigin = origin ? {
+        x: origin.x - minX,
+        y: origin.y - minY
+    } : undefined;
+
+    return {
+        seats: result,
+        origin: newOrigin
+    };
 }
 
 /**
  * Assigns member IDs to each seat, as available
  * @param {Object<string, Array<[string, Member]>} membersBySection 
- * @param {Array<Array<SeatData>>} rows 
- * @returns {Array<Array<SeatData>>}
+ * @param {Array<Array<Seat>>} rows 
+ * @returns {Array<Array<Seat>>}
  */
 export function seatMembers (membersBySection, rows) {
-    /** @type {Array<Array<SeatData>>} */
+    /** @type {Array<Array<Seat>>} */
     const seatedRows = rows.map(currentRow => currentRow.map(currentSeat => {
         const [memberId, memberData] = membersBySection[currentSeat.section]
             .find(([id, data]) => data.order === currentSeat.seat) || [];
@@ -387,7 +383,7 @@ export function seatMembers (membersBySection, rows) {
 
 /**
  * Gets the dimensions of the chart based on all the available seats
- * @param {Array<SeatData>} positionedSeats 
+ * @param {Array<Seat>} positionedSeats 
  * @returns {[number, number]}
  */
 export function getLayoutDimensions (positionedSeats) {
@@ -429,15 +425,23 @@ function ensureEnoughSeats(rowLengths, numOfMembers) {
 }
 
 /**
+ * @typedef {Object} StageData
+ * @property {Array<Seat>} seats An array of seats
+ * @property {Object} origin Origin from which free seats are positioned
+ * @property {number} origin.x - The X Coordinate
+ * @property {number} origin.y - The Y Coordinate
+ */
+
+/**
  * 
  * @param {Object<string, Region>} regions 
  * @param {Object<string, Section>} sections 
  * @param {Object<string, Member>} members 
  * @param {import('./project.js').ProjectSettings} options 
- * @returns {Array<SeatData>}
+ * @returns {StageData}
  */
-export function calculateSeatPositions(regions, sections, members, options) {
-    /** @type {Array<Array<SeatData>>} */
+export function calculateSeatPositions(regions, sections, members, options = {seatSize, seatGap}) {
+    /** @type {Array<Array<Seat>>} */
     const seatsByRegion = [];
     const dimensionsByRegion = [];
 
@@ -448,7 +452,8 @@ export function calculateSeatPositions(regions, sections, members, options) {
 
     const regionEntries = Object.entries(regions).sort(byEntryOrder);
     const sectionEntries = Object.entries(sections).sort(byEntryOrder);
-    const memberEntries = Object.entries(members).sort(byEntryOrder);
+    const origin = { x: 0, y: 0 };
+    
     for (let i=0; i<regionEntries.length; i++) {
         const [regionId, regionData] = regionEntries[i];
 
@@ -461,36 +466,15 @@ export function calculateSeatPositions(regions, sections, members, options) {
             minRegionX = 0,
             minRegionY = 0;
 
-        /**
-         * @type {Object<string, Array<[string, Member]>}
-         */
-        const membersBySection = {};
-        for (const sectionId of Object.keys(includedSections)) {
-            membersBySection[sectionId] = memberEntries.filter(([,memberData]) => memberData.section === sectionId);
-        }
-        
-        // Make sure each row generates enough seats for all members
-        Object.keys(includedSections).forEach(sectionId => {
-            includedSections[sectionId] = Section.fromObject(
-                Object.assign({}, includedSections[sectionId], { 
-                    rowSettings: ensureEnoughSeats(includedSections[sectionId].rowSettings, membersBySection[sectionId].length) 
-                })
-            );
-        });
         const rows = generateRows(includedSections);
 
-        // Seat members if any are passed
-        let seatedRows = seatMembers(membersBySection, rows);
-
-        // Curve rows if necessary, and set container dimensions for scrolling
-        if (regionData.curvedLayout)
-            seatedRows = curveRows(seatedRows, regionData.angle, options);
-        else
-            seatedRows = straightenRows(seatedRows, options);
+        const positionedRows = regionData.curvedLayout 
+            ? curveRows(rows, regionData.angle, options) 
+            : straightenRows(rows, options);
 
         // Normalize coordinates
-        const trimmedSeats = trimOuterSpacing(seatedRows.flat());
-        for (const row of seatedRows) {
+        const trimmedSeats = normalizeSeatCoordinates(positionedRows.flat()).seats;
+        for (const row of positionedRows) {
             // Update each seat with the new positions from trimmedSeats
             for (const seat of row) {
                 const trimmed = trimmedSeats.find(value => value.id === seat.id);
@@ -523,13 +507,18 @@ export function calculateSeatPositions(regions, sections, members, options) {
             minSeatY = minRegionY;
 
         // Store the info
-        seatsByRegion.push(seatedRows.flat());
+        seatsByRegion.push(positionedRows.flat());
         dimensionsByRegion.push({
             xMax: maxRegionX,
             yMax: maxRegionY,
             xMin: minRegionX,
             yMin: minRegionY
         });
+
+        if (i === 0) {
+            // Store the origin as front & center of the front region
+            origin.x = .5 * (maxRegionX + seatSize);
+        }
     }
 
     // Horizontally center all regions in the layout
@@ -547,12 +536,37 @@ export function calculateSeatPositions(regions, sections, members, options) {
             const offset = diff * .5;
     
             // Add the difference to the X value of every seat in the region
-            for (const seat of region)
+            for (const seat of region) {
                 seat.x += offset;
+            }
+            if (i === 0) {
+                // Update the origin if this is the front-most region
+                origin.x += offset;
+            }
         }
     }
+
+    // Add freely positioned seats relative to the origin
+    const freelyPositionedSeats = Object.entries(members || {})
+        .filter(([memberId, memberData]) => memberData.order === -1)
+        .map(([memberId, memberData]) => {
+            const seat = new Seat();
+            seat.member = memberId;
+            seat.color = sections[memberData.section].color;
+            seat.x = memberData.x + origin.x;
+            seat.y = memberData.y;
+
+            return seat;
+        });
+
+    // Normalize coordinates and origin after adding freely positioned seats
+    const flattenedSeats = [...seatsByRegion.flat(), ...freelyPositionedSeats];
+    const {seats: normalizedSeats, origin: normalizedOrigin} = normalizeSeatCoordinates(flattenedSeats, origin);
     
-    return seatsByRegion.flat();
+    return {
+        seats: normalizedSeats,
+        origin: normalizedOrigin
+    };
 }
 
 export function flipStageDirection(positionedSeats) {
@@ -562,5 +576,5 @@ export function flipStageDirection(positionedSeats) {
         seat.x = (seat.x * -1) + layoutWidth;
         seat.y = (seat.y * -1) + layoutHeight;
     }
-    return trimOuterSpacing(seats);
+    return normalizeSeatCoordinates(seats).seats;
 }

@@ -249,7 +249,22 @@ function removeEmpties (val) {
  */
 export function moveMemberToSection(memberId, sectionId, index, project) {
     const oldMember = project.members[memberId];
-    const newMember = Object.assign({}, oldMember, { section: sectionId, order: index });
+    const newMember = Object.assign({}, oldMember, { section: sectionId, order: index, x: 0, y: 0 });
+    const updatedMembers = JSON.parse(JSON.stringify(project.members));
+    updatedMembers[memberId] = newMember;
+    return Project.fromObject(Object.assign({}, project, { members: updatedMembers }));
+}
+
+/**
+ * Given a member IDs, returns a new copy of the project with the member moved to the given absolute X and Y coordinates.
+ * @param {string} memberId 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {Project} project 
+ */
+export function moveMemberToCoordinates(memberId, x, y, project) {
+    const oldMember = project.members[memberId];
+    const newMember = Object.assign({}, oldMember, {x, y, order: -1});
     const updatedMembers = JSON.parse(JSON.stringify(project.members));
     updatedMembers[memberId] = newMember;
     return Project.fromObject(Object.assign({}, project, { members: updatedMembers }));
