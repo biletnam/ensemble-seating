@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable } from 'react-beautiful-dnd';
 import tinycolor from 'tinycolor2';
 
 import { Card, CardPrimaryAction, CardActions, CardActionIcons, CardActionIcon } from '@rmwc/card';
@@ -15,7 +15,8 @@ import './section-list-item.css';
 
 import GroupAddIcon from '../icons/group_add-24px.svg';
 import MoreIcon from '../icons/more_vert-24px.svg';
-import { sortByOrder, Member } from '../helpers/project.js';
+import { sortByOrder } from '../helpers/project.js';
+import { Member } from '../types';
 
 const SectionListItem = props => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -74,6 +75,16 @@ const SectionListItem = props => {
         }
     }
 
+    const unnumberedSeats = memberEntries.filter(([memberId, memberData]) => memberData.order === -1)
+        .map(([memberId, memberData]) => {
+            return <SeatListItem droppable={false} key={memberId}>
+                <MemberListItem data={memberData} memberId={memberId}
+                    onEdit={handleEditedMemberListItem}
+                    onDelete={props.onRequestDeleteMember}
+                    onSelect={() => props.onRequestSelectMember(memberId)} />
+            </SeatListItem>
+        });
+
     return <Draggable key={props.sectionId}
         draggableId={props.sectionId}
         index={props.index}
@@ -90,15 +101,12 @@ const SectionListItem = props => {
                             {props.data.name}
                         </CardPrimaryAction>
 
-                        <Droppable droppableId={props.sectionId} type='member'>
-                            {(provided, snapshot) => (
-                                <ol className='section-list-item__member-list'
-                                    ref={provided.innerRef} {...provided.droppableProps}>
-                                    {seatList}
-                                    {provided.placeholder}
-                                </ol>
-                            )}
-                        </Droppable>
+                        <ol className='section-list-item__member-list'>
+                            {seatList}
+                        </ol>
+                        <ul className='section-list-item__member-list'>
+                            {unnumberedSeats}
+                        </ul>
 
                         <CardActions>
                             <CardActionIcons>

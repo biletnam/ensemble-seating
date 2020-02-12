@@ -8,11 +8,15 @@
 }
 
 .seat-list-item::before {
-    content: counter(section-seat-num) '. ';
+    content: '';
     padding: calc(.5 * var(--sidebar-padding));
     padding-left: var(--sidebar-padding);
     min-width: 1.5em;
     text-align: right;
+}
+
+ol > .seat-list-item::before {
+    content: counter(section-seat-num) '. ';
 }
 
 .seat-list-item > *, .seat-list-item::before {
