@@ -78,13 +78,16 @@ const Stage = props => {
             visible={(memberId || !seat.implicit) || props.settings.implicitSeatsVisible}
             seatNumber={seat.seat}
             color={seat.color}
+            label={memberData && label}
             x={seat.x}
             y={seat.y}
             memberId={memberId}
+            selected={props.editorId === memberId}
             onClick={() => handleMemberSelected(memberId)}
+            onBlur={() => memberId && (label.length === 0) && props.onRequestDeleteMember(memberId)}
+            onTextChange={newText => memberId ? props.onRequestEditMember(memberId, {name: newText}) : props.onRequestNewMember(seat.section, newText, seat.seat)}
             onDropMember={droppedId => handleDroppedMemberOnSeat(droppedId, seat.section, seat.seat)}>
-                {memberData && label}
-            </Seat>
+        </Seat>;
     });
 
     let className = '';

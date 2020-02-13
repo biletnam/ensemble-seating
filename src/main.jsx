@@ -878,6 +878,9 @@ class App extends Component {
                 width={layoutWidth}
                 height={layoutHeight}
                 onRequestSelectMember={this.handleRequestedSelectMember}
+                onRequestNewMember={this.handleRequestedNewPerson}
+                onRequestEditMember={this.handleAcceptMemberEdits}
+                onRequestDeleteMember={this.handleRequestedDeleteMember}
                 onRequestNewSection={this.handleClickedNewSectionButton}
                 onRequestMoveMember={(memberId, sectionId, index) => this.moveMemberToSection(memberId, sectionId, index)}
                 onRequestMoveMemberToCoordinates={(memberId, x, y) => this.moveMemberToCoordinates(memberId, x, y)} />

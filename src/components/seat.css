@@ -34,10 +34,41 @@
     content: attr(data-seat-number);
 }
 
-.seat--occupied::after {
+.seat:not(.seat--occupied) {
+    cursor: pointer;
+}
+
+.seat:not(.seat--occupied):hover::before {
+    content: "+";
+}
+
+.seat--occupied::after, .seat:not(.seat--occupied):hover::after {
     position: absolute;
     bottom: 100%;
     right: 100%;
     font-size: .75em;
     transform: translate(50%, 50%);
+}
+
+.seat--editing, .seat--selected {
+    z-index: 1;
+    border-color: currentColor;
+}
+
+.seat--editing {
+    display: block;
+}
+
+.seat > input {
+    height: 100%;
+    text-align: center;
+    width: calc(4 * var(--seat-size));
+    position: absolute;
+    top: 0;
+    left: calc(50% - (2 * var(--seat-size)));
+}
+
+.seat > input[value=""], .seat > input:not([value]) {
+    width: 100%;
+    left: 0;
 }
