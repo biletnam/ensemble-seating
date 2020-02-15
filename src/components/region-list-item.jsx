@@ -99,9 +99,10 @@ class RegionListItem extends PureComponent {
                     
                     {provided.placeholder}
 
-                    {this.props.forceNewSectionButton && <div className='section-list-item'>
+                    <div className='section-list-item'>
+                        {Object.keys(this.props.sections).length === 0 && <p>No sections to display</p>}
                         <Button dense onClick={this.handleClickedNewSection} raised><ButtonIcon icon={<AddIcon />} /> New section</Button>
-                    </div>}
+                    </div>
                 </div>
             )}
         </Droppable>

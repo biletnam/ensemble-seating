@@ -2,18 +2,6 @@
     padding-top: 0;
 }
 
-@media screen and (min-width: 800px) {
-    .roster__no-sections-message {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-}
-
 .roster__droppable-section-area:not(:last-child) {
     margin-bottom: var(--sidebar-padding);
 }

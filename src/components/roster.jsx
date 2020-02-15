@@ -56,7 +56,6 @@ const Roster = props => {
                 sections={Object.fromEntries(sectionEntries.filter(([sectionId, currentSection]) => currentSection.region === regionId))}
                 members={members}
                 enableMoveAndDeleteControls={regionEntries.length > 1}
-                forceNewSectionButton={sectionEntries.length > 0 || regionEntries.length > 1}
                 onRequestNewSection={onRequestNewSection}
                 onRequestNewPerson={onRequestNewPerson}
                 onRequestEditPerson={onRequestEditPerson}
@@ -72,7 +71,6 @@ const Roster = props => {
                 onRequestDeleteMember={onRequestDeleteMember} />
             )}
         </DragDropContext>
-        {sectionEntries.length === 0 && regionEntries.length === 1 && <p className='roster__no-sections-message'>No sections to display</p>}
     </Sidebar>
 };
 
